@@ -1,0 +1,66 @@
+[
+  {
+    "id": 1,
+    "name": "КЦ1",
+    "totalCalls": 27990,
+    "rpcCalls": 1961,
+    "deviations": 649,
+    "deviationPercentage": 7,
+    "dynamicsPercentage": -9,
+    "granularity": {
+      "День": {
+        "totalCalls": 933,
+        "rpcCalls": 65,
+        "deviations": 22,
+        "deviationPercentage": 2.3,
+        "dynamicsPercentage": -3
+      },
+      "Неделя": {
+        "totalCalls": 6998,
+        "rpcCalls": 490,
+        "deviations": 162,
+        "deviationPercentage": 2.3,
+        "dynamicsPercentage": -5
+      },
+      "Месяц": {
+        "totalCalls": 27990,
+        "rpcCalls": 1961,
+        "deviations": 649,
+        "deviationPercentage": 2.3,
+        "dynamicsPercentage": -9
+      }
+    }
+  },
+  {
+    "id": 2,
+    "name": "КЦ2",
+    "totalCalls": 21790,
+    "rpcCalls": 1097,
+    "deviations": 350,
+    "deviationPercentage": 5,
+    "dynamicsPercentage": -6,
+    "granularity": {
+      "День": {
+        "totalCalls": 726,
+        "rpcCalls": 37,
+        "deviations": 12,
+        "deviationPercentage": 1.6,
+        "dynamicsPercentage": -2
+      },
+      "Неделя": {
+        "totalCalls": 5448,
+        "rpcCalls": 274,
+        "deviations": 88,
+        "deviationPercentage": 1.6,
+        "dynamicsPercentage": -4
+      },
+      "Месяц": {
+        "totalCalls": 21790,
+        "rpcCalls": 1097,
+        "deviations": 350,
+        "deviationPercentage": 1.6,
+        "dynamicsPercentage": -6
+      }
+    }
+  }
+]
