@@ -57,29 +57,26 @@ const statCardDataByGranularity = {
     }
 };
 
-// Функция для обновления карточек статистики с учетом выбранного колл-центра и гранулярности
-function updateStatCardsForCallCenter(callCenterData, granularity) {
-    // Получаем данные для выбранного колл-центра
-    const ccData = callCenterData.granularity[granularity];
+// Функция для генерации случайной динамики (для демонстрации)
+function generateRandomDynamics(isPercentage = false) {
+    const isPositive = Math.random() > 0.5;
+    let value;
     
-    // Обновляем карточки статистики
-    document.getElementById('totalCalls').textContent = ccData.totalCalls.toLocaleString();
-    document.getElementById('totalDeviations').textContent = ccData.deviations.toLocaleString();
-    document.getElementById('totalPercentage').textContent = ccData.deviationPercentage.toFixed(1) + '%';
+    if (isPercentage) {
+        // Для процентов генерируем меньшие значения
+        value = (Math.random() * 1.5).toFixed(1);
+    } else {
+        // Для обычных значений генерируем значения от 1 до 10
+        value = Math.floor(Math.random() * 10) + 1;
+    }
     
-    // Обновляем динамику
-    document.getElementById('callsDynamics').textContent = (ccData.dynamicsPercentage > 0 ? '+' : '') + ccData.dynamicsPercentage + '%';
-    document.getElementById('callsDynamics').className = `mtm-badge ${ccData.dynamicsPercentage > 0 ? 'mtm-positive' : 'mtm-negative'} ml-2`;
+    const sign = isPositive ? '+' : '-';
+    const displayValue = `${sign}${value}%`;
     
-    // Генерируем случайную динамику для отклонений и процентов
-    const deviationsDynamics = generateRandomDynamics();
-    const percentageDynamics = generateRandomDynamics(true);
-    
-    document.getElementById('deviationsDynamics').textContent = deviationsDynamics.value;
-    document.getElementById('deviationsDynamics').className = `mtm-badge ${deviationsDynamics.class} ml-2`;
-    
-    document.getElementById('percentageDynamics').textContent = percentageDynamics.value;
-    document.getElementById('percentageDynamics').className = `mtm-badge ${percentageDynamics.class} ml-2`;
+    return {
+        value: displayValue,
+        isPositive: isPositive
+    };
 }
 
 // Функция для загрузки данных колл-центров и обновления карточек статистики
@@ -101,22 +98,32 @@ function loadCallCenterData(selectedCallCenter, granularity) {
         document.getElementById('totalDeviations').textContent = totalData.deviations.toLocaleString();
         document.getElementById('totalPercentage').textContent = totalData.percentage.toFixed(1) + '%';
         
-        // Генерируем случайную динамику
-        const callsDynamics = generateRandomDynamics();
-        const deviationsDynamics = generateRandomDynamics();
-        const percentageDynamics = generateRandomDynamics(true);
+        // Генерируем динамику
+        let callsDynamics, deviationsDynamics, percentageDynamics;
+        
+        // Фиксированные значения для демонстрации
+        if (granularity === 'День') {
+            callsDynamics = { value: '-3%', isPositive: false };
+            deviationsDynamics = { value: '-8%', isPositive: false };
+            percentageDynamics = { value: '+0.8%', isPositive: true };
+        } else if (granularity === 'Неделя') {
+            callsDynamics = { value: '-2%', isPositive: false };
+            deviationsDynamics = { value: '-5%', isPositive: false };
+            percentageDynamics = { value: '+0.5%', isPositive: true };
+        } else {
+            callsDynamics = { value: '-1%', isPositive: false };
+            deviationsDynamics = { value: '-3%', isPositive: false };
+            percentageDynamics = { value: '+0.3%', isPositive: true };
+        }
         
         document.getElementById('callsDynamics').textContent = callsDynamics.value;
-        document.getElementById('callsDynamics').className = `mtm-badge ${callsDynamics.class} ml-2`;
+        document.getElementById('callsDynamics').className = `dynamics ${callsDynamics.isPositive ? 'positive' : 'negative'}`;
         
         document.getElementById('deviationsDynamics').textContent = deviationsDynamics.value;
-        document.getElementById('deviationsDynamics').className = `mtm-badge ${deviationsDynamics.class} ml-2`;
+        document.getElementById('deviationsDynamics').className = `dynamics ${deviationsDynamics.isPositive ? 'positive' : 'negative'}`;
         
         document.getElementById('percentageDynamics').textContent = percentageDynamics.value;
-        document.getElementById('percentageDynamics').className = `mtm-badge ${percentageDynamics.class} ml-2`;
-        
-        // Обновляем детали по КЦ в карточках
-        updateCardDetails(data);
+        document.getElementById('percentageDynamics').className = `dynamics ${percentageDynamics.isPositive ? 'positive' : 'negative'}`;
     } else {
         // Находим данные для выбранного колл-центра
         const key = selectedCallCenter === 'КЦ1' ? 'kc1' : 'kc2';
@@ -128,149 +135,29 @@ function loadCallCenterData(selectedCallCenter, granularity) {
             document.getElementById('totalDeviations').textContent = selectedData.deviations.toLocaleString();
             document.getElementById('totalPercentage').textContent = selectedData.percentage.toFixed(1) + '%';
             
-            // Генерируем случайную динамику
-            const callsDynamics = generateRandomDynamics();
-            const deviationsDynamics = generateRandomDynamics();
-            const percentageDynamics = generateRandomDynamics(true);
+            // Генерируем динамику
+            let callsDynamics, deviationsDynamics, percentageDynamics;
+            
+            if (selectedCallCenter === 'КЦ1') {
+                callsDynamics = { value: '+3%', isPositive: true };
+                deviationsDynamics = { value: '+2%', isPositive: true };
+                percentageDynamics = { value: '-0.5%', isPositive: false };
+            } else {
+                callsDynamics = { value: '-1%', isPositive: false };
+                deviationsDynamics = { value: '+4%', isPositive: true };
+                percentageDynamics = { value: '+0.3%', isPositive: true };
+            }
             
             document.getElementById('callsDynamics').textContent = callsDynamics.value;
-            document.getElementById('callsDynamics').className = `mtm-badge ${callsDynamics.class} ml-2`;
+            document.getElementById('callsDynamics').className = `dynamics ${callsDynamics.isPositive ? 'positive' : 'negative'}`;
             
             document.getElementById('deviationsDynamics').textContent = deviationsDynamics.value;
-            document.getElementById('deviationsDynamics').className = `mtm-badge ${deviationsDynamics.class} ml-2`;
+            document.getElementById('deviationsDynamics').className = `dynamics ${deviationsDynamics.isPositive ? 'positive' : 'negative'}`;
             
             document.getElementById('percentageDynamics').textContent = percentageDynamics.value;
-            document.getElementById('percentageDynamics').className = `mtm-badge ${percentageDynamics.class} ml-2`;
-            
-            // Очищаем детали, так как выбран конкретный КЦ
-            clearCardDetails();
+            document.getElementById('percentageDynamics').className = `dynamics ${percentageDynamics.isPositive ? 'positive' : 'negative'}`;
         }
     }
-}
-
-// Функция для очистки деталей в карточках
-function clearCardDetails() {
-    const callsDetails = document.getElementById('callsDetails');
-    const deviationsDetails = document.getElementById('deviationsDetails');
-    const percentageDetails = document.getElementById('percentageDetails');
-    
-    if (callsDetails) callsDetails.innerHTML = '';
-    if (deviationsDetails) deviationsDetails.innerHTML = '';
-    if (percentageDetails) percentageDetails.innerHTML = '';
-}
-
-// Функция для обновления деталей в карточках
-function updateCardDetails(data) {
-    const callsDetails = document.getElementById('callsDetails');
-    const deviationsDetails = document.getElementById('deviationsDetails');
-    const percentageDetails = document.getElementById('percentageDetails');
-    
-    if (!callsDetails || !deviationsDetails || !percentageDetails) return;
-    
-    callsDetails.innerHTML = '';
-    deviationsDetails.innerHTML = '';
-    percentageDetails.innerHTML = '';
-    
-    // Добавляем детали для КЦ1
-    if (data.kc1) {
-        // Детали для карточки "Количество звонков"
-        const callsDetailItem = document.createElement('div');
-        callsDetailItem.className = 'detail-item';
-        callsDetailItem.innerHTML = `
-            <span class="label">КЦ1:</span>
-            <div class="flex items-center">
-                <span class="value">${data.kc1.calls.toLocaleString()}</span>
-                <span class="mtm-badge mtm-positive ml-2">+3%</span>
-            </div>
-        `;
-        callsDetails.appendChild(callsDetailItem);
-        
-        // Детали для карточки "Отклонения"
-        const deviationsDetailItem = document.createElement('div');
-        deviationsDetailItem.className = 'detail-item';
-        deviationsDetailItem.innerHTML = `
-            <span class="label">КЦ1:</span>
-            <div class="flex items-center">
-                <span class="value">${data.kc1.deviations.toLocaleString()}</span>
-                <span class="mtm-badge mtm-positive ml-2">+2%</span>
-            </div>
-        `;
-        deviationsDetails.appendChild(deviationsDetailItem);
-        
-        // Детали для карточки "% отклонений"
-        const percentageDetailItem = document.createElement('div');
-        percentageDetailItem.className = 'detail-item';
-        percentageDetailItem.innerHTML = `
-            <span class="label">КЦ1:</span>
-            <div class="flex items-center">
-                <span class="value">${data.kc1.percentage.toFixed(1)}%</span>
-                <span class="mtm-badge mtm-negative ml-2">-0.5%</span>
-            </div>
-        `;
-        percentageDetails.appendChild(percentageDetailItem);
-    }
-    
-    // Добавляем детали для КЦ2
-    if (data.kc2) {
-        // Детали для карточки "Количество звонков"
-        const callsDetailItem = document.createElement('div');
-        callsDetailItem.className = 'detail-item';
-        callsDetailItem.innerHTML = `
-            <span class="label">КЦ2:</span>
-            <div class="flex items-center">
-                <span class="value">${data.kc2.calls.toLocaleString()}</span>
-                <span class="mtm-badge mtm-negative ml-2">-1%</span>
-            </div>
-        `;
-        callsDetails.appendChild(callsDetailItem);
-        
-        // Детали для карточки "Отклонения"
-        const deviationsDetailItem = document.createElement('div');
-        deviationsDetailItem.className = 'detail-item';
-        deviationsDetailItem.innerHTML = `
-            <span class="label">КЦ2:</span>
-            <div class="flex items-center">
-                <span class="value">${data.kc2.deviations.toLocaleString()}</span>
-                <span class="mtm-badge mtm-positive ml-2">+4%</span>
-            </div>
-        `;
-        deviationsDetails.appendChild(deviationsDetailItem);
-        
-        // Детали для карточки "% отклонений"
-        const percentageDetailItem = document.createElement('div');
-        percentageDetailItem.className = 'detail-item';
-        percentageDetailItem.innerHTML = `
-            <span class="label">КЦ2:</span>
-            <div class="flex items-center">
-                <span class="value">${data.kc2.percentage.toFixed(1)}%</span>
-                <span class="mtm-badge mtm-positive ml-2">+0.3%</span>
-            </div>
-        `;
-        percentageDetails.appendChild(percentageDetailItem);
-    }
-}
-
-// Функция для генерации случайной динамики (для демонстрации)
-function generateRandomDynamics(isPercentage = false) {
-    const isPositive = Math.random() > 0.5;
-    let value;
-    
-    if (isPercentage) {
-        // Для процентов генерируем меньшие значения
-        value = (Math.random() * 1.5).toFixed(1);
-    } else {
-        // Для обычных значений генерируем значения от 1 до 10
-        value = Math.floor(Math.random() * 10) + 1;
-    }
-    
-    const sign = isPositive ? '+' : '-';
-    const displayValue = `${sign}${value}%`;
-    const className = isPositive ? 'mtm-positive' : 'mtm-negative';
-    
-    return {
-        value: displayValue,
-        class: className
-    };
 }
 
 // Инициализация при загрузке страницы
