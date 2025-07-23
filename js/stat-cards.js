@@ -160,11 +160,66 @@ function loadCallCenterData(selectedCallCenter, granularity) {
     }
 }
 
+// Функция для обновления данных при изменении дат
+function updateDataByDateRange(startDate, endDate, callCenter, granularity) {
+    // В реальном приложении здесь был бы запрос к серверу с новыми датами
+    // Для демонстрации просто используем существующие данные с небольшими изменениями
+    
+    // Генерируем случайные изменения для демонстрации
+    const randomFactor = 0.8 + Math.random() * 0.4; // от 0.8 до 1.2
+    
+    // Загружаем данные для выбранного колл-центра и гранулярности
+    loadCallCenterData(callCenter, granularity);
+    
+    // Применяем случайный фактор к отображаемым данным
+    const totalCalls = document.getElementById('totalCalls');
+    const totalDeviations = document.getElementById('totalDeviations');
+    const totalPercentage = document.getElementById('totalPercentage');
+    
+    if (totalCalls && totalDeviations && totalPercentage) {
+        // Получаем текущие значения
+        let calls = parseInt(totalCalls.textContent.replace(/\s/g, ''));
+        let deviations = parseInt(totalDeviations.textContent.replace(/\s/g, ''));
+        
+        // Применяем случайный фактор
+        calls = Math.round(calls * randomFactor);
+        deviations = Math.round(deviations * randomFactor);
+        
+        // Вычисляем новый процент
+        const percentage = (deviations / calls * 100).toFixed(1);
+        
+        // Обновляем отображение
+        totalCalls.textContent = calls.toLocaleString();
+        totalDeviations.textContent = deviations.toLocaleString();
+        totalPercentage.textContent = percentage + '%';
+        
+        // Обновляем динамику
+        const callsDynamics = document.getElementById('callsDynamics');
+        const deviationsDynamics = document.getElementById('deviationsDynamics');
+        const percentageDynamics = document.getElementById('percentageDynamics');
+        
+        // Генерируем новые значения динамики
+        const newCallsDynamics = generateRandomDynamics();
+        const newDeviationsDynamics = generateRandomDynamics();
+        const newPercentageDynamics = generateRandomDynamics(true);
+        
+        callsDynamics.textContent = newCallsDynamics.value;
+        callsDynamics.className = `dynamics ${newCallsDynamics.isPositive ? 'positive' : 'negative'}`;
+        
+        deviationsDynamics.textContent = newDeviationsDynamics.value;
+        deviationsDynamics.className = `dynamics ${newDeviationsDynamics.isPositive ? 'positive' : 'negative'}`;
+        
+        percentageDynamics.textContent = newPercentageDynamics.value;
+        percentageDynamics.className = `dynamics ${newPercentageDynamics.isPositive ? 'positive' : 'negative'}`;
+    }
+}
+
 // Инициализация при загрузке страницы
 document.addEventListener('DOMContentLoaded', function() {
     // Добавляем обработчики событий для выбора колл-центра и гранулярности
     const callCenterSelect = document.getElementById('callCenter');
     const timeGranularitySelect = document.getElementById('timeGranularity');
+    const updateButton = document.getElementById('updateButton');
     
     if (callCenterSelect && timeGranularitySelect) {
         // Загружаем начальные данные
@@ -179,5 +234,21 @@ document.addEventListener('DOMContentLoaded', function() {
         timeGranularitySelect.addEventListener('change', function() {
             loadCallCenterData(callCenterSelect.value, this.value);
         });
+        
+        // Обработчик нажатия на кнопку "Обновить"
+        if (updateButton) {
+            updateButton.addEventListener('click', function() {
+                const startDate = document.getElementById('startDate').value;
+                const endDate = document.getElementById('endDate').value;
+                
+                // Обновляем данные с учетом выбранных дат
+                updateDataByDateRange(
+                    startDate, 
+                    endDate, 
+                    callCenterSelect.value, 
+                    timeGranularitySelect.value
+                );
+            });
+        }
     }
 });

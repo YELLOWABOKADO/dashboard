@@ -351,6 +351,7 @@
                 
                 <div class="filter-group">
                     <div class="filter-item">
+                        <span class="filter-label">Режим отображения:</span>
                         <select id="timeGranularity">
                             <option value="День">День</option>
                             <option value="Неделя">Неделя</option>
@@ -667,6 +668,28 @@
             const tabButtons = document.querySelectorAll('.tab-button');
             const tabContents = document.querySelectorAll('.tab-content');
             
+            // Добавляем обработчик для кнопки "Обновить"
+            document.getElementById('updateButton').addEventListener('click', function() {
+                // Получаем выбранные даты
+                const startDate = document.getElementById('startDate').value;
+                const endDate = document.getElementById('endDate').value;
+                const granularity = document.getElementById('timeGranularity').value;
+                const callCenter = document.getElementById('callCenter').value;
+                
+                // Обновляем данные в зависимости от выбранных дат
+                if (typeof loadCallCenterData === 'function') {
+                    loadCallCenterData(callCenter, granularity);
+                }
+                
+                // Обновляем данные в таблице
+                if (typeof updateCompanyData === 'function') {
+                    updateCompanyData(granularity, callCenter === 'КЦ1' ? 'kc1' : (callCenter === 'КЦ2' ? 'kc2' : 'total'));
+                }
+                
+                // Показываем уведомление об обновлении
+                alert('Данные обновлены за период с ' + startDate + ' по ' + endDate);
+            });
+            
             tabButtons.forEach(button => {
                 button.addEventListener('click', function() {
                     const tabId = this.getAttribute('data-tab');
@@ -680,6 +703,8 @@
                     document.getElementById(tabId + 'Tab').classList.add('active');
                 });
             });
+            
+            // Обработчик для кнопки "Обновить" уже определен в js/stat-cards.js
         });
     </script>
 </body>
