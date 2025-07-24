@@ -103,7 +103,7 @@
             margin-top: 10px;
             opacity: 0;
             transition: opacity 0.3s;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
             border: 1px solid #e0e0e0;
             font-size: 0.9em;
             font-weight: normal;
@@ -270,6 +270,41 @@
             border: 1px solid #e9ecef;
         }
 
+        .main-table {
+            font-size: 1.1rem;
+        }
+
+        .main-table th {
+            font-size: 1rem;
+            padding: 16px 20px;
+        }
+
+        .main-table td {
+            padding: 16px 20px;
+            font-size: 1.1rem;
+        }
+
+        .main-table .expandable-row {
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .main-table .expandable-row:hover {
+            background-color: #f8f9fa;
+        }
+
+        .main-table .detail-row {
+            background-color: #e9ecef;
+            font-size: 1rem;
+        }
+
+        .expand-icon {
+            font-size: 0.8rem;
+            margin-left: 8px;
+            color: #6c757d;
+            transition: transform 0.2s ease;
+        }
+
         h4 {
             font-size: 1.1rem;
             font-weight: 600;
@@ -277,7 +312,8 @@
             color: #495057;
         }
 
-        th, td {
+        th,
+        td {
             padding: 12px 16px;
             text-align: left;
             border-bottom: 1px solid #e9ecef;
@@ -418,7 +454,7 @@
                         </span>
                     </div>
                 </div>
-                
+
                 <div class="filter-group">
                     <div class="filter-item">
                         <span class="filter-label">Режим отображения:</span>
@@ -428,7 +464,7 @@
                             <option value="Месяц" selected>Месяц</option>
                         </select>
                     </div>
-                    
+
                     <div class="filter-item">
                         <select id="callCenter">
                             <option value="Все КЦ">Все КЦ</option>
@@ -436,44 +472,22 @@
                             <option value="КЦ2">КЦ2</option>
                         </select>
                     </div>
-                    
+
                     <div class="filter-item">
+                        <span class="filter-label">Дашборд:</span>
                         <select id="dashboard">
                             <option value="Автооценка" selected>Автооценка</option>
-                            <option value="Аттестация УА">Аттестация УА</option>
-                            <option value="Аттестация Пре-хард">Аттестация Пре-хард</option>
+                            <option value="Автооценка УАВ/ПреХард">Автооценка УАВ/ПреХард</option>
                         </select>
                     </div>
-                    
+
                     <div class="filter-item">
                         <button id="updateButton" class="btn btn-primary">Обновить</button>
                     </div>
                 </div>
             </div>
 
-            <!-- Карточки статистики -->
-            <div class="stat-cards">
-                <div class="stat-card">
-                    <div class="value" id="totalCalls">33 000</div>
-                    <div class="title">Количество звонков</div>
-                    <div class="dynamics negative" id="callsDynamics">-3%</div>
-                    <div class="dynamics-label">к прошлому периоду</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="value" id="totalDeviations">2 400</div>
-                    <div class="title">Отклонения</div>
-                    <div class="dynamics negative" id="deviationsDynamics">-8%</div>
-                    <div class="dynamics-label">к прошлому периоду</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="value" id="totalPercentage">7.3%</div>
-                    <div class="title">% отклонений</div>
-                    <div class="dynamics positive" id="percentageDynamics">+0.8%</div>
-                    <div class="dynamics-label">к прошлому периоду</div>
-                </div>
-            </div>
+
 
             <!-- Таблица с данными сводной информации -->
             <div id="companySummaryTable" class="mt-4">
@@ -501,9 +515,12 @@
                         </tr>
                         <tr>
                             <td>% отклонений</td>
-                            <td class="text-right"><span class="percentage-medium">7%</span> <span class="badge badge-success">+1%</span></td>
-                            <td class="text-right"><span class="percentage-high">13%</span> <span class="badge badge-neutral">0%</span></td>
-                            <td class="text-right"><span class="percentage-low">5%</span> <span class="badge badge-danger">-3%</span></td>
+                            <td class="text-right"><span class="percentage-medium">7%</span> <span
+                                    class="badge badge-success">+1%</span></td>
+                            <td class="text-right"><span class="percentage-high">13%</span> <span
+                                    class="badge badge-neutral">0%</span></td>
+                            <td class="text-right"><span class="percentage-low">5%</span> <span
+                                    class="badge badge-danger">-3%</span></td>
                         </tr>
                     </tbody>
                 </table>
@@ -565,19 +582,22 @@
     <div class="icon-buttons">
         <div class="icon-button">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+                <path
+                    d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z" />
             </svg>
         </div>
         <div class="icon-button">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                <path
+                    d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z" />
             </svg>
         </div>
         <div class="icon-button">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                <path d="M4.285 9.567a.5.5 0 0 1 .683.183A3.498 3.498 0 0 0 8 11.5a3.498 3.498 0 0 0 3.032-1.75.5.5 0 1 1 .866.5A4.498 4.498 0 0 1 8 12.5a4.498 4.498 0 0 1-3.898-2.25.5.5 0 0 1 .183-.683zM7 6.5C7 7.328 6.552 8 6 8s-1-.672-1-1.5S5.448 5 6 5s1 .672 1 1.5zm4 0c0 .828-.448 1.5-1 1.5s-1-.672-1-1.5S9.448 5 10 5s1 .672 1 1.5z"/>
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                <path
+                    d="M4.285 9.567a.5.5 0 0 1 .683.183A3.498 3.498 0 0 0 8 11.5a3.498 3.498 0 0 0 3.032-1.75.5.5 0 1 1 .866.5A4.498 4.498 0 0 1 8 12.5a4.498 4.498 0 0 1-3.898-2.25.5.5 0 0 1 .183-.683zM7 6.5C7 7.328 6.552 8 6 8s-1-.672-1-1.5S5.448 5 6 5s1 .672 1 1.5zm4 0c0 .828-.448 1.5-1 1.5s-1-.672-1-1.5S9.448 5 10 5s1 .672 1 1.5z" />
             </svg>
         </div>
     </div>
@@ -598,19 +618,19 @@
                     dropdown.classList.remove('active');
                 }
             });
-            
+
             // Переключаем текущий выпадающий список
             const dropdown = document.getElementById(dropdownId);
             dropdown.classList.toggle('active');
-            
+
             // Предотвращаем всплытие события
             event.stopPropagation();
         }
-        
+
         // Обработчик выбора "Все подразделения"
         function handleDepartmentSelection(checkbox) {
             const checkboxes = document.querySelectorAll('#departmentsDropdown input[type="checkbox"]');
-            
+
             if (checkbox.value === "Все подразделения") {
                 // Если выбрано "Все подразделения", снимаем выбор с остальных
                 checkboxes.forEach(cb => {
@@ -622,29 +642,29 @@
                 // Если выбрано конкретное подразделение, снимаем выбор с "Все подразделения"
                 const allDepartmentsCheckbox = document.querySelector('#departmentsDropdown input[value="Все подразделения"]');
                 allDepartmentsCheckbox.checked = false;
-                
+
                 // Проверяем, есть ли хотя бы один выбранный элемент
                 const hasSelectedItems = Array.from(checkboxes).some(cb => cb.value !== "Все подразделения" && cb.checked);
-                
+
                 // Если нет выбранных элементов, выбираем "Все подразделения"
                 if (!hasSelectedItems) {
                     allDepartmentsCheckbox.checked = true;
                 }
             }
-            
+
             updateDepartmentSelection();
         }
-        
+
         // Обновление выбора подразделений
         function updateDepartmentSelection() {
             const checkboxes = document.querySelectorAll('#departmentsDropdown input[type="checkbox"]');
             const selectedDepartments = Array.from(checkboxes)
                 .filter(cb => cb.checked)
                 .map(cb => cb.value);
-            
+
             const selectedText = document.getElementById('selectedDepartments');
             const allDepartmentsCheckbox = document.querySelector('#departmentsDropdown input[value="Все подразделения"]');
-            
+
             if (selectedDepartments.length === 0) {
                 // Если ничего не выбрано, выбираем "Все подразделения"
                 allDepartmentsCheckbox.checked = true;
@@ -663,11 +683,11 @@
                 selectedText.textContent = `Выбрано ${selectedDepartments.length}`;
             }
         }
-        
+
         // Обработчик выбора "Все сотрудники"
         function handleEmployeeSelection(checkbox) {
             const checkboxes = document.querySelectorAll('#employeesDropdown input[type="checkbox"]');
-            
+
             if (checkbox.value === "Все сотрудники") {
                 // Если выбрано "Все сотрудники", снимаем выбор с остальных
                 checkboxes.forEach(cb => {
@@ -679,29 +699,29 @@
                 // Если выбран конкретный сотрудник, снимаем выбор с "Все сотрудники"
                 const allEmployeesCheckbox = document.querySelector('#employeesDropdown input[value="Все сотрудники"]');
                 allEmployeesCheckbox.checked = false;
-                
+
                 // Проверяем, есть ли хотя бы один выбранный элемент
                 const hasSelectedItems = Array.from(checkboxes).some(cb => cb.value !== "Все сотрудники" && cb.checked);
-                
+
                 // Если нет выбранных элементов, выбираем "Все сотрудники"
                 if (!hasSelectedItems) {
                     allEmployeesCheckbox.checked = true;
                 }
             }
-            
+
             updateEmployeeSelection();
         }
-        
+
         // Обновление выбора сотрудников
         function updateEmployeeSelection() {
             const checkboxes = document.querySelectorAll('#employeesDropdown input[type="checkbox"]');
             const selectedEmployees = Array.from(checkboxes)
                 .filter(cb => cb.checked)
                 .map(cb => cb.value);
-            
+
             const selectedText = document.getElementById('selectedEmployees');
             const allEmployeesCheckbox = document.querySelector('#employeesDropdown input[value="Все сотрудники"]');
-            
+
             if (selectedEmployees.length === 0) {
                 // Если ничего не выбрано, выбираем "Все сотрудники"
                 allEmployeesCheckbox.checked = true;
@@ -720,43 +740,43 @@
                 selectedText.textContent = `Выбрано ${selectedEmployees.length}`;
             }
         }
-        
+
         // Предотвращение закрытия выпадающего списка при клике на его содержимое
         document.querySelectorAll('.dropdown-content').forEach(content => {
-            content.addEventListener('click', function(event) {
+            content.addEventListener('click', function (event) {
                 // Предотвращаем всплытие события клика
                 event.stopPropagation();
             });
         });
-        
+
         // Закрытие выпадающих списков при клике вне них
-        document.addEventListener('click', function() {
+        document.addEventListener('click', function () {
             document.querySelectorAll('.dropdown').forEach(dropdown => {
                 dropdown.classList.remove('active');
             });
         });
-        
+
         // Инициализация вкладок
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const tabButtons = document.querySelectorAll('.tab-button');
             const tabContents = document.querySelectorAll('.tab-content');
-            
+
             // Функция для валидации диапазона дат
             function validateDateRange(startDate, endDate, granularity) {
                 if (!startDate || !endDate) {
                     alert('Пожалуйста, выберите начальную и конечную даты');
                     return false;
                 }
-                
+
                 const start = new Date(startDate);
                 const end = new Date(endDate);
                 const diffTime = Math.abs(end - start);
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                
+
                 let maxDays;
                 let errorMessage;
-                
-                switch(granularity) {
+
+                switch (granularity) {
                     case 'День':
                         maxDays = 1;
                         errorMessage = 'При выборе режима "День" можно выбрать максимум 1 день';
@@ -772,56 +792,56 @@
                     default:
                         return true;
                 }
-                
+
                 if (diffDays > maxDays) {
                     alert(errorMessage);
                     return false;
                 }
-                
+
                 return true;
             }
 
             // Добавляем обработчик для кнопки "Обновить"
-            document.getElementById('updateButton').addEventListener('click', function() {
+            document.getElementById('updateButton').addEventListener('click', function () {
                 // Получаем выбранные даты
                 const startDate = document.getElementById('startDate').value;
                 const endDate = document.getElementById('endDate').value;
                 const granularity = document.getElementById('timeGranularity').value;
                 const callCenter = document.getElementById('callCenter').value;
-                
+
                 // Проверяем валидность диапазона дат
                 if (!validateDateRange(startDate, endDate, granularity)) {
                     return;
                 }
-                
+
                 // Обновляем данные в зависимости от выбранных дат
                 if (typeof loadCallCenterData === 'function') {
                     loadCallCenterData(callCenter, granularity);
                 }
-                
+
                 // Обновляем данные в таблице
                 if (typeof updateCompanyData === 'function') {
                     updateCompanyData(granularity, callCenter === 'КЦ1' ? 'kc1' : (callCenter === 'КЦ2' ? 'kc2' : 'total'));
                 }
-                
+
                 // Показываем уведомление об обновлении
                 alert('Данные обновлены за период с ' + startDate + ' по ' + endDate);
             });
-            
+
             tabButtons.forEach(button => {
-                button.addEventListener('click', function() {
+                button.addEventListener('click', function () {
                     const tabId = this.getAttribute('data-tab');
-                    
+
                     // Убираем активный класс у всех кнопок и содержимого вкладок
                     tabButtons.forEach(btn => btn.classList.remove('active'));
                     tabContents.forEach(content => content.classList.remove('active'));
-                    
+
                     // Добавляем активный класс выбранной кнопке и содержимому
                     this.classList.add('active');
                     document.getElementById(tabId + 'Tab').classList.add('active');
                 });
             });
-            
+
             // Обработчик для кнопки "Обновить" уже определен в js/stat-cards.js
         });
     </script>

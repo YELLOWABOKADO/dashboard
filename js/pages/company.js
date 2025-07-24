@@ -194,9 +194,15 @@ function renderCompanyTable() {
         const totalData = companyData.total;
         const kc1Data = companyData.kc1;
         const kc2Data = companyData.kc2;
+        const rpcTotalData = companyData.rpc.total;
+        const nonRpcTotalData = companyData.nonRpc.total;
+        const rpcKc1Data = companyData.rpc.kc1;
+        const nonRpcKc1Data = companyData.nonRpc.kc1;
+        const rpcKc2Data = companyData.rpc.kc2;
+        const nonRpcKc2Data = companyData.nonRpc.kc2;
         
         tableHTML = `
-            <table>
+            <table class="main-table">
                 <thead>
                     <tr>
                         <th>КОЛЛ-ЦЕНТР</th>
@@ -206,23 +212,59 @@ function renderCompanyTable() {
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td><strong>Всего</strong></td>
+                    <tr class="expandable-row" onclick="toggleExpansion('total-row')">
+                        <td><strong>Всего</strong> <span class="expand-icon" id="total-icon">▼</span></td>
                         <td class="text-right"><strong>${totalData.calls.toLocaleString()}</strong> <span class="badge badge-success">+1%</span></td>
                         <td class="text-right"><strong>${totalData.deviations.toLocaleString()}</strong> <span class="badge badge-success">+2%</span></td>
                         <td class="text-right"><strong><span class="percentage-medium">${totalData.percentage}%</span></strong> <span class="badge badge-success">+0.5%</span></td>
                     </tr>
-                    <tr>
-                        <td>КЦ 1</td>
+                    <tr class="detail-row" id="total-row" style="display: none;">
+                        <td style="padding-left: 30px;">RPC</td>
+                        <td class="text-right">${rpcTotalData.calls.toLocaleString()} <span class="badge badge-success">+1%</span></td>
+                        <td class="text-right">${rpcTotalData.deviations.toLocaleString()} <span class="badge badge-danger">-1%</span></td>
+                        <td class="text-right"><span class="percentage-high">${rpcTotalData.percentage}%</span> <span class="badge badge-neutral">0%</span></td>
+                    </tr>
+                    <tr class="detail-row" id="total-row-2" style="display: none;">
+                        <td style="padding-left: 30px;">Не RPC</td>
+                        <td class="text-right">${nonRpcTotalData.calls.toLocaleString()} <span class="badge badge-success">+2%</span></td>
+                        <td class="text-right">${nonRpcTotalData.deviations.toLocaleString()} <span class="badge badge-success">+3%</span></td>
+                        <td class="text-right"><span class="percentage-low">${nonRpcTotalData.percentage}%</span> <span class="badge badge-danger">-2%</span></td>
+                    </tr>
+                    <tr class="expandable-row" onclick="toggleExpansion('kc1-row')">
+                        <td>КЦ 1 <span class="expand-icon" id="kc1-icon">▼</span></td>
                         <td class="text-right">${kc1Data.calls.toLocaleString()} <span class="badge badge-success">+3%</span></td>
                         <td class="text-right">${kc1Data.deviations.toLocaleString()} <span class="badge badge-success">+2%</span></td>
                         <td class="text-right"><span class="percentage-medium">${kc1Data.percentage}%</span> <span class="badge badge-neutral">0%</span></td>
                     </tr>
-                    <tr>
-                        <td>КЦ 2</td>
+                    <tr class="detail-row" id="kc1-row" style="display: none;">
+                        <td style="padding-left: 30px;">RPC</td>
+                        <td class="text-right">${rpcKc1Data.calls.toLocaleString()} <span class="badge badge-success">+2%</span></td>
+                        <td class="text-right">${rpcKc1Data.deviations.toLocaleString()} <span class="badge badge-danger">-1%</span></td>
+                        <td class="text-right"><span class="percentage-high">${rpcKc1Data.percentage}%</span> <span class="badge badge-neutral">0%</span></td>
+                    </tr>
+                    <tr class="detail-row" id="kc1-row-2" style="display: none;">
+                        <td style="padding-left: 30px;">Не RPC</td>
+                        <td class="text-right">${nonRpcKc1Data.calls.toLocaleString()} <span class="badge badge-success">+3%</span></td>
+                        <td class="text-right">${nonRpcKc1Data.deviations.toLocaleString()} <span class="badge badge-success">+2%</span></td>
+                        <td class="text-right"><span class="percentage-low">${nonRpcKc1Data.percentage}%</span> <span class="badge badge-danger">-2%</span></td>
+                    </tr>
+                    <tr class="expandable-row" onclick="toggleExpansion('kc2-row')">
+                        <td>КЦ 2 <span class="expand-icon" id="kc2-icon">▼</span></td>
                         <td class="text-right">${kc2Data.calls.toLocaleString()} <span class="badge badge-danger">-4%</span></td>
                         <td class="text-right">${kc2Data.deviations.toLocaleString()} <span class="badge badge-success">+1%</span></td>
                         <td class="text-right"><span class="percentage-low">${kc2Data.percentage}%</span> <span class="badge badge-success">+0.3%</span></td>
+                    </tr>
+                    <tr class="detail-row" id="kc2-row" style="display: none;">
+                        <td style="padding-left: 30px;">RPC</td>
+                        <td class="text-right">${rpcKc2Data.calls.toLocaleString()} <span class="badge badge-success">+1%</span></td>
+                        <td class="text-right">${rpcKc2Data.deviations.toLocaleString()} <span class="badge badge-danger">-2%</span></td>
+                        <td class="text-right"><span class="percentage-high">${rpcKc2Data.percentage}%</span> <span class="badge badge-neutral">0%</span></td>
+                    </tr>
+                    <tr class="detail-row" id="kc2-row-2" style="display: none;">
+                        <td style="padding-left: 30px;">Не RPC</td>
+                        <td class="text-right">${nonRpcKc2Data.calls.toLocaleString()} <span class="badge badge-danger">-5%</span></td>
+                        <td class="text-right">${nonRpcKc2Data.deviations.toLocaleString()} <span class="badge badge-success">+2%</span></td>
+                        <td class="text-right"><span class="percentage-low">${nonRpcKc2Data.percentage}%</span> <span class="badge badge-success">+1%</span></td>
                     </tr>
                 </tbody>
             </table>
@@ -269,13 +311,26 @@ function renderCompanyTable() {
     
     // Обновляем содержимое контейнера
     tableContainer.innerHTML = tableHTML;
+}
+
+// Функция для раскрытия/скрытия деталей
+function toggleExpansion(rowId) {
+    const detailRows = document.querySelectorAll(`[id^="${rowId}"]`);
+    const icon = document.getElementById(rowId.replace('-row', '-icon'));
     
-    // Также обновляем карточки статистики
-    if (typeof loadCallCenterData === 'function') {
-        const callCenterSelect = document.getElementById('callCenter');
-        if (callCenterSelect) {
-            loadCallCenterData(callCenterSelect.value, document.getElementById('timeGranularity').value);
+    let isExpanded = false;
+    detailRows.forEach(row => {
+        if (row.style.display === 'none' || row.style.display === '') {
+            row.style.display = 'table-row';
+            isExpanded = true;
+        } else {
+            row.style.display = 'none';
         }
+    });
+    
+    // Обновляем иконку
+    if (icon) {
+        icon.textContent = isExpanded ? '▲' : '▼';
     }
 }
 

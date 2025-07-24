@@ -36,7 +36,7 @@ const mockData = {
         { date: '2025-07-29', callCenter: 'КЦ1', calls: 900, deviations: 63 },
         { date: '2025-07-30', callCenter: 'КЦ1', calls: 880, deviations: 62 },
         { date: '2025-07-31', callCenter: 'КЦ1', calls: 870, deviations: 61 },
-        
+
         { date: '2025-07-01', callCenter: 'КЦ2', calls: 700, deviations: 35 },
         { date: '2025-07-02', callCenter: 'КЦ2', calls: 680, deviations: 34 },
         { date: '2025-07-03', callCenter: 'КЦ2', calls: 720, deviations: 36 },
@@ -74,16 +74,16 @@ const mockData = {
         { date: '2025-07-01', department: 'Гридчина - группа', callCenter: 'КЦ1', calls: 300, deviations: 21 },
         { date: '2025-07-02', department: 'Гридчина - группа', callCenter: 'КЦ1', calls: 290, deviations: 20 },
         { date: '2025-07-03', department: 'Гридчина - группа', callCenter: 'КЦ1', calls: 310, deviations: 22 },
-        
+
         { date: '2025-07-01', department: 'Сычева - группа', callCenter: 'КЦ1', calls: 280, deviations: 14 },
         { date: '2025-07-02', department: 'Сычева - группа', callCenter: 'КЦ1', calls: 270, deviations: 14 },
         { date: '2025-07-03', department: 'Сычева - группа', callCenter: 'КЦ1', calls: 290, deviations: 15 },
-        
+
         // Данные для подразделений КЦ2
         { date: '2025-07-01', department: 'Мельникова - группа', callCenter: 'КЦ2', calls: 320, deviations: 16 },
         { date: '2025-07-02', department: 'Мельникова - группа', callCenter: 'КЦ2', calls: 310, deviations: 16 },
         { date: '2025-07-03', department: 'Мельникова - группа', callCenter: 'КЦ2', calls: 330, deviations: 17 },
-        
+
         { date: '2025-07-01', department: 'Коровина - группа', callCenter: 'КЦ2', calls: 290, deviations: 15 },
         { date: '2025-07-02', department: 'Коровина - группа', callCenter: 'КЦ2', calls: 280, deviations: 14 },
         { date: '2025-07-03', department: 'Коровина - группа', callCenter: 'КЦ2', calls: 300, deviations: 15 }
@@ -94,15 +94,15 @@ const mockData = {
         { date: '2025-07-01', employee: 'Иванов И.И.', department: 'Гридчина - группа', callCenter: 'КЦ1', calls: 50, deviations: 3 },
         { date: '2025-07-02', employee: 'Иванов И.И.', department: 'Гридчина - группа', callCenter: 'КЦ1', calls: 48, deviations: 3 },
         { date: '2025-07-03', employee: 'Иванов И.И.', department: 'Гридчина - группа', callCenter: 'КЦ1', calls: 52, deviations: 4 },
-        
+
         { date: '2025-07-01', employee: 'Петров П.П.', department: 'Гридчина - группа', callCenter: 'КЦ1', calls: 45, deviations: 2 },
         { date: '2025-07-02', employee: 'Петров П.П.', department: 'Гридчина - группа', callCenter: 'КЦ1', calls: 43, deviations: 2 },
         { date: '2025-07-03', employee: 'Петров П.П.', department: 'Гридчина - группа', callCenter: 'КЦ1', calls: 47, deviations: 2 },
-        
+
         { date: '2025-07-01', employee: 'Сидоров С.С.', department: 'Сычева - группа', callCenter: 'КЦ1', calls: 55, deviations: 3 },
         { date: '2025-07-02', employee: 'Сидоров С.С.', department: 'Сычева - группа', callCenter: 'КЦ1', calls: 53, deviations: 3 },
         { date: '2025-07-03', employee: 'Сидоров С.С.', department: 'Сычева - группа', callCenter: 'КЦ1', calls: 57, deviations: 3 },
-        
+
         // Данные для сотрудников КЦ2
         { date: '2025-07-01', employee: 'Смирнова А.А.', department: 'Мельникова - группа', callCenter: 'КЦ2', calls: 60, deviations: 3 },
         { date: '2025-07-02', employee: 'Смирнова А.А.', department: 'Мельникова - группа', callCenter: 'КЦ2', calls: 58, deviations: 3 },
@@ -115,15 +115,15 @@ const mockData = {
 function getCompanyData(startDate, endDate, granularity, selectedCallCenter = 'Все КЦ') {
     // Группировка данных по периодам и контакт-центрам
     const result = {};
-    
+
     // Получаем уникальные контакт-центры
     let callCenters = [...new Set(mockData.company.map(item => item.callCenter))];
-    
+
     // Фильтруем по выбранному контакт-центру, если он указан
     if (selectedCallCenter !== 'Все КЦ') {
         callCenters = callCenters.filter(cc => cc === selectedCallCenter);
     }
-    
+
     // Загружаем данные из JSON файла для колл-центров
     fetch('js/data/call-centers.json')
         .then(response => response.json())
@@ -136,14 +136,14 @@ function getCompanyData(startDate, endDate, granularity, selectedCallCenter = '�
                     rpcCalls: 0,
                     deviations: 0
                 };
-                
+
                 callCentersData.forEach(cc => {
                     const ccData = cc.granularity[granularity];
                     totalData.totalCalls += ccData.totalCalls;
                     totalData.rpcCalls += ccData.rpcCalls;
                     totalData.deviations += ccData.deviations;
                 });
-                
+
                 // Обновляем карточки статистики с суммарными данными
                 updateStatCards({
                     'Все КЦ': {
@@ -152,13 +152,13 @@ function getCompanyData(startDate, endDate, granularity, selectedCallCenter = '�
                         percentage: Math.round((totalData.deviations / totalData.totalCalls) * 100)
                     }
                 }, totalData.totalCalls, totalData.deviations, Math.round((totalData.deviations / totalData.totalCalls) * 100));
-                
+
             } else {
                 // Находим данные для выбранного колл-центра
                 const selectedCCData = callCentersData.find(cc => cc.name === selectedCallCenter);
                 if (selectedCCData) {
                     const ccData = selectedCCData.granularity[granularity];
-                    
+
                     // Обновляем карточки статистики с данными выбранного колл-центра
                     updateStatCards({
                         [selectedCallCenter]: {
@@ -171,15 +171,15 @@ function getCompanyData(startDate, endDate, granularity, selectedCallCenter = '�
             }
         })
         .catch(error => console.error('Ошибка при загрузке данных колл-центров:', error));
-    
+
     callCenters.forEach(callCenter => {
         // Фильтруем данные по контакт-центру
         const filteredData = mockData.company.filter(item => item.callCenter === callCenter);
-        
+
         // Группируем данные по периодам
         result[callCenter] = groupDataByPeriod(filteredData, 'date', granularity, startDate, endDate);
     });
-    
+
     return result;
 }
 
@@ -187,15 +187,15 @@ function getCompanyData(startDate, endDate, granularity, selectedCallCenter = '�
 function getDepartmentsData(startDate, endDate, granularity, selectedDepartments = [], selectedCallCenter = 'Все КЦ') {
     // Группировка данных по периодам и подразделениям
     const result = {};
-    
+
     // Получаем уникальные подразделения
     let departments = [...new Set(mockData.departments.map(item => item.department))];
-    
+
     // Если выбраны конкретные подразделения, фильтруем по ним
     if (selectedDepartments.length > 0) {
         departments = departments.filter(dept => selectedDepartments.includes(dept));
     }
-    
+
     // Фильтруем данные по выбранному контакт-центру
     let filteredDepartmentsData = mockData.departments;
     if (selectedCallCenter !== 'Все КЦ') {
@@ -207,18 +207,18 @@ function getDepartmentsData(startDate, endDate, granularity, selectedDepartments
             return item.callCenter === selectedCallCenter;
         });
     }
-    
+
     departments.forEach(department => {
         // Фильтруем данные по подразделению
         const filteredData = filteredDepartmentsData.filter(item => item.department === department);
-        
+
         // Если после фильтрации данных нет, пропускаем это подразделение
         if (filteredData.length === 0) return;
-        
+
         // Группируем данные по периодам
         result[department] = groupDataByPeriod(filteredData, 'date', granularity, startDate, endDate);
     });
-    
+
     return result;
 }
 
@@ -226,10 +226,10 @@ function getDepartmentsData(startDate, endDate, granularity, selectedDepartments
 function getEmployeesData(startDate, endDate, granularity, selectedDepartments = [], selectedEmployees = [], selectedCallCenter = 'Все КЦ') {
     // Группировка данных по периодам и сотрудникам
     const result = {};
-    
+
     // Фильтруем сотрудников по выбранным подразделениям, если они указаны
     let filteredEmployees = mockData.employees;
-    
+
     // Фильтрация по КЦ
     if (selectedCallCenter !== 'Все КЦ') {
         // Предполагаем, что у нас есть информация о том, к какому КЦ относится сотрудник
@@ -240,34 +240,34 @@ function getEmployeesData(startDate, endDate, granularity, selectedDepartments =
             return item.callCenter === selectedCallCenter;
         });
     }
-    
+
     // Фильтрация по подразделениям
     if (selectedDepartments.length > 0) {
         filteredEmployees = filteredEmployees.filter(item => selectedDepartments.includes(item.department));
     }
-    
+
     // Фильтрация по конкретным сотрудникам
     if (selectedEmployees.length > 0) {
         filteredEmployees = filteredEmployees.filter(item => selectedEmployees.includes(item.employee));
     }
-    
+
     // Получаем уникальных сотрудников
     const employees = [...new Set(filteredEmployees.map(item => item.employee))];
-    
+
     employees.forEach(employee => {
         // Фильтруем данные по сотруднику
         const employeeData = filteredEmployees.filter(item => item.employee === employee);
-        
+
         // Получаем подразделение сотрудника
         const department = employeeData[0]?.department || '';
-        
+
         // Группируем данные по периодам
         result[employee] = {
             department: department,
             data: groupDataByPeriod(employeeData, 'date', granularity, startDate, endDate)
         };
     });
-    
+
     return result;
 }
 
@@ -275,52 +275,52 @@ function getEmployeesData(startDate, endDate, granularity, selectedDepartments =
 function updateCompanyTable(data, metric) {
     const tableBody = document.querySelector('#companyTab table tbody');
     if (!tableBody) return;
-    
+
     // Очищаем таблицу
     tableBody.innerHTML = '';
-    
+
     // Получаем контакт-центры
     const callCenters = Object.keys(data);
-    
+
     // Суммарные данные для всех КЦ
     let grandTotalCalls = 0;
     let grandTotalDeviations = 0;
-    
+
     // Данные по каждому КЦ
     const callCenterData = {};
-    
+
     callCenters.forEach(callCenter => {
         // Суммируем данные по всем периодам
         let totalCalls = 0;
         let totalDeviations = 0;
-        
+
         Object.values(data[callCenter]).forEach(periodData => {
             totalCalls += periodData.calls;
             totalDeviations += periodData.deviations;
         });
-        
+
         // Вычисляем процент отклонений
         const percentage = totalCalls > 0 ? Math.round((totalDeviations / totalCalls) * 100) : 0;
-        
+
         // Сохраняем данные по КЦ
         callCenterData[callCenter] = {
             calls: totalCalls,
             deviations: totalDeviations,
             percentage: percentage
         };
-        
+
         // Добавляем к общей сумме
         grandTotalCalls += totalCalls;
         grandTotalDeviations += totalDeviations;
-        
+
         // Генерируем случайную динамику для демонстрации
         const callsDynamics = generateRandomDynamics();
         const deviationsDynamics = generateRandomDynamics();
         const percentageDynamics = generateRandomDynamics(true); // для процентов меньшие значения
-        
+
         // Создаем строку таблицы
         const row = document.createElement('tr');
-        
+
         // Добавляем ячейки
         row.innerHTML = `
             <td class="py-4 px-6 font-medium">${callCenter}</td>
@@ -331,13 +331,13 @@ function updateCompanyTable(data, metric) {
                 <span class="mtm-badge ${callsDynamics.class}">${callsDynamics.value}</span>
             </td>
         `;
-        
+
         tableBody.appendChild(row);
     });
-    
+
     // Вычисляем общий процент отклонений
     const grandTotalPercentage = grandTotalCalls > 0 ? Math.round((grandTotalDeviations / grandTotalCalls) * 100) : 0;
-    
+
     // Обновляем карточки статистики
     updateStatCards(callCenterData, grandTotalCalls, grandTotalDeviations, grandTotalPercentage);
 }
@@ -346,17 +346,17 @@ function updateCompanyTable(data, metric) {
 function updateStatCards(callCenterData, totalCalls, totalDeviations, totalPercentage) {
     // Обновляем карточку "Количество звонков"
     document.getElementById('totalCalls').textContent = totalCalls.toLocaleString();
-    
+
     // Обновляем карточку "Отклонения"
     document.getElementById('totalDeviations').textContent = totalDeviations.toLocaleString();
-    
+
     // Обновляем карточку "% отклонений"
     document.getElementById('totalPercentage').textContent = totalPercentage.toFixed(1) + '%';
-    
+
     // Генерируем динамику в зависимости от выбранного режима отображения
     const granularity = document.getElementById('selectedTimeGranularity').textContent;
     let dynamicsLabel;
-    
+
     if (granularity === 'День') {
         dynamicsLabel = 'к прошлому дню';
     } else if (granularity === 'Неделя') {
@@ -364,36 +364,36 @@ function updateStatCards(callCenterData, totalCalls, totalDeviations, totalPerce
     } else {
         dynamicsLabel = 'MTM';
     }
-    
+
     // Обновляем динамику для карточек
     const callsDynamics = generateRandomDynamics();
     const deviationsDynamics = generateRandomDynamics();
     const percentageDynamics = generateRandomDynamics(true); // для процентов меньшие значения
-    
+
     document.getElementById('callsDynamics').textContent = callsDynamics.value;
     document.getElementById('callsDynamics').className = `mtm-badge ${callsDynamics.class} ml-2`;
-    
+
     document.getElementById('deviationsDynamics').textContent = deviationsDynamics.value;
     document.getElementById('deviationsDynamics').className = `mtm-badge ${deviationsDynamics.class} ml-2`;
-    
+
     document.getElementById('percentageDynamics').textContent = percentageDynamics.value;
     document.getElementById('percentageDynamics').className = `mtm-badge ${percentageDynamics.class} ml-2`;
-    
+
     // Обновляем детали по КЦ в карточках
     const callsDetails = document.getElementById('callsDetails');
     const deviationsDetails = document.getElementById('deviationsDetails');
     const percentageDetails = document.getElementById('percentageDetails');
-    
+
     callsDetails.innerHTML = '';
     deviationsDetails.innerHTML = '';
     percentageDetails.innerHTML = '';
-    
+
     Object.keys(callCenterData).forEach(callCenter => {
         const data = callCenterData[callCenter];
         const callsDynamics = generateRandomDynamics();
         const deviationsDynamics = generateRandomDynamics();
         const percentageDynamics = generateRandomDynamics(true);
-        
+
         // Детали для карточки "Количество звонков"
         const callsDetailItem = document.createElement('div');
         callsDetailItem.className = 'detail-item';
@@ -405,7 +405,7 @@ function updateStatCards(callCenterData, totalCalls, totalDeviations, totalPerce
             </div>
         `;
         callsDetails.appendChild(callsDetailItem);
-        
+
         // Детали для карточки "Отклонения"
         const deviationsDetailItem = document.createElement('div');
         deviationsDetailItem.className = 'detail-item';
@@ -417,7 +417,7 @@ function updateStatCards(callCenterData, totalCalls, totalDeviations, totalPerce
             </div>
         `;
         deviationsDetails.appendChild(deviationsDetailItem);
-        
+
         // Детали для карточки "% отклонений"
         const percentageDetailItem = document.createElement('div');
         percentageDetailItem.className = 'detail-item';
@@ -436,7 +436,7 @@ function updateStatCards(callCenterData, totalCalls, totalDeviations, totalPerce
 function generateRandomDynamics(isPercentage = false) {
     const isPositive = Math.random() > 0.5;
     let value;
-    
+
     if (isPercentage) {
         // Для процентов генерируем меньшие значения
         value = (Math.random() * 1.5).toFixed(1);
@@ -444,11 +444,11 @@ function generateRandomDynamics(isPercentage = false) {
         // Для обычных значений генерируем значения от 1 до 10
         value = Math.floor(Math.random() * 10) + 1;
     }
-    
+
     const sign = isPositive ? '+' : '-';
     const displayValue = `${sign}${value}%`;
     const className = isPositive ? 'mtm-positive' : 'mtm-negative';
-    
+
     return {
         value: displayValue,
         class: className
@@ -459,29 +459,29 @@ function generateRandomDynamics(isPercentage = false) {
 function updateDepartmentsTable(data, metric) {
     const tableBody = document.querySelector('#departmentsTableBody');
     if (!tableBody) return;
-    
+
     // Очищаем таблицу
     tableBody.innerHTML = '';
-    
+
     // Получаем подразделения
     const departments = Object.keys(data);
-    
+
     departments.forEach(department => {
         // Суммируем данные по всем периодам
         let totalCalls = 0;
         let totalDeviations = 0;
-        
+
         Object.values(data[department]).forEach(periodData => {
             totalCalls += periodData.calls;
             totalDeviations += periodData.deviations;
         });
-        
+
         // Вычисляем процент отклонений
         const percentage = totalCalls > 0 ? Math.round((totalDeviations / totalCalls) * 100) : 0;
-        
+
         // Создаем строку таблицы
         const row = document.createElement('tr');
-        
+
         // Добавляем ячейки
         row.innerHTML = `
             <td class="py-4 px-6 font-medium">${department}</td>
@@ -489,10 +489,10 @@ function updateDepartmentsTable(data, metric) {
             <td class="py-4 px-6 text-center">${totalDeviations.toLocaleString()}</td>
             <td class="py-4 px-6 text-center"><span class="${getPercentageClass(percentage)}">${percentage}%</span></td>
         `;
-        
+
         tableBody.appendChild(row);
     });
-    
+
     // Метрика обработана
 }
 
@@ -500,32 +500,32 @@ function updateDepartmentsTable(data, metric) {
 function updateEmployeesTable(data, metric) {
     const tableBody = document.querySelector('#employeesTableBody');
     if (!tableBody) return;
-    
+
     // Очищаем таблицу
     tableBody.innerHTML = '';
-    
+
     // Получаем сотрудников
     const employees = Object.keys(data);
-    
+
     employees.forEach(employee => {
         // Получаем подразделение сотрудника
         const department = data[employee].department;
-        
+
         // Суммируем данные по всем периодам
         let totalCalls = 0;
         let totalDeviations = 0;
-        
+
         Object.values(data[employee].data).forEach(periodData => {
             totalCalls += periodData.calls;
             totalDeviations += periodData.deviations;
         });
-        
+
         // Вычисляем процент отклонений
         const percentage = totalCalls > 0 ? Math.round((totalDeviations / totalCalls) * 100) : 0;
-        
+
         // Создаем строку таблицы
         const row = document.createElement('tr');
-        
+
         // Добавляем ячейки
         row.innerHTML = `
             <td class="py-4 px-6 font-medium">${employee}</td>
@@ -534,10 +534,10 @@ function updateEmployeesTable(data, metric) {
             <td class="py-4 px-6 text-center">${totalDeviations.toLocaleString()}</td>
             <td class="py-4 px-6 text-center"><span class="${getPercentageClass(percentage)}">${percentage}%</span></td>
         `;
-        
+
         tableBody.appendChild(row);
     });
-    
+
     // Метрика обработана
 }
 

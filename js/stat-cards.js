@@ -79,85 +79,10 @@ function generateRandomDynamics(isPercentage = false) {
     };
 }
 
-// Функция для загрузки данных колл-центров и обновления карточек статистики
+// Функция для загрузки данных колл-центров (карточки статистики удалены)
 function loadCallCenterData(selectedCallCenter, granularity) {
-    // Используем локальные данные вместо загрузки из JSON
-    const data = statCardDataByGranularity[granularity];
-    
-    if (!data) {
-        console.error('Нет данных для режима отображения:', granularity);
-        return;
-    }
-    
-    if (selectedCallCenter === 'Все КЦ') {
-        // Используем суммарные данные
-        const totalData = data.total;
-        
-        // Обновляем карточки статистики с суммарными данными
-        document.getElementById('totalCalls').textContent = totalData.calls.toLocaleString();
-        document.getElementById('totalDeviations').textContent = totalData.deviations.toLocaleString();
-        document.getElementById('totalPercentage').textContent = totalData.percentage.toFixed(1) + '%';
-        
-        // Генерируем динамику
-        let callsDynamics, deviationsDynamics, percentageDynamics;
-        
-        // Фиксированные значения для демонстрации
-        if (granularity === 'День') {
-            callsDynamics = { value: '-3%', isPositive: false };
-            deviationsDynamics = { value: '-8%', isPositive: false };
-            percentageDynamics = { value: '+0.8%', isPositive: true };
-        } else if (granularity === 'Неделя') {
-            callsDynamics = { value: '-2%', isPositive: false };
-            deviationsDynamics = { value: '-5%', isPositive: false };
-            percentageDynamics = { value: '+0.5%', isPositive: true };
-        } else {
-            callsDynamics = { value: '-1%', isPositive: false };
-            deviationsDynamics = { value: '-3%', isPositive: false };
-            percentageDynamics = { value: '+0.3%', isPositive: true };
-        }
-        
-        document.getElementById('callsDynamics').textContent = callsDynamics.value;
-        document.getElementById('callsDynamics').className = `dynamics ${callsDynamics.isPositive ? 'positive' : 'negative'}`;
-        
-        document.getElementById('deviationsDynamics').textContent = deviationsDynamics.value;
-        document.getElementById('deviationsDynamics').className = `dynamics ${deviationsDynamics.isPositive ? 'positive' : 'negative'}`;
-        
-        document.getElementById('percentageDynamics').textContent = percentageDynamics.value;
-        document.getElementById('percentageDynamics').className = `dynamics ${percentageDynamics.isPositive ? 'positive' : 'negative'}`;
-    } else {
-        // Находим данные для выбранного колл-центра
-        const key = selectedCallCenter === 'КЦ1' ? 'kc1' : 'kc2';
-        const selectedData = data[key];
-        
-        if (selectedData) {
-            // Обновляем карточки статистики с данными выбранного колл-центра
-            document.getElementById('totalCalls').textContent = selectedData.calls.toLocaleString();
-            document.getElementById('totalDeviations').textContent = selectedData.deviations.toLocaleString();
-            document.getElementById('totalPercentage').textContent = selectedData.percentage.toFixed(1) + '%';
-            
-            // Генерируем динамику
-            let callsDynamics, deviationsDynamics, percentageDynamics;
-            
-            if (selectedCallCenter === 'КЦ1') {
-                callsDynamics = { value: '+3%', isPositive: true };
-                deviationsDynamics = { value: '+2%', isPositive: true };
-                percentageDynamics = { value: '-0.5%', isPositive: false };
-            } else {
-                callsDynamics = { value: '-1%', isPositive: false };
-                deviationsDynamics = { value: '+4%', isPositive: true };
-                percentageDynamics = { value: '+0.3%', isPositive: true };
-            }
-            
-            document.getElementById('callsDynamics').textContent = callsDynamics.value;
-            document.getElementById('callsDynamics').className = `dynamics ${callsDynamics.isPositive ? 'positive' : 'negative'}`;
-            
-            document.getElementById('deviationsDynamics').textContent = deviationsDynamics.value;
-            document.getElementById('deviationsDynamics').className = `dynamics ${deviationsDynamics.isPositive ? 'positive' : 'negative'}`;
-            
-            document.getElementById('percentageDynamics').textContent = percentageDynamics.value;
-            document.getElementById('percentageDynamics').className = `dynamics ${percentageDynamics.isPositive ? 'positive' : 'negative'}`;
-        }
-    }
+    // Карточки статистики удалены, функция оставлена для совместимости
+    console.log(`Данные обновлены: КЦ - ${selectedCallCenter}, режим - ${granularity}`);
 }
 
 // Функция для обновления данных при изменении дат
