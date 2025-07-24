@@ -2,10 +2,10 @@
  * Логика для вкладки "Подразделения"
  */
 
-// Данные для разных режимов отображения
+// Данные для разных режимов отображения с предыдущими периодами
 const departmentsMockDataByGranularity = {
     'День': {
-        departments: [
+        current: [
             {
                 name: 'Гридчина - группа',
                 callCenter: 'КЦ1',
@@ -34,10 +34,40 @@ const departmentsMockDataByGranularity = {
                 deviations: 15,
                 percentage: 5.2
             }
+        ],
+        previous: [
+            {
+                name: 'Гридчина - группа',
+                callCenter: 'КЦ1',
+                calls: 285,
+                deviations: 23,
+                percentage: 8.1
+            },
+            {
+                name: 'Сычева - группа',
+                callCenter: 'КЦ1',
+                calls: 295,
+                deviations: 15,
+                percentage: 5.1
+            },
+            {
+                name: 'Мельникова - группа',
+                callCenter: 'КЦ2',
+                calls: 310,
+                deviations: 17,
+                percentage: 5.5
+            },
+            {
+                name: 'Коровина - группа',
+                callCenter: 'КЦ2',
+                calls: 275,
+                deviations: 14,
+                percentage: 5.1
+            }
         ]
     },
     'Неделя': {
-        departments: [
+        current: [
             {
                 name: 'Гридчина - группа',
                 callCenter: 'КЦ1',
@@ -66,10 +96,40 @@ const departmentsMockDataByGranularity = {
                 deviations: 105,
                 percentage: 5.2
             }
+        ],
+        previous: [
+            {
+                name: 'Гридчина - группа',
+                callCenter: 'КЦ1',
+                calls: 2205,
+                deviations: 154,
+                percentage: 7
+            },
+            {
+                name: 'Сычева - группа',
+                callCenter: 'КЦ1',
+                calls: 2058,
+                deviations: 103,
+                percentage: 5
+            },
+            {
+                name: 'Мельникова - группа',
+                callCenter: 'КЦ2',
+                calls: 2352,
+                deviations: 118,
+                percentage: 5
+            },
+            {
+                name: 'Коровина - группа',
+                callCenter: 'КЦ2',
+                calls: 2132,
+                deviations: 110,
+                percentage: 5.2
+            }
         ]
     },
     'Месяц': {
-        departments: [
+        current: [
             {
                 name: 'Гридчина - группа',
                 callCenter: 'КЦ1',
@@ -98,17 +158,68 @@ const departmentsMockDataByGranularity = {
                 deviations: 450,
                 percentage: 5.2
             }
+        ],
+        previous: [
+            {
+                name: 'Гридчина - группа',
+                callCenter: 'КЦ1',
+                calls: 9450,
+                deviations: 661,
+                percentage: 7
+            },
+            {
+                name: 'Сычева - группа',
+                callCenter: 'КЦ1',
+                calls: 8820,
+                deviations: 441,
+                percentage: 5
+            },
+            {
+                name: 'Мельникова - группа',
+                callCenter: 'КЦ2',
+                calls: 10080,
+                deviations: 504,
+                percentage: 5
+            },
+            {
+                name: 'Коровина - группа',
+                callCenter: 'КЦ2',
+                calls: 9135,
+                deviations: 473,
+                percentage: 5.2
+            }
         ]
     }
 };
 
 // Текущие данные (по умолчанию - месяц)
 let departmentsData = departmentsMockDataByGranularity['Месяц'];
+let currentGranularity = 'Месяц';
+
+// Функция для расчета процентного изменения
+function calculateDepartmentChange(current, previous) {
+    if (!previous || previous === 0) {
+        return current > 0 ? 100 : 0;
+    }
+    
+    const change = ((current - previous) / previous) * 100;
+    return Math.round(change * 10) / 10;
+}
+
+// Функция для создания бейджа с изменением для подразделений
+function createDepartmentChangeBadge(current, previous) {
+    const change = calculateDepartmentChange(current, previous);
+    const sign = change > 0 ? '+' : '';
+    const cssClass = change > 0 ? 'badge-success' : (change < 0 ? 'badge-danger' : 'badge-neutral');
+    
+    return `<span class="badge ${cssClass}">${sign}${change}%</span>`;
+}
 
 // Функция для инициализации вкладки "Подразделения"
 function initDepartmentsTab() {
     // Получаем текущий режим отображения
-    const granularity = document.getElementById('selectedTimeGranularity').textContent;
+    const granularity = document.getElementById('timeGranularity') ? 
+        document.getElementById('timeGranularity').value : 'Месяц';
     
     // Обновляем данные подразделений
     updateDepartmentsData(granularity);
@@ -164,6 +275,7 @@ function initDepartmentsTab() {
 function updateDepartmentsData(granularity) {
     // Обновляем текущие данные в зависимости от выбранного режима отображения
     departmentsData = departmentsMockDataByGranularity[granularity];
+    currentGranularity = granularity;
     
     // Обновляем таблицу с данными
     updateDepartmentsTable();
@@ -172,74 +284,60 @@ function updateDepartmentsData(granularity) {
 // Функция для обновления таблицы с данными подразделений
 function updateDepartmentsTable() {
     // Получаем выбранный контакт-центр
-    const selectedCallCenter = document.getElementById('selectedCallCenter').textContent;
+    const callCenterSelect = document.getElementById('callCenter');
+    const selectedCallCenter = callCenterSelect ? callCenterSelect.value : 'Все КЦ';
     
-    // Получаем выбранные подразделения
-    const selectedDepartments = Array.from(document.querySelectorAll('#departmentsDropdown input[type="checkbox"]:checked'))
-        .map(cb => cb.value);
-    
-    // Фильтруем данные по выбранному контакт-центру и подразделениям
-    let filteredData = departmentsData.departments;
+    // Фильтруем данные по выбранному контакт-центру
+    let currentData = departmentsData.current;
+    let previousData = departmentsData.previous;
     
     if (selectedCallCenter !== 'Все КЦ') {
-        filteredData = filteredData.filter(dept => dept.callCenter === selectedCallCenter);
+        currentData = currentData.filter(dept => dept.callCenter === selectedCallCenter);
+        previousData = previousData.filter(dept => dept.callCenter === selectedCallCenter);
     }
-    
-    if (selectedDepartments.length > 0) {
-        filteredData = filteredData.filter(dept => selectedDepartments.includes(dept.name));
-    }
-    
-    // Определяем заголовки таблицы
-    const headers = [
-        { key: 'name', text: 'ПОДРАЗДЕЛЕНИЕ', class: 'py-3 px-6 text-left' },
-        { key: 'callCenter', text: 'КОНТАКТ-ЦЕНТР', class: 'py-3 px-6 text-center' },
-        { key: 'calls', text: 'ОЦЕНЕНО ЗВОНКОВ', class: 'py-3 px-6 text-center', render: value => formatNumber(value) },
-        { key: 'deviations', text: 'ОТКЛОНЕНИЙ', class: 'py-3 px-6 text-center', render: value => formatNumber(value) },
-        { key: 'percentage', text: '% ОТКЛОНЕНИЙ', class: 'py-3 px-6 text-center', render: value => {
-            const percentageClass = getDeviationPercentageClass(value);
-            return `<span class="${percentageClass}">${formatPercentage(value)}</span>`;
-        }}
-    ];
     
     // Создаем или обновляем таблицу
     const tableContainer = document.getElementById('departmentsTable');
-    if (tableContainer) {
-        // Если контейнер существует, но таблица еще не создана
-        if (!tableContainer.querySelector('table')) {
-            createDataTable('departmentsTable', headers, filteredData, {
-                tbodyId: 'departmentsTableBody',
-                rowClass: 'border-b border-gray-200'
-            });
-        } else {
-            // Если таблица уже существует, обновляем данные
-            const tbody = document.getElementById('departmentsTableBody');
-            if (tbody) {
-                tbody.innerHTML = '';
-                
-                filteredData.forEach(rowData => {
-                    const row = document.createElement('tr');
-                    row.className = 'border-b border-gray-200';
-                    
-                    // Добавляем ячейки данных
-                    headers.forEach(header => {
-                        const td = document.createElement('td');
-                        td.className = header.key === 'name' ? 'py-4 px-6 text-left font-medium' : 'py-4 px-6 text-center';
-                        
-                        // Если есть функция рендеринга для этого столбца, используем ее
-                        if (header.render && typeof header.render === 'function') {
-                            td.innerHTML = header.render(rowData[header.key], rowData);
-                        } else {
-                            td.textContent = rowData[header.key] || '';
-                        }
-                        
-                        row.appendChild(td);
-                    });
-                    
-                    tbody.appendChild(row);
-                });
-            }
-        }
-    }
+    if (!tableContainer) return;
+    
+    let tableHTML = `
+        <h4>Подразделения</h4>
+        <table>
+            <thead>
+                <tr>
+                    <th>ПОДРАЗДЕЛЕНИЕ</th>
+                    <th class="text-right">КОНТАКТ-ЦЕНТР</th>
+                    <th class="text-right">ОЦЕНЕНО ЗВОНКОВ</th>
+                    <th class="text-right">ОТКЛОНЕНИЙ</th>
+                    <th class="text-right">% ОТКЛОНЕНИЙ</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+    
+    // Добавляем строки данных
+    currentData.forEach((dept, index) => {
+        const prevDept = previousData[index];
+        const percentageClass = dept.percentage >= 10 ? 'percentage-high' : 
+                               (dept.percentage >= 5 ? 'percentage-medium' : 'percentage-low');
+        
+        tableHTML += `
+            <tr>
+                <td>${dept.name}</td>
+                <td class="text-right">${dept.callCenter}</td>
+                <td class="text-right">${dept.calls.toLocaleString()} ${createDepartmentChangeBadge(dept.calls, prevDept.calls)}</td>
+                <td class="text-right">${dept.deviations.toLocaleString()} ${createDepartmentChangeBadge(dept.deviations, prevDept.deviations)}</td>
+                <td class="text-right"><span class="${percentageClass}">${dept.percentage}%</span> ${createDepartmentChangeBadge(dept.percentage, prevDept.percentage)}</td>
+            </tr>
+        `;
+    });
+    
+    tableHTML += `
+            </tbody>
+        </table>
+    `;
+    
+    tableContainer.innerHTML = tableHTML;
 }
 
 // Инициализация при загрузке страницы

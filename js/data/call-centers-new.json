@@ -1,0 +1,183 @@
+{
+  "metadata": {
+    "lastUpdated": "2025-07-24",
+    "version": "2.0",
+    "periods": ["current", "30_days_ago", "50_days_ago"]
+  },
+  "callCenters": {
+    "kc1": {
+      "id": "kc1",
+      "name": "КЦ 1",
+      "periods": {
+        "current": {
+          "totalCalls": 33000,
+          "rpcCalls": 9000,
+          "nonRpcCalls": 24000,
+          "deviations": 2400,
+          "rpcDeviations": 1200,
+          "nonRpcDeviations": 1200,
+          "deviationPercentage": 7.3,
+          "rpcDeviationPercentage": 13.3,
+          "nonRpcDeviationPercentage": 5.0,
+          "dynamicsPercentage": 3
+        },
+        "30_days_ago": {
+          "totalCalls": 32000,
+          "rpcCalls": 8800,
+          "nonRpcCalls": 23200,
+          "deviations": 2300,
+          "rpcDeviations": 1150,
+          "nonRpcDeviations": 1150,
+          "deviationPercentage": 7.2,
+          "rpcDeviationPercentage": 13.1,
+          "nonRpcDeviationPercentage": 5.0,
+          "dynamicsPercentage": 2
+        },
+        "50_days_ago": {
+          "totalCalls": 31000,
+          "rpcCalls": 8500,
+          "nonRpcCalls": 22500,
+          "deviations": 2200,
+          "rpcDeviations": 1100,
+          "nonRpcDeviations": 1100,
+          "deviationPercentage": 7.1,
+          "rpcDeviationPercentage": 12.9,
+          "nonRpcDeviationPercentage": 4.9,
+          "dynamicsPercentage": 1
+        }
+      },
+      "departments": {       
+ "gridchina_group": {
+          "id": "gridchina_group",
+          "name": "Гридчина группа",
+          "periods": {
+            "current": {
+              "totalCalls": 8500,
+              "rpcCalls": 2300,
+              "nonRpcCalls": 6200,
+              "deviations": 620,
+              "rpcDeviations": 310,
+              "nonRpcDeviations": 310,
+              "deviationPercentage": 7.3,
+              "rpcDeviationPercentage": 13.5,
+              "nonRpcDeviationPercentage": 5.0,
+              "dynamicsPercentage": 2
+            },
+            "30_days_ago": {
+              "totalCalls": 8300,
+              "rpcCalls": 2250,
+              "nonRpcCalls": 6050,
+              "deviations": 600,
+              "rpcDeviations": 300,
+              "nonRpcDeviations": 300,
+              "deviationPercentage": 7.2,
+              "rpcDeviationPercentage": 13.3,
+              "nonRpcDeviationPercentage": 5.0,
+              "dynamicsPercentage": 1
+            },
+            "50_days_ago": {
+              "totalCalls": 8000,
+              "rpcCalls": 2200,
+              "nonRpcCalls": 5800,
+              "deviations": 580,
+              "rpcDeviations": 290,
+              "nonRpcDeviations": 290,
+              "deviationPercentage": 7.3,
+              "rpcDeviationPercentage": 13.2,
+              "nonRpcDeviationPercentage": 5.0,
+              "dynamicsPercentage": 0
+            }
+          },
+          "employees": {
+            "markina_im": {
+              "id": "markina_im",
+              "name": "Маркина И. М.",
+              "periods": {
+                "current": {
+                  "totalCalls": 2800,
+                  "rpcCalls": 760,
+                  "nonRpcCalls": 2040,
+                  "deviations": 204,
+                  "rpcDeviations": 102,
+                  "nonRpcDeviations": 102,
+                  "deviationPercentage": 7.3,
+                  "rpcDeviationPercentage": 13.4,
+                  "nonRpcDeviationPercentage": 5.0,
+                  "dynamicsPercentage": 3
+                }
+              }
+            }, 
+           "ermoshina_sv": {
+              "id": "ermoshina_sv",
+              "name": "Ермошина С. В.",
+              "periods": {
+                "current": {
+                  "totalCalls": 2900,
+                  "rpcCalls": 780,
+                  "nonRpcCalls": 2120,
+                  "deviations": 212,
+                  "rpcDeviations": 105,
+                  "nonRpcDeviations": 107,
+                  "deviationPercentage": 7.3,
+                  "rpcDeviationPercentage": 13.5,
+                  "nonRpcDeviationPercentage": 5.0,
+                  "dynamicsPercentage": 2
+                }
+              }
+            },
+            "kuznetsova_vyu": {
+              "id": "kuznetsova_vyu",
+              "name": "Кузнецова В. Ю.",
+              "periods": {
+                "current": {
+                  "totalCalls": 2800,
+                  "rpcCalls": 760,
+                  "nonRpcCalls": 2040,
+                  "deviations": 204,
+                  "rpcDeviations": 101,
+                  "nonRpcDeviations": 103,
+                  "deviationPercentage": 7.3,
+                  "rpcDeviationPercentage": 13.3,
+                  "nonRpcDeviationPercentage": 5.0,
+                  "dynamicsPercentage": 4
+                }
+              }
+            }
+          }
+        },
+        "korovina_group": {
+          "id": "korovina_group",
+          "name": "Коровина группа",
+          "periods": {
+            "current": {
+              "totalCalls": 8200,
+              "rpcCalls": 2200,
+              "nonRpcCalls": 6000,
+              "deviations": 600,
+              "rpcDeviations": 295,
+              "nonRpcDeviations": 305,
+              "deviationPercentage": 7.3,
+              "rpcDeviationPercentage": 13.4,
+              "nonRpcDeviationPercentage": 5.1,
+              "dynamicsPercentage": 1
+            }
+          },
+          "employees": {
+            "anpilogov_ea": {
+              "id": "anpilogov_ea",
+              "name": "Анпилогов Е. А.",
+              "periods": {
+                "current": {
+                  "totalCalls": 2700,
+                  "rpcCalls": 730,
+                  "nonRpcCalls": 1970,
+                  "deviations": 197,
+                  "rpcDeviations": 98,
+                  "nonRpcDeviations": 99,
+                  "deviationPercentage": 7.3,
+                  "rpcDeviationPercentage": 13.4,
+                  "nonRpcDeviationPercentage": 5.0,
+                  "dynamicsPercentage": 1
+                }
+              }
+            },

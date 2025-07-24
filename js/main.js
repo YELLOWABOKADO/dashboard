@@ -143,13 +143,13 @@ function loadTabData(tabId) {
         case 'departments':
             // Загрузка данных для вкладки "Подразделения"
             if (typeof updateDepartmentsData === 'function') {
-                updateDepartmentsData(granularity, callCenter);
+                updateDepartmentsData(granularity);
             }
             break;
         case 'employees':
             // Загрузка данных для вкладки "Команда"
             if (typeof updateEmployeesData === 'function') {
-                updateEmployeesData(granularity, callCenter);
+                updateEmployeesData(granularity);
             }
             break;
         // Добавьте обработку других вкладок по мере необходимости

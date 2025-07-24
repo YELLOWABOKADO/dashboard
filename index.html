@@ -489,6 +489,14 @@
 
 
 
+            <!-- Информационное примечание -->
+            <div class="warning-icon" style="margin-bottom: 15px; display: inline-block;">
+                <span style="background-color: #e3f2fd; color: #1976d2; padding: 8px 12px; border-radius: 4px; font-size: 14px; font-weight: normal;">
+                    ℹ️ Изменения показаны относительно предыдущего периода
+                    <span id="periodInfo">(01.06.2025 - 30.06.2025)</span>
+                </span>
+            </div>
+
             <!-- Таблица с данными сводной информации -->
             <div id="companySummaryTable" class="mt-4">
                 <table>
@@ -603,11 +611,14 @@
     </div>
 
     <!-- Подключение JavaScript файлов -->
+    <script src="js/utils/period-comparison.js"></script>
     <script src="js/data-handler.js"></script>
     <script src="js/time-granularity.js"></script>
     <script src="js/dropdown-handler.js"></script>
     <script src="js/stat-cards.js"></script>
     <script src="js/pages/company.js"></script>
+    <script src="js/pages/departments.js"></script>
+    <script src="js/pages/employees.js"></script>
     <script src="js/main.js"></script>
     <script>
         // Функция для переключения выпадающего списка

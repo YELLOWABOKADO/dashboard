@@ -9,25 +9,46 @@
     "dynamicsPercentage": -9,
     "granularity": {
       "День": {
-        "totalCalls": 933,
-        "rpcCalls": 65,
-        "deviations": 22,
-        "deviationPercentage": 2.3,
-        "dynamicsPercentage": -3
+        "current": {
+          "totalCalls": 933,
+          "rpcCalls": 65,
+          "deviations": 22,
+          "deviationPercentage": 2.3
+        },
+        "previous": {
+          "totalCalls": 912,
+          "rpcCalls": 63,
+          "deviations": 24,
+          "deviationPercentage": 2.6
+        }
       },
       "Неделя": {
-        "totalCalls": 6998,
-        "rpcCalls": 490,
-        "deviations": 162,
-        "deviationPercentage": 2.3,
-        "dynamicsPercentage": -5
+        "current": {
+          "totalCalls": 6998,
+          "rpcCalls": 490,
+          "deviations": 162,
+          "deviationPercentage": 2.3
+        },
+        "previous": {
+          "totalCalls": 7350,
+          "rpcCalls": 515,
+          "deviations": 171,
+          "deviationPercentage": 2.3
+        }
       },
       "Месяц": {
-        "totalCalls": 27990,
-        "rpcCalls": 1961,
-        "deviations": 649,
-        "deviationPercentage": 2.3,
-        "dynamicsPercentage": -9
+        "current": {
+          "totalCalls": 27990,
+          "rpcCalls": 1961,
+          "deviations": 649,
+          "deviationPercentage": 2.3
+        },
+        "previous": {
+          "totalCalls": 30750,
+          "rpcCalls": 2155,
+          "deviations": 708,
+          "deviationPercentage": 2.3
+        }
       }
     }
   },
@@ -41,25 +62,46 @@
     "dynamicsPercentage": -6,
     "granularity": {
       "День": {
-        "totalCalls": 726,
-        "rpcCalls": 37,
-        "deviations": 12,
-        "deviationPercentage": 1.6,
-        "dynamicsPercentage": -2
+        "current": {
+          "totalCalls": 726,
+          "rpcCalls": 37,
+          "deviations": 12,
+          "deviationPercentage": 1.6
+        },
+        "previous": {
+          "totalCalls": 741,
+          "rpcCalls": 38,
+          "deviations": 12,
+          "deviationPercentage": 1.6
+        }
       },
       "Неделя": {
-        "totalCalls": 5448,
-        "rpcCalls": 274,
-        "deviations": 88,
-        "deviationPercentage": 1.6,
-        "dynamicsPercentage": -4
+        "current": {
+          "totalCalls": 5448,
+          "rpcCalls": 274,
+          "deviations": 88,
+          "deviationPercentage": 1.6
+        },
+        "previous": {
+          "totalCalls": 5670,
+          "rpcCalls": 285,
+          "deviations": 91,
+          "deviationPercentage": 1.6
+        }
       },
       "Месяц": {
-        "totalCalls": 21790,
-        "rpcCalls": 1097,
-        "deviations": 350,
-        "deviationPercentage": 1.6,
-        "dynamicsPercentage": -6
+        "current": {
+          "totalCalls": 21790,
+          "rpcCalls": 1097,
+          "deviations": 350,
+          "deviationPercentage": 1.6
+        },
+        "previous": {
+          "totalCalls": 23180,
+          "rpcCalls": 1167,
+          "deviations": 372,
+          "deviationPercentage": 1.6
+        }
       }
     }
   }
