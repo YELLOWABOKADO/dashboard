@@ -70,6 +70,56 @@
             box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
         }
 
+        .warning-icon {
+            color: #e67e22;
+            background-color: #fef9e7;
+            padding: 3px 8px;
+            border-radius: 50%;
+            font-size: 1.2em;
+            margin-left: 8px;
+            font-weight: bold;
+            cursor: help;
+            position: relative;
+            display: inline-block;
+        }
+
+        .warning-icon:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .tooltip-text {
+            visibility: hidden;
+            width: 280px;
+            background-color: #fff;
+            color: #333;
+            text-align: left;
+            border-radius: 6px;
+            padding: 10px;
+            position: absolute;
+            z-index: 1000;
+            top: 100%;
+            left: -120px;
+            margin-top: 10px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            border: 1px solid #e0e0e0;
+            font-size: 0.9em;
+            font-weight: normal;
+        }
+
+        .tooltip-text::after {
+            content: "";
+            position: absolute;
+            bottom: 100%;
+            left: 130px;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: transparent transparent #fff transparent;
+        }
+
         /* Стили для кнопок */
         .btn {
             padding: 8px 16px;
@@ -157,6 +207,12 @@
             font-weight: 500;
         }
 
+        .stat-card .dynamics-label {
+            font-size: 0.75rem;
+            color: #6c757d;
+            margin-top: 4px;
+        }
+
         .positive {
             color: #28a745;
         }
@@ -212,6 +268,13 @@
             border-collapse: collapse;
             margin-top: 20px;
             border: 1px solid #e9ecef;
+        }
+
+        h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #495057;
         }
 
         th, td {
@@ -346,6 +409,13 @@
                     <div class="filter-item">
                         <span class="filter-label">по:</span>
                         <input type="date" id="endDate" value="2025-07-31" class="date-input">
+                        <span class="warning-icon">!
+                            <span class="tooltip-text">Ограничения периода выборки:<br>
+                                • Месяц - максимум 31 день<br>
+                                • Неделя - максимум 7 дней<br>
+                                • День - максимум 1 день
+                            </span>
+                        </span>
                     </div>
                 </div>
                 
@@ -387,18 +457,21 @@
                     <div class="value" id="totalCalls">33 000</div>
                     <div class="title">Количество звонков</div>
                     <div class="dynamics negative" id="callsDynamics">-3%</div>
+                    <div class="dynamics-label">к прошлому периоду</div>
                 </div>
                 
                 <div class="stat-card">
                     <div class="value" id="totalDeviations">2 400</div>
                     <div class="title">Отклонения</div>
                     <div class="dynamics negative" id="deviationsDynamics">-8%</div>
+                    <div class="dynamics-label">к прошлому периоду</div>
                 </div>
                 
                 <div class="stat-card">
                     <div class="value" id="totalPercentage">7.3%</div>
                     <div class="title">% отклонений</div>
                     <div class="dynamics positive" id="percentageDynamics">+0.8%</div>
+                    <div class="dynamics-label">к прошлому периоду</div>
                 </div>
             </div>
 
@@ -668,6 +741,46 @@
             const tabButtons = document.querySelectorAll('.tab-button');
             const tabContents = document.querySelectorAll('.tab-content');
             
+            // Функция для валидации диапазона дат
+            function validateDateRange(startDate, endDate, granularity) {
+                if (!startDate || !endDate) {
+                    alert('Пожалуйста, выберите начальную и конечную даты');
+                    return false;
+                }
+                
+                const start = new Date(startDate);
+                const end = new Date(endDate);
+                const diffTime = Math.abs(end - start);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                
+                let maxDays;
+                let errorMessage;
+                
+                switch(granularity) {
+                    case 'День':
+                        maxDays = 1;
+                        errorMessage = 'При выборе режима "День" можно выбрать максимум 1 день';
+                        break;
+                    case 'Неделя':
+                        maxDays = 7;
+                        errorMessage = 'При выборе режима "Неделя" можно выбрать максимум 7 дней';
+                        break;
+                    case 'Месяц':
+                        maxDays = 31;
+                        errorMessage = 'При выборе режима "Месяц" можно выбрать максимум 31 день';
+                        break;
+                    default:
+                        return true;
+                }
+                
+                if (diffDays > maxDays) {
+                    alert(errorMessage);
+                    return false;
+                }
+                
+                return true;
+            }
+
             // Добавляем обработчик для кнопки "Обновить"
             document.getElementById('updateButton').addEventListener('click', function() {
                 // Получаем выбранные даты
@@ -675,6 +788,11 @@
                 const endDate = document.getElementById('endDate').value;
                 const granularity = document.getElementById('timeGranularity').value;
                 const callCenter = document.getElementById('callCenter').value;
+                
+                // Проверяем валидность диапазона дат
+                if (!validateDateRange(startDate, endDate, granularity)) {
+                    return;
+                }
                 
                 // Обновляем данные в зависимости от выбранных дат
                 if (typeof loadCallCenterData === 'function') {

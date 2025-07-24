@@ -187,44 +187,85 @@ function renderCompanyTable() {
     const tableContainer = document.getElementById('companySummaryTable');
     if (!tableContainer) return;
     
-    // Получаем данные в зависимости от выбранного колл-центра
-    const totalData = companyData[selectedCallCenter];
-    const rpcData = companyData.rpc[selectedCallCenter];
-    const nonRpcData = companyData.nonRpc[selectedCallCenter];
+    let tableHTML = '';
     
-    // Создаем таблицу
-    let tableHTML = `
-        <table>
-            <thead>
-                <tr>
-                    <th>ПАРАМЕТР</th>
-                    <th>ВСЕГО</th>
-                    <th>RPC</th>
-                    <th>НЕ RPC</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Оценено звонков</td>
-                    <td>${totalData.calls.toLocaleString()} <span class="badge badge-success">+2%</span></td>
-                    <td>${rpcData.calls.toLocaleString()} <span class="badge badge-success">+2%</span></td>
-                    <td>${nonRpcData.calls.toLocaleString()} <span class="badge badge-success">+3%</span></td>
-                </tr>
-                <tr>
-                    <td>Отклонений выявлено</td>
-                    <td>${totalData.deviations.toLocaleString()} <span class="badge badge-success">+3%</span></td>
-                    <td>${rpcData.deviations.toLocaleString()} <span class="badge badge-danger">-1%</span></td>
-                    <td>${nonRpcData.deviations.toLocaleString()} <span class="badge badge-success">+2%</span></td>
-                </tr>
-                <tr>
-                    <td>% отклонений</td>
-                    <td><span class="percentage-medium">${totalData.percentage}%</span> <span class="badge badge-success">+1%</span></td>
-                    <td><span class="percentage-high">${rpcData.percentage}%</span> <span class="badge badge-info">0%</span></td>
-                    <td><span class="percentage-low">${nonRpcData.percentage}%</span> <span class="badge badge-danger">-3%</span></td>
-                </tr>
-            </tbody>
-        </table>
-    `;
+    // Если выбраны все КЦ, показываем разбивку по КЦ
+    if (selectedCallCenter === 'total') {
+        const totalData = companyData.total;
+        const kc1Data = companyData.kc1;
+        const kc2Data = companyData.kc2;
+        
+        tableHTML = `
+            <table>
+                <thead>
+                    <tr>
+                        <th>КОЛЛ-ЦЕНТР</th>
+                        <th class="text-right">ВСЕГО ЗВОНКОВ</th>
+                        <th class="text-right">ОТКЛОНЕНИЯ</th>
+                        <th class="text-right">% ОТКЛОНЕНИЙ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Всего</strong></td>
+                        <td class="text-right"><strong>${totalData.calls.toLocaleString()}</strong> <span class="badge badge-success">+1%</span></td>
+                        <td class="text-right"><strong>${totalData.deviations.toLocaleString()}</strong> <span class="badge badge-success">+2%</span></td>
+                        <td class="text-right"><strong><span class="percentage-medium">${totalData.percentage}%</span></strong> <span class="badge badge-success">+0.5%</span></td>
+                    </tr>
+                    <tr>
+                        <td>КЦ 1</td>
+                        <td class="text-right">${kc1Data.calls.toLocaleString()} <span class="badge badge-success">+3%</span></td>
+                        <td class="text-right">${kc1Data.deviations.toLocaleString()} <span class="badge badge-success">+2%</span></td>
+                        <td class="text-right"><span class="percentage-medium">${kc1Data.percentage}%</span> <span class="badge badge-neutral">0%</span></td>
+                    </tr>
+                    <tr>
+                        <td>КЦ 2</td>
+                        <td class="text-right">${kc2Data.calls.toLocaleString()} <span class="badge badge-danger">-4%</span></td>
+                        <td class="text-right">${kc2Data.deviations.toLocaleString()} <span class="badge badge-success">+1%</span></td>
+                        <td class="text-right"><span class="percentage-low">${kc2Data.percentage}%</span> <span class="badge badge-success">+0.3%</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        `;
+    } else {
+        // Если выбран конкретный КЦ, показываем стандартную таблицу
+        const totalData = companyData[selectedCallCenter];
+        const rpcData = companyData.rpc[selectedCallCenter];
+        const nonRpcData = companyData.nonRpc[selectedCallCenter];
+        
+        tableHTML = `
+            <table>
+                <thead>
+                    <tr>
+                        <th>ПАРАМЕТР</th>
+                        <th class="text-right">ВСЕГО</th>
+                        <th class="text-right">RPC</th>
+                        <th class="text-right">НЕ RPC</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Оценено звонков</td>
+                        <td class="text-right">${totalData.calls.toLocaleString()} <span class="badge badge-success">+2%</span></td>
+                        <td class="text-right">${rpcData.calls.toLocaleString()} <span class="badge badge-success">+2%</span></td>
+                        <td class="text-right">${nonRpcData.calls.toLocaleString()} <span class="badge badge-success">+3%</span></td>
+                    </tr>
+                    <tr>
+                        <td>Отклонений выявлено</td>
+                        <td class="text-right">${totalData.deviations.toLocaleString()} <span class="badge badge-success">+3%</span></td>
+                        <td class="text-right">${rpcData.deviations.toLocaleString()} <span class="badge badge-danger">-1%</span></td>
+                        <td class="text-right">${nonRpcData.deviations.toLocaleString()} <span class="badge badge-success">+2%</span></td>
+                    </tr>
+                    <tr>
+                        <td>% отклонений</td>
+                        <td class="text-right"><span class="percentage-medium">${totalData.percentage}%</span> <span class="badge badge-success">+1%</span></td>
+                        <td class="text-right"><span class="percentage-high">${rpcData.percentage}%</span> <span class="badge badge-neutral">0%</span></td>
+                        <td class="text-right"><span class="percentage-low">${nonRpcData.percentage}%</span> <span class="badge badge-danger">-3%</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        `;
+    }
     
     // Обновляем содержимое контейнера
     tableContainer.innerHTML = tableHTML;
