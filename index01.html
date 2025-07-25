@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Колл-центр дашборд</title>
+    <style>
+        /* Стили */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f5f7;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #fff;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .tabs span {
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 4px;
+            background-color: #f0f0f0;
+            font-size: 14px;
+        }
+        .tabs span:hover {
+            background-color: #e0e0e0;
+        }
+        .filters {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .filter-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .filter-item label {
+            font-size: 14px;
+            white-space: nowrap;
+        }
+        .filter-item input, .filter-item select {
+            padding: 6px 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .filter-item button {
+            padding: 6px 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .filter-item button:hover {
+            background-color: #0056b3;
+        }
+        .table-container {
+            margin-top: 20px;
+            overflow-x: auto;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+        .percentage-change {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .positive {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .negative {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .center-cell {
+            font-weight: 600;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 18px;
+            color: #666;
+        }
+        .error {
+            color: #dc3545;
+            text-align: center;
+            padding: 20px;
+        }
+        .debug {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Верхняя панель -->
+        <div class="header">
+            <div class="tabs">
+                <span>Компания</span>
+                <span>Подразделения</span>
+                <span>Команда</span>
+                <span>Свод</span>
+                <span>Отклонения по КЦ</span>
+                <span>Отклонения по операторам</span>
+                <span>Ручная оценка</span>
+                <span>Графики</span>
+            </div>
+            <div class="filters">
+                <div class="filter-item">
+                    <label>Период с:</label>
+                    <input type="date" id="date-from" value="2025-05-01">
+                </div>
+                <div class="filter-item">
+                    <label>по:</label>
+                    <input type="date" id="date-to" value="2025-05-03">
+                </div>
+                <div class="filter-item">
+                    <label>Режим отображения:</label>
+                    <select id="display-mode">
+                        <option selected>Месяц</option>
+                        <option>Неделя</option>
+                        <option>День</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>КЦ:</label>
+                    <select id="kc-filter">
+                        <option selected value="all">Все КЦ</option>
+                        <option value="КЦ 1">КЦ 1</option>
+                        <option value="КЦ 2">КЦ 2</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>Дашборд:</label>
+                    <select id="dashboard-type">
+                        <option selected>Автооценка</option>
+                        <option>Ручная оценка</option>
+                    </select>
+                </div>
+                <button id="refresh-btn">Обновить</button>
+                <button id="test-btn" style="background-color: #28a745;">Тест с демо-данными</button>
+            </div>
+        </div>
+
+        <!-- Отладочная информация -->
+        <div id="debug-info" class="debug" style="display: none;"></div>
+
+        <!-- Таблица данных -->
+        <div class="table-container">
+            <table id="callcenter-table">
+                <thead>
+                    <tr>
+                        <th>КОЛЛ-ЦЕНТР</th>
+                        <th>ВСЕГО ЗВОНКОВ</th>
+                        <th>ОТКЛОНЕНИЯ</th>
+                        <th>% ОТКЛОНЕНИЙ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="4" class="loading">Загрузка данных...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Тестовые данные для демонстрации
+        const testData = {
+            "Маркина И. М.": {
+                "КЦ": "КЦ 1",
+                "Группа": "Гридчина",
+                "Данные": {
+                    "2025-05-01": { "Звонков": 785, "Отклонений": 4, "%": 0.51 },
+                    "2025-05-02": { "Звонков": 603, "Отклонений": 14, "%": 2.32 },
+                    "2025-05-03": { "Звонков": 857, "Отклонений": 22, "%": 2.57 }
+                }
+            },
+            "Ермошина С. В.": {
+                "КЦ": "КЦ 1",
+                "Группа": "Гридчина",
+                "Данные": {
+                    "2025-05-01": { "Звонков": 735, "Отклонений": 5, "%": 0.68 },
+                    "2025-05-02": { "Звонков": 789, "Отклонений": 9, "%": 1.14 },
+                    "2025-05-03": { "Звонков": 817, "Отклонений": 10, "%": 1.22 }
+                }
+            },
+            "Петров А. В.": {
+                "КЦ": "КЦ 2",
+                "Группа": "Сидорова",
+                "Данные": {
+                    "2025-05-01": { "Звонков": 642, "Отклонений": 8, "%": 1.25 },
+                    "2025-05-02": { "Звонков": 598, "Отклонений": 12, "%": 2.01 },
+                    "2025-05-03": { "Звонков": 723, "Отклонений": 15, "%": 2.07 }
+                }
+            },
+            "Иванова О. Н.": {
+                "КЦ": "КЦ 2",
+                "Группа": "Сидорова",
+                "Данные": {
+                    "2025-05-01": { "Звонков": 691, "Отклонений": 3, "%": 0.43 },
+                    "2025-05-02": { "Звонков": 712, "Отклонений": 7, "%": 0.98 },
+                    "2025-05-03": { "Звонков": 634, "Отклонений": 11, "%": 1.73 }
+                }
+            }
+        };
+
+        // Функция для использования тестовых данных
+        function useTestData() {
+            debugLog('Используем тестовые данные...');
+            operatorData = testData;
+            debugLog(`Тестовые данные загружены. Количество операторов: ${Object.keys(testData).length}`);
+            updateData();
+        }
+
+        // Функция для отладочной информации
+        function debugLog(message) {
+            if (debugMode) {
+                console.log(message);
+                const debugDiv = document.getElementById('debug-info');
+                debugDiv.style.display = 'block';
+                debugDiv.innerHTML += message + '<br>';
+            }
+        }
+
+        // Функция для загрузки JSON данных
+        async function loadOperatorData() {
+            try {
+                debugLog('Попытка загрузки файла callcenter_operator_data.json...');
+                debugLog(`Текущий URL: ${window.location.href}`);
+                
+                // Пробуем разные варианты пути к файлу
+                const possiblePaths = [
+                    './callcenter_operator_data.json',
+                    'callcenter_operator_data.json',
+                    '/callcenter_operator_data.json'
+                ];
+                
+                let lastError = null;
+                
+                for (const path of possiblePaths) {
+                    try {
+                        debugLog(`Пробуем загрузить: ${path}`);
+                        const response = await fetch(path);
+                        
+                        debugLog(`Ответ сервера: ${response.status} ${response.statusText}`);
+                        
+                        if (!response.ok) {
+                            lastError = new Error(`HTTP error! status: ${response.status} для пути: ${path}`);
+                            continue;
+                        }
+                        
+                        const data = await response.json();
+                        operatorData = data;
+                        
+                        debugLog(`Данные успешно загружены из ${path}`);
+                        debugLog(`Количество операторов: ${Object.keys(data).length}`);
+                        debugLog(`Операторы: ${Object.keys(data).join(', ')}`);
+                        
+                        return true;
+                    } catch (error) {
+                        debugLog(`Ошибка для пути ${path}: ${error.message}`);
+                        lastError = error;
+                        continue;
+                    }
+                }
+                
+                throw lastError || new Error('Не удалось загрузить файл ни по одному из путей');
+                
+            } catch (error) {
+                debugLog(`Финальная ошибка загрузки: ${error.message}`);
+                
+                // Показываем подробную информацию об ошибке
+                const errorHTML = `
+                    <tr><td colspan="4" class="error">
+                        <strong>Ошибка загрузки данных:</strong> ${error.message}<br><br>
+                        <strong>Возможные причины:</strong><br>
+                        1. Файл callcenter_operator_data.json не найден в папке<br>
+                        2. Неправильное имя файла (проверьте регистр)<br>
+                        3. Некорректный JSON формат<br>
+                        4. Страница открыта через file:// (нужен веб-сервер)<br><br>
+                        <strong>Решение:</strong><br>
+                        - Убедитесь что файл callcenter_operator_data.json в той же папке что и HTML<br>
+                        - Запустите через веб-сервер (например: python -m http.server 8000)<br>
+                        - Или откройте через Live Server в VS Code
+                    </td></tr>
+                `;
+                
+                document.querySelector('#callcenter-table tbody').innerHTML = errorHTML;
+                return false;
+            }
+        }
+
+        // Функция для агрегации данных
+        function aggregateData(data, fromDate, toDate, selectedKC) {
+            debugLog(`Агрегация данных за период: ${fromDate} - ${toDate}, КЦ: ${selectedKC}`);
+            
+            const result = {
+                'Всего': { 'Звонков': 0, 'Отклонений': 0, '%' : 0 }
+            };
+
+            // Инициализируем КЦ
+            const allKCs = new Set();
+            for (const operator in data) {
+                const kc = data[operator]['КЦ'];
+                allKCs.add(kc);
+            }
+
+            allKCs.forEach(kc => {
+                result[kc] = { 'Звонков': 0, 'Отклонений': 0, '%' : 0 };
+            });
+
+            debugLog(`Найденные КЦ: ${Array.from(allKCs).join(', ')}`);
+
+            // Агрегация данных
+            for (const operator in data) {
+                const operatorData = data[operator];
+                const kc = operatorData['КЦ'];
+                
+                debugLog(`Обрабатываем оператора: ${operator}, КЦ: ${kc}`);
+                
+                // Фильтр по КЦ
+                if (selectedKC !== 'all' && kc !== selectedKC) {
+                    debugLog(`Оператор ${operator} пропущен по фильтру КЦ`);
+                    continue;
+                }
+
+                // Агрегация данных по дням
+                for (const date in operatorData['Данные']) {
+                    // Фильтрация по датам
+                    if (date >= fromDate && date <= toDate) {
+                        const dailyData = operatorData['Данные'][date];
+                        
+                        debugLog(`Дата: ${date}, Звонков: ${dailyData['Звонков']}, Отклонений: ${dailyData['Отклонений']}`);
+                        
+                        // Общие данные
+                        result['Всего']['Звонков'] += dailyData['Звонков'];
+                        result['Всего']['Отклонений'] += dailyData['Отклонений'];
+                        
+                        // Данные по КЦ
+                        result[kc]['Звонков'] += dailyData['Звонков'];
+                        result[kc]['Отклонений'] += dailyData['Отклонений'];
+                    }
+                }
+            }
+
+            // Вычисляем проценты
+            for (const key in result) {
+                if (result[key]['Звонков'] > 0) {
+                    result[key]['%'] = (result[key]['Отклонений'] / result[key]['Звонков']) * 100;
+                } else {
+                    result[key]['%'] = 0;
+                }
+                debugLog(`${key}: Звонков: ${result[key]['Звонков']}, Отклонений: ${result[key]['Отклонений']}, %: ${result[key]['%'].toFixed(2)}`);
+            }
+
+            return result;
+        }
+
+        // Функция для генерации таблицы
+        function generateTable(aggregatedData) {
+            const tableBody = document.querySelector('#callcenter-table tbody');
+            tableBody.innerHTML = ''; // Очищаем таблицу
+
+            // Строка "Всего"
+            const totalRow = createRow('Всего', aggregatedData['Всего'], true);
+            tableBody.appendChild(totalRow);
+
+            // Строки для КЦ (исключаем "Всего")
+            for (const kc in aggregatedData) {
+                if (kc !== 'Всего' && aggregatedData[kc]['Звонков'] > 0) {
+                    const kcRow = createRow(kc, aggregatedData[kc], false);
+                    tableBody.appendChild(kcRow);
+                }
+            }
+        }
+
+        // Вспомогательная функция для создания строки таблицы
+        function createRow(label, data, isTotal = false) {
+            const row = document.createElement('tr');
+
+            // Колонка "КОЛЛ-ЦЕНТР"
+            const centerCell = document.createElement('td');
+            centerCell.textContent = label;
+            if (isTotal) {
+                centerCell.classList.add('center-cell');
+            }
+            row.appendChild(centerCell);
+
+            // Колонка "ВСЕГО ЗВОНКОВ"
+            const callsCell = document.createElement('td');
+            callsCell.textContent = data['Звонков'].toLocaleString();
+            row.appendChild(callsCell);
+
+            // Колонка "ОТКЛОНЕНИЯ"
+            const deviationsCell = document.createElement('td');
+            deviationsCell.textContent = data['Отклонений'].toLocaleString();
+            row.appendChild(deviationsCell);
+
+            // Колонка "% ОТКЛОНЕНИЙ"
+            const percentageCell = document.createElement('td');
+            const percentageValue = data['%'];
+            percentageCell.textContent = `${percentageValue.toFixed(2)}%`;
+            if (percentageValue > 0) {
+                percentageCell.classList.add('percentage-change');
+                if (percentageValue > 2) {
+                    percentageCell.classList.add('negative');
+                } else if (percentageValue < 1) {
+                    percentageCell.classList.add('positive');
+                }
+            }
+            row.appendChild(percentageCell);
+
+            return row;
+        }
+
+        // Функция обновления данных
+        async function updateData() {
+            // Очищаем отладочную информацию
+            if (debugMode) {
+                document.getElementById('debug-info').innerHTML = '';
+            }
+            
+            if (!operatorData) {
+                const loaded = await loadOperatorData();
+                if (!loaded) return;
+            }
+
+            const fromDate = document.getElementById('date-from').value;
+            const toDate = document.getElementById('date-to').value;
+            const selectedKC = document.getElementById('kc-filter').value;
+
+            const aggregatedData = aggregateData(operatorData, fromDate, toDate, selectedKC);
+            generateTable(aggregatedData);
+        }
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', async function() {
+            debugLog('Страница загружена, начинаем инициализацию...');
+            
+            await loadOperatorData();
+            if (operatorData) {
+                updateData();
+            }
+
+            // Обработчик кнопки "Обновить"
+            document.getElementById('refresh-btn').addEventListener('click', updateData);
+            
+            // Обработчик кнопки "Тест с демо-данными"
+            document.getElementById('test-btn').addEventListener('click', useTestData);
+
+            // Обработчики изменения фильтров
+            const filters = ['date-from', 'date-to', 'kc-filter', 'display-mode', 'dashboard-type'];
+            filters.forEach(id => {
+                document.getElementById(id).addEventListener('change', updateData);
+            });
+        });
+    </script>
+</body>
+</html>
