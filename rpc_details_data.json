@@ -1,0 +1,168 @@
+{
+  "2025-07": {
+    "total": {
+      "calls": 141082,
+      "deviations": 4689,
+      "percentage": 3.32,
+      "details": {
+        "Д": {
+          "calls": 42325,
+          "deviations": 1407,
+          "percentage": 3.32
+        },
+        "П": {
+          "calls": 28217,
+          "deviations": 938,
+          "percentage": 3.32
+        },
+        "Р": {
+          "calls": 42325,
+          "deviations": 1407,
+          "percentage": 3.32
+        },
+        "Т/Л": {
+          "calls": 28215,
+          "deviations": 937,
+          "percentage": 3.32
+        }
+      }
+    },
+    "kc1": {
+      "calls": 80437,
+      "deviations": 2762,
+      "percentage": 3.43,
+      "details": {
+        "Д": {
+          "calls": 24131,
+          "deviations": 829,
+          "percentage": 3.43
+        },
+        "П": {
+          "calls": 16087,
+          "deviations": 552,
+          "percentage": 3.43
+        },
+        "Р": {
+          "calls": 24131,
+          "deviations": 829,
+          "percentage": 3.43
+        },
+        "Т/Л": {
+          "calls": 16088,
+          "deviations": 552,
+          "percentage": 3.43
+        }
+      }
+    },
+    "kc2": {
+      "calls": 60645,
+      "deviations": 1927,
+      "percentage": 3.18,
+      "details": {
+        "Д": {
+          "calls": 18194,
+          "deviations": 578,
+          "percentage": 3.18
+        },
+        "П": {
+          "calls": 12130,
+          "deviations": 386,
+          "percentage": 3.18
+        },
+        "Р": {
+          "calls": 18194,
+          "deviations": 578,
+          "percentage": 3.18
+        },
+        "Т/Л": {
+          "calls": 12127,
+          "deviations": 385,
+          "percentage": 3.18
+        }
+      }
+    }
+  },
+  "2025-06": {
+    "total": {
+      "calls": 145623,
+      "deviations": 4658,
+      "percentage": 3.20,
+      "details": {
+        "Д": {
+          "calls": 43687,
+          "deviations": 1397,
+          "percentage": 3.20
+        },
+        "П": {
+          "calls": 29125,
+          "deviations": 932,
+          "percentage": 3.20
+        },
+        "Р": {
+          "calls": 43687,
+          "deviations": 1397,
+          "percentage": 3.20
+        },
+        "Т/Л": {
+          "calls": 29124,
+          "deviations": 932,
+          "percentage": 3.20
+        }
+      }
+    },
+    "kc1": {
+      "calls": 82951,
+      "deviations": 2689,
+      "percentage": 3.24,
+      "details": {
+        "Д": {
+          "calls": 24885,
+          "deviations": 807,
+          "percentage": 3.24
+        },
+        "П": {
+          "calls": 16590,
+          "deviations": 538,
+          "percentage": 3.24
+        },
+        "Р": {
+          "calls": 24885,
+          "deviations": 807,
+          "percentage": 3.24
+        },
+        "Т/Л": {
+          "calls": 16591,
+          "deviations": 537,
+          "percentage": 3.24
+        }
+      }
+    },
+    "kc2": {
+      "calls": 62672,
+      "deviations": 1969,
+      "percentage": 3.14,
+      "details": {
+        "Д": {
+          "calls": 18802,
+          "deviations": 590,
+          "percentage": 3.14
+        },
+        "П": {
+          "calls": 12535,
+          "deviations": 394,
+          "percentage": 3.14
+        },
+        "Р": {
+          "calls": 18802,
+          "deviations": 590,
+          "percentage": 3.14
+        },
+        "Т/Л": {
+          "calls": 12533,
+          "deviations": 395,
+          "percentage": 3.14
+        }
+      }
+    }
+  }
+}

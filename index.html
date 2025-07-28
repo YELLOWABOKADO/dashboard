@@ -712,6 +712,101 @@
             }
         }
 
+        // Функция для создания RPC детализации (для строк)
+        function createRpcDetails(rpcDetailsData, kcKey, rowIdPrefix) {
+            if (!rpcDetailsData || !rpcDetailsData.current[kcKey]) return '';
+            
+            const currentDetails = rpcDetailsData.current[kcKey].details;
+            const previousDetails = rpcDetailsData.previous[kcKey].details || {};
+            
+            let detailsHTML = '';
+            
+            Object.keys(currentDetails).forEach(detailType => {
+                const current = currentDetails[detailType];
+                const previous = previousDetails[detailType] || { calls: 0, deviations: 0, percentage: 0 };
+                
+                detailsHTML += `
+                    <tr class="detail-row" id="${rowIdPrefix}-rpc-${detailType}" style="display: none; background-color: #f0f8ff;">
+                        <td style="padding-left: 50px; font-size: 0.9em; color: #666;">RPC ${detailType}</td>
+                        <td class="text-right" style="font-size: 0.9em;">${current.calls.toLocaleString()} ${createChangeBadge(current.calls, previous.calls)}</td>
+                        <td class="text-right" style="font-size: 0.9em;">${current.deviations.toLocaleString()} ${createChangeBadge(current.deviations, previous.deviations)}</td>
+                        <td class="text-right" style="font-size: 0.9em;"><span class="${getPercentageClass(current.percentage)}">${current.percentage}%</span> ${createChangeBadge(current.percentage, previous.percentage)}</td>
+                    </tr>
+                `;
+            });
+            
+            return detailsHTML;
+        }
+
+        // Функция для создания RPC детализации в колонке (для отдельных КЦ)
+        function createRpcColumnDetails(rpcDetailsData, kcKey, metric) {
+            if (!rpcDetailsData || !rpcDetailsData.current[kcKey]) {
+                return '<div style="font-size: 0.8em; color: #999; margin-top: 5px;">Нет данных</div>';
+            }
+            
+            const currentDetails = rpcDetailsData.current[kcKey].details;
+            const previousDetails = rpcDetailsData.previous[kcKey].details || {};
+            
+            let detailsHTML = '';
+            
+            Object.keys(currentDetails).forEach(detailType => {
+                const current = currentDetails[detailType];
+                const previous = previousDetails[detailType] || { calls: 0, deviations: 0, percentage: 0 };
+                
+                let value, prevValue;
+                switch(metric) {
+                    case 'calls':
+                        value = current.calls.toLocaleString();
+                        prevValue = previous.calls;
+                        break;
+                    case 'deviations':
+                        value = current.deviations.toLocaleString();
+                        prevValue = previous.deviations;
+                        break;
+                    case 'percentage':
+                        value = `${current.percentage}%`;
+                        prevValue = previous.percentage;
+                        break;
+                }
+                
+                detailsHTML += `
+                    <div style="font-size: 0.8em; color: #666; margin-top: 3px; padding-left: 10px;">
+                        ${detailType}: ${value} ${createChangeBadge(current[metric], prevValue)}
+                    </div>
+                `;
+            });
+            
+            return detailsHTML;
+        }
+
+        // Функция для переключения RPC колонки
+        function toggleRpcColumn() {
+            const detailsElements = [
+                document.getElementById('rpc-calls-details'),
+                document.getElementById('rpc-deviations-details'),
+                document.getElementById('rpc-percentage-details')
+            ];
+            
+            const icon = document.getElementById('rpc-column-icon');
+            
+            let isExpanded = false;
+            detailsElements.forEach(element => {
+                if (element) {
+                    if (element.style.display === 'none' || element.style.display === '') {
+                        element.style.display = 'block';
+                        isExpanded = true;
+                    } else {
+                        element.style.display = 'none';
+                    }
+                }
+            });
+            
+            // Обновляем иконку
+            if (icon) {
+                icon.textContent = isExpanded ? '▲' : '▼';
+            }
+        }
+
         // Функция для обновления данных компании
         async function updateCompanyData() {
             console.log('=== updateCompanyData вызвана ===');
@@ -731,6 +826,10 @@
                 const companyData = await getCompanyData(startDate, endDate, granularity, callCenter);
                 console.log('Получены данные компании:', companyData);
 
+                console.log('Вызываем getRpcDetailsData...');
+                const rpcDetailsData = await getRpcDetailsData(startDate, endDate, granularity, callCenter);
+                console.log('Получены RPC данные:', rpcDetailsData);
+
                 if (!companyData) {
                     console.error('companyData is null');
                     showError('companySummaryTable', 'Не удалось загрузить данные компании');
@@ -738,7 +837,7 @@
                 }
 
                 console.log('Вызываем renderCompanyTable...');
-                renderCompanyTable(companyData, callCenter);
+                renderCompanyTable(companyData, callCenter, rpcDetailsData);
                 console.log('renderCompanyTable завершена');
             } catch (error) {
                 console.error('Ошибка при обновлении данных компании:', error);
@@ -747,7 +846,7 @@
         }
 
         // Функция для отрисовки таблицы компании
-        function renderCompanyTable(companyData, selectedCallCenter) {
+        function renderCompanyTable(companyData, selectedCallCenter, rpcDetailsData = null) {
             const tableContainer = document.getElementById('companySummaryTable');
             if (!tableContainer) return;
 
@@ -796,12 +895,13 @@
                                 <td class="text-right"><strong>${totalData.deviations.toLocaleString()}</strong> ${createChangeBadge(totalData.deviations, prevTotalData.deviations)}</td>
                                 <td class="text-right"><strong><span class="${getPercentageClass(totalData.percentage)}">${totalData.percentage}%</span></strong> ${createChangeBadge(totalData.percentage, prevTotalData.percentage)}</td>
                             </tr>
-                            <tr class="detail-row" id="total-row" style="display: none;">
-                                <td style="padding-left: 30px;">RPC</td>
+                            <tr class="detail-row expandable-row" id="total-row" style="display: none;" onclick="toggleExpansion('total-rpc-row')">
+                                <td style="padding-left: 30px;">RPC <span class="expand-icon" id="total-rpc-icon">▼</span></td>
                                 <td class="text-right">${rpcTotalData.calls.toLocaleString()} ${createChangeBadge(rpcTotalData.calls, prevRpcTotalData.calls)}</td>
                                 <td class="text-right">${rpcTotalData.deviations.toLocaleString()} ${createChangeBadge(rpcTotalData.deviations, prevRpcTotalData.deviations)}</td>
                                 <td class="text-right"><span class="${getPercentageClass(rpcTotalData.percentage)}">${rpcTotalData.percentage}%</span> ${createChangeBadge(rpcTotalData.percentage, prevRpcTotalData.percentage)}</td>
                             </tr>
+                            ${createRpcDetails(rpcDetailsData, 'total', 'total-rpc-row')}
                             <tr class="detail-row" id="total-row-2" style="display: none;">
                                 <td style="padding-left: 30px;">Не RPC</td>
                                 <td class="text-right">${nonRpcTotalData.calls.toLocaleString()} ${createChangeBadge(nonRpcTotalData.calls, prevNonRpcTotalData.calls)}</td>
@@ -814,12 +914,13 @@
                                 <td class="text-right">${kc1Data.deviations.toLocaleString()} ${createChangeBadge(kc1Data.deviations, prevKc1Data.deviations)}</td>
                                 <td class="text-right"><span class="${getPercentageClass(kc1Data.percentage)}">${kc1Data.percentage}%</span> ${createChangeBadge(kc1Data.percentage, prevKc1Data.percentage)}</td>
                             </tr>
-                            <tr class="detail-row" id="kc1-row" style="display: none;">
-                                <td style="padding-left: 30px;">RPC</td>
+                            <tr class="detail-row expandable-row" id="kc1-row" style="display: none;" onclick="toggleExpansion('kc1-rpc-row')">
+                                <td style="padding-left: 30px;">RPC <span class="expand-icon" id="kc1-rpc-icon">▼</span></td>
                                 <td class="text-right">${rpcKc1Data.calls.toLocaleString()} ${createChangeBadge(rpcKc1Data.calls, prevRpcKc1Data.calls)}</td>
                                 <td class="text-right">${rpcKc1Data.deviations.toLocaleString()} ${createChangeBadge(rpcKc1Data.deviations, prevRpcKc1Data.deviations)}</td>
                                 <td class="text-right"><span class="${getPercentageClass(rpcKc1Data.percentage)}">${rpcKc1Data.percentage}%</span> ${createChangeBadge(rpcKc1Data.percentage, prevRpcKc1Data.percentage)}</td>
                             </tr>
+                            ${createRpcDetails(rpcDetailsData, 'kc1', 'kc1-rpc-row')}
                             <tr class="detail-row" id="kc1-row-2" style="display: none;">
                                 <td style="padding-left: 30px;">Не RPC</td>
                                 <td class="text-right">${nonRpcKc1Data.calls.toLocaleString()} ${createChangeBadge(nonRpcKc1Data.calls, prevNonRpcKc1Data.calls)}</td>
@@ -832,12 +933,13 @@
                                 <td class="text-right">${kc2Data.deviations.toLocaleString()} ${createChangeBadge(kc2Data.deviations, prevKc2Data.deviations)}</td>
                                 <td class="text-right"><span class="${getPercentageClass(kc2Data.percentage)}">${kc2Data.percentage}%</span> ${createChangeBadge(kc2Data.percentage, prevKc2Data.percentage)}</td>
                             </tr>
-                            <tr class="detail-row" id="kc2-row" style="display: none;">
-                                <td style="padding-left: 30px;">RPC</td>
+                            <tr class="detail-row expandable-row" id="kc2-row" style="display: none;" onclick="toggleExpansion('kc2-rpc-row')">
+                                <td style="padding-left: 30px;">RPC <span class="expand-icon" id="kc2-rpc-icon">▼</span></td>
                                 <td class="text-right">${rpcKc2Data.calls.toLocaleString()} ${createChangeBadge(rpcKc2Data.calls, prevRpcKc2Data.calls)}</td>
                                 <td class="text-right">${rpcKc2Data.deviations.toLocaleString()} ${createChangeBadge(rpcKc2Data.deviations, prevRpcKc2Data.deviations)}</td>
                                 <td class="text-right"><span class="${getPercentageClass(rpcKc2Data.percentage)}">${rpcKc2Data.percentage}%</span> ${createChangeBadge(rpcKc2Data.percentage, prevRpcKc2Data.percentage)}</td>
                             </tr>
+                            ${createRpcDetails(rpcDetailsData, 'kc2', 'kc2-rpc-row')}
                             <tr class="detail-row" id="kc2-row-2" style="display: none;">
                                 <td style="padding-left: 30px;">Не RPC</td>
                                 <td class="text-right">${nonRpcKc2Data.calls.toLocaleString()} ${createChangeBadge(nonRpcKc2Data.calls, prevNonRpcKc2Data.calls)}</td>
@@ -867,7 +969,9 @@
                             <tr>
                                 <th>ПАРАМЕТР</th>
                                 <th class="text-right">ВСЕГО</th>
-                                <th class="text-right">RPC</th>
+                                <th class="text-right expandable-row" onclick="toggleRpcColumn()" style="cursor: pointer;">
+                                    RPC <span class="expand-icon" id="rpc-column-icon">▼</span>
+                                </th>
                                 <th class="text-right">НЕ RPC</th>
                             </tr>
                         </thead>
@@ -875,19 +979,34 @@
                             <tr>
                                 <td>Оценено звонков</td>
                                 <td class="text-right">${totalData.calls.toLocaleString()} ${createChangeBadge(totalData.calls, prevTotalData.calls)}</td>
-                                <td class="text-right">${rpcData.calls.toLocaleString()} ${createChangeBadge(rpcData.calls, prevRpcData.calls)}</td>
+                                <td class="text-right">
+                                    <div>${rpcData.calls.toLocaleString()} ${createChangeBadge(rpcData.calls, prevRpcData.calls)}</div>
+                                    <div id="rpc-calls-details" style="display: none;">
+                                        ${createRpcColumnDetails(rpcDetailsData, kcKey, 'calls')}
+                                    </div>
+                                </td>
                                 <td class="text-right">${nonRpcData.calls.toLocaleString()} ${createChangeBadge(nonRpcData.calls, prevNonRpcData.calls)}</td>
                             </tr>
                             <tr>
                                 <td>Отклонений выявлено</td>
                                 <td class="text-right">${totalData.deviations.toLocaleString()} ${createChangeBadge(totalData.deviations, prevTotalData.deviations)}</td>
-                                <td class="text-right">${rpcData.deviations.toLocaleString()} ${createChangeBadge(rpcData.deviations, prevRpcData.deviations)}</td>
+                                <td class="text-right">
+                                    <div>${rpcData.deviations.toLocaleString()} ${createChangeBadge(rpcData.deviations, prevRpcData.deviations)}</div>
+                                    <div id="rpc-deviations-details" style="display: none;">
+                                        ${createRpcColumnDetails(rpcDetailsData, kcKey, 'deviations')}
+                                    </div>
+                                </td>
                                 <td class="text-right">${nonRpcData.deviations.toLocaleString()} ${createChangeBadge(nonRpcData.deviations, prevNonRpcData.deviations)}</td>
                             </tr>
                             <tr>
                                 <td>% отклонений</td>
                                 <td class="text-right"><span class="${getPercentageClass(totalData.percentage)}">${totalData.percentage}%</span> ${createChangeBadge(totalData.percentage, prevTotalData.percentage)}</td>
-                                <td class="text-right"><span class="${getPercentageClass(rpcData.percentage)}">${rpcData.percentage}%</span> ${createChangeBadge(rpcData.percentage, prevRpcData.percentage)}</td>
+                                <td class="text-right">
+                                    <div><span class="${getPercentageClass(rpcData.percentage)}">${rpcData.percentage}%</span> ${createChangeBadge(rpcData.percentage, prevRpcData.percentage)}</div>
+                                    <div id="rpc-percentage-details" style="display: none;">
+                                        ${createRpcColumnDetails(rpcDetailsData, kcKey, 'percentage')}
+                                    </div>
+                                </td>
                                 <td class="text-right"><span class="${getPercentageClass(nonRpcData.percentage)}">${nonRpcData.percentage}%</span> ${createChangeBadge(nonRpcData.percentage, prevNonRpcData.percentage)}</td>
                             </tr>
                         </tbody>

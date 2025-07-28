@@ -3,6 +3,7 @@
  */
 
 let operatorData = null;
+let rpcDetailsData = null;
 
 // Загрузка данных из JSON файла
 async function loadOperatorData() {
@@ -34,6 +35,31 @@ async function loadOperatorData() {
     } catch (error) {
         console.error('Ошибка загрузки данных операторов:', error);
         console.error('Error details:', error.message, error.stack);
+        return null;
+    }
+}
+
+// Загрузка данных RPC детализации
+async function loadRpcDetailsData() {
+    if (rpcDetailsData) {
+        console.log('Данные RPC уже загружены, используем кэш');
+        return rpcDetailsData;
+    }
+
+    try {
+        console.log('Загружаем данные RPC из rpc_details_data.json...');
+        const response = await fetch('rpc_details_data.json');
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status} ${response.statusText}`);
+        }
+        
+        rpcDetailsData = await response.json();
+        console.log('Данные RPC успешно загружены');
+        
+        return rpcDetailsData;
+    } catch (error) {
+        console.error('Ошибка загрузки данных RPC:', error);
         return null;
     }
 }
@@ -403,6 +429,42 @@ async function getEmployeesData(startDate, endDate, granularity, selectedCallCen
     return employees;
 }
 
+// Функция для получения RPC детализации
+async function getRpcDetailsData(startDate, endDate, granularity, selectedCallCenter = 'Все КЦ') {
+    const rpcData = await loadRpcDetailsData();
+    if (!rpcData) return null;
+
+    // Определяем период (пока используем месяц из startDate)
+    const periodKey = startDate.substring(0, 7); // "2025-07"
+    const previousPeriodKey = getPreviousPeriod(startDate, endDate, granularity).startDate.substring(0, 7);
+
+    if (!rpcData[periodKey] || !rpcData[previousPeriodKey]) {
+        console.warn('Нет данных RPC для периода:', periodKey, 'или', previousPeriodKey);
+        return null;
+    }
+
+    const currentPeriodData = rpcData[periodKey];
+    const previousPeriodData = rpcData[previousPeriodKey];
+
+    // Определяем ключ для выбранного КЦ
+    let kcKey = 'total';
+    if (selectedCallCenter === 'КЦ 1') kcKey = 'kc1';
+    else if (selectedCallCenter === 'КЦ 2') kcKey = 'kc2';
+
+    return {
+        current: {
+            total: currentPeriodData.total,
+            kc1: currentPeriodData.kc1,
+            kc2: currentPeriodData.kc2
+        },
+        previous: {
+            total: previousPeriodData.total,
+            kc1: previousPeriodData.kc1,
+            kc2: previousPeriodData.kc2
+        }
+    };
+}
+
 // Экспорт функций для Node.js
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
@@ -410,7 +472,9 @@ if (typeof module !== 'undefined' && module.exports) {
         getCompanyData,
         getDepartmentsData,
         getEmployeesData,
-        getPreviousPeriod
+        getPreviousPeriod,
+        loadRpcDetailsData,
+        getRpcDetailsData
     };
 } else {
     // Для браузера делаем функции глобальными
@@ -419,4 +483,6 @@ if (typeof module !== 'undefined' && module.exports) {
     window.getDepartmentsData = getDepartmentsData;
     window.getEmployeesData = getEmployeesData;
     window.getPreviousPeriod = getPreviousPeriod;
+    window.loadRpcDetailsData = loadRpcDetailsData;
+    window.getRpcDetailsData = getRpcDetailsData;
 }
