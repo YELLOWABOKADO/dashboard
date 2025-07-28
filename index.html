@@ -62,12 +62,21 @@
             font-size: 14px;
             background-color: #fff;
             transition: border-color 0.15s ease-in-out;
+            cursor: pointer;
+            position: relative;
+            z-index: 10;
+            pointer-events: auto;
         }
 
         .date-input:focus {
             outline: none;
             border-color: #007bff;
             box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+        }
+
+        .date-input::-webkit-calendar-picker-indicator {
+            cursor: pointer;
+            opacity: 1;
         }
 
         .warning-icon {
@@ -81,6 +90,7 @@
             cursor: help;
             position: relative;
             display: inline-block;
+            pointer-events: auto; /* Иконка должна реагировать на hover */
         }
 
         .warning-icon:hover .tooltip-text {
@@ -99,7 +109,7 @@
             position: absolute;
             z-index: 1000;
             top: 100%;
-            left: -120px;
+            left: -140px;
             margin-top: 10px;
             opacity: 0;
             transition: opacity 0.3s;
@@ -107,6 +117,7 @@
             border: 1px solid #e0e0e0;
             font-size: 0.9em;
             font-weight: normal;
+            pointer-events: none; /* Важно: tooltip не должен перехватывать клики */
         }
 
         .tooltip-text::after {
@@ -371,12 +382,14 @@
                 <div class="filter-group">
                     <div class="filter-item">
                         <span class="filter-label">Период с:</span>
-                        <input type="date" id="startDate" value="2025-07-01" class="date-input">
+                        <input type="date" id="startDate" value="2025-07-01" class="date-input" style="position: relative; z-index: 1000;">
                     </div>
                     <div class="filter-item">
                         <span class="filter-label">по:</span>
-                        <input type="date" id="endDate" value="2025-07-31" class="date-input">
-                        <span class="warning-icon">!
+                        <input type="date" id="endDate" value="2025-07-31" class="date-input" style="position: relative; z-index: 1000;">
+                    </div>
+                    <div class="filter-item">
+                        <span class="warning-icon" style="z-index: 1;">!
                             <span class="tooltip-text">Ограничения периода выборки:<br>
                                 • Месяц - максимум 31 день<br>
                                 • Неделя - максимум 7 дней<br>
@@ -573,6 +586,13 @@
 
             const start = new Date(startDate);
             const end = new Date(endDate);
+
+            // Проверяем, что конечная дата не раньше начальной
+            if (end < start) {
+                alert('Конечная дата не может быть раньше начальной даты');
+                return false;
+            }
+
             const diffTime = Math.abs(end - start);
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
@@ -602,6 +622,47 @@
             }
 
             return true;
+        }
+
+        // Функция для динамической валидации полей дат
+        function validateDateFields() {
+            const startDateField = document.getElementById('startDate');
+            const endDateField = document.getElementById('endDate');
+            
+            if (!startDateField || !endDateField) return;
+            
+            const startDate = startDateField.value;
+            const endDate = endDateField.value;
+            
+            // Устанавливаем минимальную дату для поля "по"
+            if (startDate) {
+                endDateField.min = startDate;
+            }
+            
+            // Сбрасываем стили ошибок
+            startDateField.style.borderColor = '#dee2e6';
+            endDateField.style.borderColor = '#dee2e6';
+            
+            // Если обе даты заполнены, проверяем их
+            if (startDate && endDate) {
+                const start = new Date(startDate);
+                const end = new Date(endDate);
+                
+                if (end < start) {
+                    // Подсвечиваем поля красным
+                    startDateField.style.borderColor = '#dc3545';
+                    endDateField.style.borderColor = '#dc3545';
+                    
+                    // Показываем подсказку
+                    endDateField.title = 'Конечная дата не может быть раньше начальной';
+                    
+                    // Автоматически исправляем конечную дату
+                    endDateField.value = startDate;
+                } else {
+                    // Убираем подсказку об ошибке
+                    endDateField.title = '';
+                }
+            }
         }
 
         // Функция для расчета процентного изменения
@@ -1201,9 +1262,12 @@
 
             // Обработчик кнопки "Обновить"
             document.getElementById('updateButton').addEventListener('click', async function () {
+                console.log('=== Кнопка "Обновить" нажата ===');
                 const startDate = document.getElementById('startDate').value;
                 const endDate = document.getElementById('endDate').value;
                 const granularity = document.getElementById('timeGranularity').value;
+
+                console.log('Значения фильтров:', { startDate, endDate, granularity });
 
                 // Проверяем валидность диапазона дат
                 if (!validateDateRange(startDate, endDate, granularity)) {
@@ -1213,10 +1277,55 @@
                 await updateActiveTab();
             });
 
-            // Обработчики изменения фильтров
-            document.getElementById('timeGranularity').addEventListener('change', updateActiveTab);
-            document.getElementById('callCenter').addEventListener('change', updateActiveTab);
+            // Отладка полей дат
+            const startDateField = document.getElementById('startDate');
+            const endDateField = document.getElementById('endDate');
+            
+            console.log('Поля дат найдены:', { startDateField, endDateField });
+            
+            if (startDateField) {
+                startDateField.addEventListener('click', function() {
+                    console.log('Клик по полю startDate');
+                    // Принудительно показываем календарь
+                    try {
+                        this.showPicker();
+                    } catch (e) {
+                        console.log('showPicker не поддерживается:', e);
+                    }
+                });
+                startDateField.addEventListener('focus', function() {
+                    console.log('Фокус на поле startDate');
+                });
+                startDateField.addEventListener('change', function() {
+                    console.log('Изменение startDate:', this.value);
+                    validateDateFields();
+                });
+            }
+            
+            if (endDateField) {
+                endDateField.addEventListener('click', function() {
+                    console.log('Клик по полю endDate');
+                    // Принудительно показываем календарь
+                    try {
+                        this.showPicker();
+                    } catch (e) {
+                        console.log('showPicker не поддерживается:', e);
+                    }
+                });
+                endDateField.addEventListener('focus', function() {
+                    console.log('Фокус на поле endDate');
+                });
+                endDateField.addEventListener('change', function() {
+                    console.log('Изменение endDate:', this.value);
+                    validateDateFields();
+                });
+            }
 
+            // Обработчики изменения фильтров убраны - данные обновляются только по кнопке "Обновить"
+
+            // Устанавливаем начальные ограничения для полей дат
+            validateDateFields();
+            
             // Загружаем данные для начальной вкладки
             setTimeout(updateActiveTab, 500);
         });
