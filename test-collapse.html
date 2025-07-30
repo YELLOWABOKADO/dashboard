@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест сворачивания</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h4>Тест функциональности сворачивания</h4>
+        <p>Кликните на строку "Всего ▼" чтобы свернуть/развернуть детали</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>КОЛЛ-ЦЕНТР</th>
+                    <th class="text-right">ВСЕГО ЗВОНКОВ</th>
+                    <th class="text-right">ОТКЛОНЕНИЙ</th>
+                    <th class="text-right">% ОТКЛОНЕНИЙ</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="expandable-row" data-target="total-details" style="cursor: pointer;">
+                    <td><strong>Всего <span class="arrow">▼</span></strong></td>
+                    <td class="text-right"><strong>318,489</strong></td>
+                    <td class="text-right"><strong>5,229</strong></td>
+                    <td class="text-right"><strong>1.64%</strong></td>
+                </tr>
+                <tr class="detail-row total-details" style="background-color: #f8f9fa;">
+                    <td style="padding-left: 20px;">RPC</td>
+                    <td class="text-right">95,551</td>
+                    <td class="text-right">2,091</td>
+                    <td class="text-right">2.19%</td>
+                </tr>
+                <tr class="detail-row total-details" style="background-color: #f8f9fa;">
+                    <td style="padding-left: 20px;">Не RPC</td>
+                    <td class="text-right">222,938</td>
+                    <td class="text-right">3,138</td>
+                    <td class="text-right">1.41%</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div style="margin-top: 20px; padding: 15px; background: #e3f2fd; border-radius: 4px;">
+            <h5>Инструкции для тестирования:</h5>
+            <ol>
+                <li>Откройте консоль браузера (F12)</li>
+                <li>Кликните на строку "Всего ▼"</li>
+                <li>Проверьте, что строки RPC и "Не RPC" скрываются/показываются</li>
+                <li>Проверьте, что стрелка поворачивается (▼ → ▶)</li>
+                <li>Посмотрите логи в консоли для отладки</li>
+            </ol>
+        </div>
+    </div>
+
+    <script src="js/modules/ui-helpers.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('=== DOM загружен, инициализируем сворачивание ===');
+            initTableCollapse();
+        });
+    </script>
+</body>
+</html>

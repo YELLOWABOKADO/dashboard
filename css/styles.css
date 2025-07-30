@@ -1,0 +1,397 @@
+/* Основные стили */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f8f9fa;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+}
+
+/* Стили для фильтров */
+.filters-container {
+    padding: 15px 0;
+    margin-bottom: 20px;
+    background-color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    position: relative; /* Добавляем относительное позиционирование */
+    overflow: visible; /* Разрешаем переполнение для выпадающих списков */
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.filter-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.filter-label {
+    font-weight: 500;
+    color: #6c757d;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.date-input {
+    padding: 8px 12px;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: #fff;
+    transition: border-color 0.15s ease-in-out;
+    cursor: pointer;
+}
+
+.date-input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+/* Стили для кнопок */
+.btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #0069d9;
+}
+
+/* Стили для селектов */
+select {
+    padding: 8px 12px;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    background-color: #fff;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    min-width: 120px;
+}
+
+select:hover {
+    border-color: #adb5bd;
+}
+
+select:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+/* Стили для вкладок */
+.tabs {
+    display: flex;
+    border-bottom: 1px solid #dee2e6;
+    margin-bottom: 20px;
+    overflow-x: auto;
+}
+
+.tab-button {
+    padding: 12px 16px;
+    background-color: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    font-weight: 500;
+    color: #6c757d;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+
+.tab-button:hover {
+    color: #007bff;
+}
+
+.tab-button.active {
+    color: #007bff;
+    border-bottom-color: #007bff;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Стили для таблиц */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    border: 1px solid #e9ecef;
+}
+
+h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: #495057;
+}
+
+th,
+td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid #e9ecef;
+}
+
+th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    color: #495057;
+    font-size: 0.85em;
+    text-transform: uppercase;
+}
+
+tr:hover {
+    background-color: #f8f9fa;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.text-center {
+    text-align: center;
+}
+
+/* Стили для бейджей */
+.badge {
+    display: inline-block;
+    padding: 3px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.75em;
+    margin-left: 6px;
+}
+
+.badge-success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.badge-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.badge-neutral {
+    background-color: #e9ecef;
+    color: #6c757d;
+}
+
+/* Стили для процентов */
+.percentage-high {
+    color: #dc3545;
+    font-weight: 600;
+}
+
+.percentage-medium {
+    color: #fd7e14;
+    font-weight: 600;
+}
+
+.percentage-low {
+    color: #28a745;
+    font-weight: 600;
+}
+
+/* Стили для множественного выбора */
+.multi-select-container {
+    position: relative;
+    display: inline-block;
+    min-width: 200px;
+    z-index: 100; /* Базовый z-index для контейнера */
+}
+
+.multi-select-button {
+    padding: 8px 12px;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    background-color: #fff;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    min-width: 200px;
+    text-align: left;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.multi-select-button:hover {
+    border-color: #adb5bd;
+}
+
+.multi-select-button:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.multi-select-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #dee2e6;
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 9999; /* Увеличиваем z-index для выпадающего списка */
+    display: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Добавляем тень для лучшей видимости */
+}
+
+.multi-select-dropdown.show {
+    display: block;
+}
+
+.multi-select-option {
+    padding: 8px 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.multi-select-option:hover {
+    background-color: #f8f9fa;
+}
+
+.multi-select-option input[type="checkbox"] {
+    margin: 0;
+}
+
+.multi-select-arrow {
+    font-size: 12px;
+    color: #6c757d;
+}
+
+/* Утилиты */
+.mt-4 {
+    margin-top: 1rem;
+}
+
+.mb-4 {
+    margin-bottom: 1rem;
+}
+
+/* Стили для загрузки */
+.loading {
+    text-align: center;
+    padding: 40px;
+    color: #6c757d;
+}
+
+.error {
+    text-align: center;
+    padding: 40px;
+    color: #dc3545;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+    margin: 20px 0;
+}
+
+.warning-icon {
+    color: #e67e22;
+    background-color: #fef9e7;
+    padding: 3px 8px;
+    border-radius: 50%;
+    font-size: 1.2em;
+    margin-left: 8px;
+    font-weight: bold;
+    cursor: help;
+    position: relative;
+    display: inline-block;
+}
+
+/* Дополнительные стили для исправления верстки */
+.filter-group {
+    position: relative;
+    z-index: 1;
+}
+
+.filter-group:has(.multi-select-dropdown.show) {
+    z-index: 1000;
+}
+
+/* Исправление для переполнения в контейнере */
+.container {
+    overflow: visible;
+}
+
+/* Стили для лучшего отображения выпадающих списков */
+.multi-select-dropdown {
+    min-width: 200px;
+    white-space: nowrap;
+}
+
+.multi-select-option label {
+    cursor: pointer;
+    user-select: none;
+    width: 100%;
+    display: block;
+}
+
+/* Стили для сворачивания строк таблицы */
+.expandable-row {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.expandable-row:hover {
+    background-color: #f1f3f4 !important;
+}
+
+.expandable-row .arrow {
+    font-size: 12px;
+    margin-left: 5px;
+    transition: transform 0.2s ease;
+    display: inline-block;
+}
+
+.expandable-row.collapsed .arrow {
+    transform: rotate(-90deg);
+}
+
+.detail-row {
+    transition: all 0.3s ease;
+}
+
+.detail-row.hidden {
+    display: none;
+}

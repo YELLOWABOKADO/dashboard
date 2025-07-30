@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Полный тест сворачивания</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h4>Полный тест функциональности сворачивания</h4>
+        <button id="renderTable" class="btn btn-primary">Отрисовать таблицу</button>
+        
+        <div id="companySummaryTable" class="mt-4">
+            <div class="loading">Нажмите кнопку для отрисовки таблицы...</div>
+        </div>
+    </div>
+
+    <!-- Подключаем те же скрипты, что и в основном приложении -->
+    <script src="js/data/real-data-processor.js"></script>
+    <script src="js/modules/ui-helpers.js"></script>
+    <script src="js/modules/filters.js"></script>
+    <script src="js/modules/company.js"></script>
+
+    <script>
+        // Имитируем данные компании
+        const mockCompanyData = {
+            current: {
+                total: { calls: 318489, deviations: 5229, percentage: 1.64 },
+                rpc: {
+                    total: { calls: 95551, deviations: 2091, percentage: 2.19 }
+                },
+                nonRpc: {
+                    total: { calls: 222938, deviations: 3138, percentage: 1.41 }
+                }
+            },
+            previous: {
+                total: { calls: 300000, deviations: 5000, percentage: 1.67 },
+                rpc: {
+                    total: { calls: 90000, deviations: 2000, percentage: 2.22 }
+                },
+                nonRpc: {
+                    total: { calls: 210000, deviations: 3000, percentage: 1.43 }
+                }
+            }
+        };
+
+        document.getElementById('renderTable').addEventListener('click', function() {
+            console.log('=== Кнопка нажата, отрисовываем таблицу ===');
+            
+            // Имитируем процесс отрисовки как в основном приложении
+            const tableContainer = document.getElementById('companySummaryTable');
+            
+            // Показываем загрузку
+            tableContainer.innerHTML = '<div class="loading">Загрузка...</div>';
+            
+            // Через небольшую задержку отрисовываем таблицу
+            setTimeout(() => {
+                renderCompanyTable(mockCompanyData);
+            }, 500);
+        });
+
+        // Инициализируем при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('=== DOM загружен ===');
+            if (typeof initTableCollapse === 'function') {
+                initTableCollapse();
+            }
+        });
+    </script>
+</body>
+</html>

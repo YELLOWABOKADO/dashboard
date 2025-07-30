@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Простой тест сворачивания</title>
+    <style>
+        .expandable-row {
+            cursor: pointer;
+            background-color: #f0f0f0;
+            transition: background-color 0.2s ease;
+        }
+        
+        .expandable-row:hover {
+            background-color: #e0e0e0;
+        }
+        
+        .expandable-row .arrow {
+            font-size: 12px;
+            margin-left: 5px;
+            transition: transform 0.2s ease;
+            display: inline-block;
+        }
+        
+        .expandable-row.collapsed .arrow {
+            transform: rotate(-90deg);
+        }
+        
+        .detail-row {
+            transition: all 0.3s ease;
+            background-color: #f8f9fa;
+        }
+        
+        .detail-row.hidden {
+            display: none;
+        }
+        
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <h2>Простой тест сворачивания</h2>
+    <p>Кликните на "Всего ▼" чтобы свернуть/развернуть</p>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Название</th>
+                <th>Значение</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="expandable-row" data-target="total-details">
+                <td><strong>Всего <span class="arrow">▼</span></strong></td>
+                <td><strong>100</strong></td>
+            </tr>
+            <tr class="detail-row total-details">
+                <td style="padding-left: 20px;">RPC</td>
+                <td>60</td>
+            </tr>
+            <tr class="detail-row total-details">
+                <td style="padding-left: 20px;">Не RPC</td>
+                <td>40</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script>
+        function handleTableRowClick(event) {
+            console.log('Клик обработан:', event.target);
+            
+            const expandableRow = event.target.closest('.expandable-row');
+            console.log('expandableRow:', expandableRow);
+            
+            if (!expandableRow) return;
+            
+            const targetClass = expandableRow.getAttribute('data-target');
+            console.log('targetClass:', targetClass);
+            
+            if (!targetClass) return;
+            
+            const detailRows = document.querySelectorAll(`.detail-row.${targetClass}`);
+            console.log('detailRows:', detailRows);
+            
+            const arrow = expandableRow.querySelector('.arrow');
+            console.log('arrow:', arrow);
+            
+            if (detailRows.length === 0) return;
+            
+            const isCollapsed = expandableRow.classList.contains('collapsed');
+            console.log('isCollapsed:', isCollapsed);
+            
+            if (isCollapsed) {
+                expandableRow.classList.remove('collapsed');
+                detailRows.forEach(row => {
+                    row.classList.remove('hidden');
+                });
+                if (arrow) {
+                    arrow.textContent = '▼';
+                }
+                console.log('Развернуто');
+            } else {
+                expandableRow.classList.add('collapsed');
+                detailRows.forEach(row => {
+                    row.classList.add('hidden');
+                });
+                if (arrow) {
+                    arrow.textContent = '▶';
+                }
+                console.log('Свернуто');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM загружен');
+            document.addEventListener('click', handleTableRowClick);
+            console.log('Обработчик добавлен');
+        });
+    </script>
+</body>
+</html>

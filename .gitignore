@@ -33,3 +33,4 @@ out/
 # Черновики и тестовые файлы
 draft_*.html
 *_test.*
+index-archive.html

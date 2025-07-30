@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Отладка загрузки функций</title>
+</head>
+<body>
+    <h2>Отладка загрузки функций</h2>
+    <p>Откройте консоль браузера (F12) чтобы увидеть порядок загрузки</p>
+    
+    <div id="status">Загрузка...</div>
+
+    <!-- Подключение в том же порядке, что и в index.html -->
+    <script>
+        console.log('=== Начинаем загрузку скриптов ===');
+    </script>
+    
+    <script src="js/data/real-data-processor.js" onerror="console.error('Ошибка загрузки real-data-processor.js')"></script>
+    <script src="js/modules/ui-helpers.js"></script>
+    <script src="js/modules/filters.js"></script>
+    <script src="js/modules/tabs.js"></script>
+    <script src="js/modules/company.js"></script>
+    <script src="js/modules/departments.js"></script>
+    <script src="js/modules/employees.js"></script>
+    <script src="js/modules/app.js"></script>
+    
+    <script>
+        console.log('=== После загрузки всех модулей ===');
+        console.log('Проверяем функции:', {
+            loadOperatorData: typeof loadOperatorData,
+            getDepartmentsData: typeof getDepartmentsData,
+            getCompanyData: typeof getCompanyData,
+            updateCompanyData: typeof updateCompanyData,
+            initTableCollapse: typeof initTableCollapse,
+            initApp: typeof initApp
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('=== DOM загружен ===');
+            
+            const statusDiv = document.getElementById('status');
+            
+            const functions = {
+                loadOperatorData: typeof loadOperatorData,
+                getDepartmentsData: typeof getDepartmentsData,
+                getCompanyData: typeof getCompanyData,
+                updateCompanyData: typeof updateCompanyData,
+                initTableCollapse: typeof initTableCollapse,
+                initApp: typeof initApp
+            };
+            
+            let html = '<h3>Статус функций:</h3><ul>';
+            for (const [name, type] of Object.entries(functions)) {
+                const status = type === 'function' ? '✅' : '❌';
+                html += `<li>${status} ${name}: ${type}</li>`;
+            }
+            html += '</ul>';
+            
+            const allLoaded = Object.values(functions).every(type => type === 'function');
+            if (allLoaded) {
+                html += '<p style="color: green;"><strong>✅ Все функции загружены успешно!</strong></p>';
+            } else {
+                html += '<p style="color: red;"><strong>❌ Некоторые функции не загружены</strong></p>';
+            }
+            
+            statusDiv.innerHTML = html;
+        });
+    </script>
+</body>
+</html>

@@ -6,364 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Отчет по работе групп</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        /* Основные стили */
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f8f9fa;
-            color: #333;
-            margin: 0;
-            padding: 0;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #fff;
-        }
-
-        /* Стили для фильтров */
-        .filters-container {
-            padding: 15px 0;
-            margin-bottom: 20px;
-            background-color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .filter-group {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            flex-wrap: wrap;
-        }
-
-        .filter-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .filter-label {
-            font-weight: 500;
-            color: #6c757d;
-            font-size: 14px;
-            white-space: nowrap;
-        }
-
-        .date-input {
-            padding: 8px 12px;
-            border: 1px solid #dee2e6;
-            border-radius: 4px;
-            font-size: 14px;
-            background-color: #fff;
-            transition: border-color 0.15s ease-in-out;
-            cursor: pointer;
-            position: relative;
-            z-index: 10;
-            pointer-events: auto;
-        }
-
-        .date-input:focus {
-            outline: none;
-            border-color: #007bff;
-            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
-        }
-
-        .date-input::-webkit-calendar-picker-indicator {
-            cursor: pointer;
-            opacity: 1;
-        }
-
-        .warning-icon {
-            color: #e67e22;
-            background-color: #fef9e7;
-            padding: 3px 8px;
-            border-radius: 50%;
-            font-size: 1.2em;
-            margin-left: 8px;
-            font-weight: bold;
-            cursor: help;
-            position: relative;
-            display: inline-block;
-            pointer-events: auto; /* Иконка должна реагировать на hover */
-        }
-
-        .warning-icon:hover .tooltip-text {
-            visibility: visible;
-            opacity: 1;
-        }
-
-        .tooltip-text {
-            visibility: hidden;
-            width: 280px;
-            background-color: #fff;
-            color: #333;
-            text-align: left;
-            border-radius: 6px;
-            padding: 10px;
-            position: absolute;
-            z-index: 1000;
-            top: 100%;
-            left: -140px;
-            margin-top: 10px;
-            opacity: 0;
-            transition: opacity 0.3s;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-            border: 1px solid #e0e0e0;
-            font-size: 0.9em;
-            font-weight: normal;
-            pointer-events: none; /* Важно: tooltip не должен перехватывать клики */
-        }
-
-        .tooltip-text::after {
-            content: "";
-            position: absolute;
-            bottom: 100%;
-            left: 130px;
-            margin-left: -5px;
-            border-width: 5px;
-            border-style: solid;
-            border-color: transparent transparent #fff transparent;
-        }
-
-        /* Стили для кнопок */
-        .btn {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 500;
-            font-size: 14px;
-            transition: all 0.2s ease;
-        }
-
-        .btn-primary {
-            background-color: #007bff;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background-color: #0069d9;
-        }
-
-        .btn-secondary {
-            background-color: #f8f9fa;
-            color: #6c757d;
-            border: 1px solid #dee2e6;
-        }
-
-        .btn-secondary:hover {
-            background-color: #e9ecef;
-        }
-
-        /* Стили для селектов */
-        select {
-            padding: 8px 12px;
-            border: 1px solid #dee2e6;
-            border-radius: 4px;
-            background-color: #fff;
-            font-family: 'Inter', sans-serif;
-            font-size: 14px;
-            cursor: pointer;
-            min-width: 120px;
-        }
-
-        select:hover {
-            border-color: #adb5bd;
-        }
-
-        select:focus {
-            outline: none;
-            border-color: #007bff;
-            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
-        }
-
-        /* Стили для вкладок */
-        .tabs {
-            display: flex;
-            border-bottom: 1px solid #dee2e6;
-            margin-bottom: 20px;
-            overflow-x: auto;
-        }
-
-        .tab-button {
-            padding: 12px 16px;
-            background-color: transparent;
-            border: none;
-            border-bottom: 2px solid transparent;
-            cursor: pointer;
-            font-weight: 500;
-            color: #6c757d;
-            white-space: nowrap;
-            transition: all 0.2s ease;
-        }
-
-        .tab-button:hover {
-            color: #007bff;
-        }
-
-        .tab-button.active {
-            color: #007bff;
-            border-bottom-color: #007bff;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        /* Стили для таблиц */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            border: 1px solid #e9ecef;
-        }
-
-        .main-table {
-            font-size: 1.1rem;
-        }
-
-        .main-table th {
-            font-size: 1rem;
-            padding: 16px 20px;
-        }
-
-        .main-table td {
-            padding: 16px 20px;
-            font-size: 1.1rem;
-        }
-
-        .main-table .expandable-row {
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-        }
-
-        .main-table .expandable-row:hover {
-            background-color: #f8f9fa;
-        }
-
-        .main-table .detail-row {
-            background-color: #e9ecef;
-            font-size: 1rem;
-        }
-
-        .expand-icon {
-            font-size: 0.8rem;
-            margin-left: 8px;
-            color: #6c757d;
-            transition: transform 0.2s ease;
-        }
-
-        h4 {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 15px;
-            color: #495057;
-        }
-
-        th,
-        td {
-            padding: 12px 16px;
-            text-align: left;
-            border-bottom: 1px solid #e9ecef;
-        }
-
-        th {
-            background-color: #f8f9fa;
-            font-weight: 600;
-            color: #495057;
-            font-size: 0.85em;
-            text-transform: uppercase;
-        }
-
-        tr:hover {
-            background-color: #f8f9fa;
-        }
-
-        .text-right {
-            text-align: right;
-        }
-
-        .text-center {
-            text-align: center;
-        }
-
-        /* Стили для бейджей */
-        .badge {
-            display: inline-block;
-            padding: 3px 6px;
-            border-radius: 4px;
-            font-weight: 600;
-            font-size: 0.75em;
-            margin-left: 6px;
-        }
-
-        .badge-success {
-            background-color: #d4edda;
-            color: #155724;
-        }
-
-        .badge-danger {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-
-        .badge-neutral {
-            background-color: #e9ecef;
-            color: #6c757d;
-        }
-
-        /* Стили для процентов */
-        .percentage-high {
-            color: #dc3545;
-            font-weight: 600;
-        }
-
-        .percentage-medium {
-            color: #fd7e14;
-            font-weight: 600;
-        }
-
-        .percentage-low {
-            color: #28a745;
-            font-weight: 600;
-        }
-
-        /* Утилиты */
-        .mt-4 {
-            margin-top: 1rem;
-        }
-
-        .mb-4 {
-            margin-bottom: 1rem;
-        }
-
-        /* Стили для загрузки */
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: #6c757d;
-        }
-
-        .error {
-            text-align: center;
-            padding: 40px;
-            color: #dc3545;
-            background-color: #f8d7da;
-            border: 1px solid #f5c6cb;
-            border-radius: 4px;
-            margin: 20px 0;
-        }
-    </style>
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 
 <body>
@@ -382,20 +25,11 @@
                 <div class="filter-group">
                     <div class="filter-item">
                         <span class="filter-label">Период с:</span>
-                        <input type="date" id="startDate" value="2025-07-01" class="date-input" style="position: relative; z-index: 1000;">
+                        <input type="date" id="startDate" value="2025-07-01" class="date-input">
                     </div>
                     <div class="filter-item">
                         <span class="filter-label">по:</span>
-                        <input type="date" id="endDate" value="2025-07-31" class="date-input" style="position: relative; z-index: 1000;">
-                    </div>
-                    <div class="filter-item">
-                        <span class="warning-icon" style="z-index: 1;">!
-                            <span class="tooltip-text">Ограничения периода выборки:<br>
-                                • Месяц - максимум 31 день<br>
-                                • Неделя - максимум 7 дней<br>
-                                • День - максимум 1 день
-                            </span>
-                        </span>
+                        <input type="date" id="endDate" value="2025-07-31" class="date-input">
                     </div>
                 </div>
 
@@ -417,6 +51,8 @@
                         </select>
                     </div>
 
+
+
                     <div class="filter-item">
                         <span class="filter-label">Дашборд:</span>
                         <select id="dashboard">
@@ -433,8 +69,7 @@
 
             <!-- Информационное примечание -->
             <div class="warning-icon" style="margin-bottom: 15px; display: inline-block;">
-                <span
-                    style="background-color: #e3f2fd; color: #1976d2; padding: 8px 12px; border-radius: 4px; font-size: 14px; font-weight: normal;">
+                <span style="background-color: #e3f2fd; color: #1976d2; padding: 8px 12px; border-radius: 4px; font-size: 14px; font-weight: normal;">
                     ℹ️ Изменения показаны относительно предыдущего периода
                     <span id="periodInfo">(01.06.2025 - 30.06.2025)</span>
                 </span>
@@ -443,22 +78,109 @@
             <!-- Таблица с данными сводной информации -->
             <div id="companySummaryTable" class="mt-4">
                 <div class="loading">Загрузка данных...</div>
-                <div id="debugInfo"
-                    style="margin-top: 20px; padding: 10px; background: #f0f0f0; border-radius: 4px; font-family: monospace; font-size: 12px;">
-                </div>
             </div>
         </div>
 
         <!-- Departments Tab Content -->
         <div id="departmentsTab" class="tab-content">
+            <!-- Фильтры для подразделений -->
+            <div class="filters-container">
+                <div class="filter-group">
+                    <div class="filter-item">
+                        <span class="filter-label">Период с:</span>
+                        <input type="date" id="deptStartDate" value="2025-07-01" class="date-input">
+                    </div>
+                    <div class="filter-item">
+                        <span class="filter-label">по:</span>
+                        <input type="date" id="deptEndDate" value="2025-07-31" class="date-input">
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <div class="filter-item">
+                        <span class="filter-label">Режим отображения:</span>
+                        <select id="deptTimeGranularity">
+                            <option value="День">День</option>
+                            <option value="Неделя">Неделя</option>
+                            <option value="Месяц" selected>Месяц</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-item">
+                        <span class="filter-label">КЦ:</span>
+                        <select id="deptCallCenter">
+                            <option value="Все КЦ">Все КЦ</option>
+                            <option value="КЦ 1">КЦ 1</option>
+                            <option value="КЦ 2">КЦ 2</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-item">
+                        <span class="filter-label">Группы:</span>
+                        <div class="multi-select-container">
+                            <button type="button" class="multi-select-button" id="deptDepartmentsButton">
+                                <span id="deptDepartmentsText">Все группы</span>
+                                <span class="multi-select-arrow">▼</span>
+                            </button>
+                            <div class="multi-select-dropdown" id="deptDepartmentsDropdown" style="display: none;">
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="dept_all" value="all" checked>
+                                    <label for="dept_all">Все группы</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="dept_gridchina" value="Гридчина">
+                                    <label for="dept_gridchina">Гридчина - группа</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="dept_korovina" value="Коровина">
+                                    <label for="dept_korovina">Коровина - группа</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="dept_melnikova" value="Мельникова">
+                                    <label for="dept_melnikova">Мельникова - группа</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="dept_sycheva" value="Сычева">
+                                    <label for="dept_sycheva">Сычева - группа</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="dept_group1" value="группа 1">
+                                    <label for="dept_group1">Группа 1 - группа</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="dept_group2" value="группа 2">
+                                    <label for="dept_group2">Группа 2 - группа</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="dept_group3" value="группа 3">
+                                    <label for="dept_group3">Группа 3 - группа</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="filter-item">
+                        <span class="filter-label">Дашборд:</span>
+                        <select id="deptDashboard">
+                            <option value="Автооценка" selected>Автооценка</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-item">
+                        <button id="deptUpdateButton" class="btn btn-primary">Обновить</button>
+                    </div>
+                </div>
+            </div>
+
             <!-- Информационное примечание -->
             <div class="warning-icon" style="margin-bottom: 15px; display: inline-block;">
-                <span
-                    style="background-color: #e3f2fd; color: #1976d2; padding: 8px 12px; border-radius: 4px; font-size: 14px; font-weight: normal;">
+                <span style="background-color: #e3f2fd; color: #1976d2; padding: 8px 12px; border-radius: 4px; font-size: 14px; font-weight: normal;">
                     ℹ️ Изменения показаны относительно предыдущего периода
                     <span id="departmentsPeriodInfo">(01.06.2025 - 30.06.2025)</span>
                 </span>
             </div>
+
+            <!-- Таблица подразделений -->
             <div id="departmentsTable" class="mt-4">
                 <div class="loading">Загрузка данных...</div>
             </div>
@@ -466,868 +188,230 @@
 
         <!-- Employees Tab Content -->
         <div id="employeesTab" class="tab-content">
+            <!-- Фильтры для команды -->
+            <div class="filters-container">
+                <div class="filter-group">
+                    <div class="filter-item">
+                        <span class="filter-label">Период с:</span>
+                        <input type="date" id="empStartDate" value="2025-07-01" class="date-input">
+                    </div>
+                    <div class="filter-item">
+                        <span class="filter-label">по:</span>
+                        <input type="date" id="empEndDate" value="2025-07-31" class="date-input">
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <div class="filter-item">
+                        <span class="filter-label">Режим отображения:</span>
+                        <select id="empTimeGranularity">
+                            <option value="День">День</option>
+                            <option value="Неделя">Неделя</option>
+                            <option value="Месяц" selected>Месяц</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-item">
+                        <span class="filter-label">КЦ:</span>
+                        <select id="empCallCenter">
+                            <option value="Все КЦ">Все КЦ</option>
+                            <option value="КЦ 1">КЦ 1</option>
+                            <option value="КЦ 2">КЦ 2</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-item">
+                        <span class="filter-label">Группы:</span>
+                        <div class="multi-select-container">
+                            <button type="button" class="multi-select-button" id="empDepartmentsButton">
+                                <span id="empDepartmentsText">Все группы</span>
+                                <span class="multi-select-arrow">▼</span>
+                            </button>
+                            <div class="multi-select-dropdown" id="empDepartmentsDropdown" style="display: none;">
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="emp_dept_all" value="all" checked>
+                                    <label for="emp_dept_all">Все группы</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="emp_dept_gridchina" value="Гридчина">
+                                    <label for="emp_dept_gridchina">Гридчина - группа</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="emp_dept_korovina" value="Коровина">
+                                    <label for="emp_dept_korovina">Коровина - группа</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="emp_dept_melnikova" value="Мельникова">
+                                    <label for="emp_dept_melnikova">Мельникова - группа</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="emp_dept_sycheva" value="Сычева">
+                                    <label for="emp_dept_sycheva">Сычева - группа</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="emp_dept_group1" value="группа 1">
+                                    <label for="emp_dept_group1">Группа 1 - группа</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="emp_dept_group2" value="группа 2">
+                                    <label for="emp_dept_group2">Группа 2 - группа</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="emp_dept_group3" value="группа 3">
+                                    <label for="emp_dept_group3">Группа 3 - группа</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="filter-item">
+                        <span class="filter-label">Сотрудники:</span>
+                        <div class="multi-select-container">
+                            <button type="button" class="multi-select-button" id="empEmployeesButton">
+                                <span id="empEmployeesText">Все сотрудники</span>
+                                <span class="multi-select-arrow">▼</span>
+                            </button>
+                            <div class="multi-select-dropdown" id="empEmployeesDropdown" style="display: none;">
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="emp_all" value="all" checked>
+                                    <label for="emp_all">Все сотрудники</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="emp_markina" value="Маркина И. М.">
+                                    <label for="emp_markina">Маркина И. М.</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="emp_petrova" value="Петрова А. С.">
+                                    <label for="emp_petrova">Петрова А. С.</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="emp_sidorov" value="Сидоров В. П.">
+                                    <label for="emp_sidorov">Сидоров В. П.</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="emp_ivanova" value="Иванова М. К.">
+                                    <label for="emp_ivanova">Иванова М. К.</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="emp_smirnov" value="Смирнов Д. А.">
+                                    <label for="emp_smirnov">Смирнов Д. А.</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="emp_kozlova" value="Козлова Е. В.">
+                                    <label for="emp_kozlova">Козлова Е. В.</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="emp_ermoshina" value="Ермошина С. В.">
+                                    <label for="emp_ermoshina">Ермошина С. В.</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="emp_kuznetsova" value="Кузнецова В. Ю.">
+                                    <label for="emp_kuznetsova">Кузнецова В. Ю.</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="emp_anpilogov" value="Анпилогов Е. А.">
+                                    <label for="emp_anpilogov">Анпилогов Е. А.</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="emp_tarasova" value="Тарасова К. И.">
+                                    <label for="emp_tarasova">Тарасова К. И.</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="emp_borisova" value="Борисова В. А.">
+                                    <label for="emp_borisova">Борисова В. А.</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="emp_moiseenko" value="Моисеенко А. А.">
+                                    <label for="emp_moiseenko">Моисеенко А. А.</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="emp_ladygina" value="Ладыгина Д. В.">
+                                    <label for="emp_ladygina">Ладыгина Д. В.</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="emp_zabrovskaya" value="Забровская А. В.">
+                                    <label for="emp_zabrovskaya">Забровская А. В.</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="emp_sukhorukova" value="Сухорукова И. В.">
+                                    <label for="emp_sukhorukova">Сухорукова И. В.</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="emp_korotenko" value="Коротенко П. Р.">
+                                    <label for="emp_korotenko">Коротенко П. Р.</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="emp_bakina" value="Бакина В. О.">
+                                    <label for="emp_bakina">Бакина В. О.</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="filter-item">
+                        <button id="empUpdateButton" class="btn btn-primary">Обновить</button>
+                    </div>
+                </div>
+            </div>
+
             <!-- Информационное примечание -->
             <div class="warning-icon" style="margin-bottom: 15px; display: inline-block;">
-                <span
-                    style="background-color: #e3f2fd; color: #1976d2; padding: 8px 12px; border-radius: 4px; font-size: 14px; font-weight: normal;">
+                <span style="background-color: #e3f2fd; color: #1976d2; padding: 8px 12px; border-radius: 4px; font-size: 14px; font-weight: normal;">
                     ℹ️ Изменения показаны относительно предыдущего периода
                     <span id="employeesPeriodInfo">(01.06.2025 - 30.06.2025)</span>
                 </span>
             </div>
+
+            <!-- Таблица сотрудников -->
             <div id="employeesTable" class="mt-4">
                 <div class="loading">Загрузка данных...</div>
             </div>
         </div>
     </div>
 
-    <!-- Подключение JavaScript файлов -->
-    <script src="js/data/real-data-processor.js"></script>
-
+    <!-- Подключение модулей -->
     <script>
-        // Отладка загрузки
-        console.log('=== ОТЛАДКА ЗАГРУЗКИ ===');
-        console.log('Скрипт загружен');
-
-        function updateDebugInfo(message) {
-            const debugDiv = document.getElementById('debugInfo');
-            if (debugDiv) {
-                debugDiv.innerHTML += message + '<br>';
-            }
-        }
-
-        // Проверяем доступность функций
-        setTimeout(() => {
-            console.log('Проверяем функции через 1 секунду...');
-            updateDebugInfo('Проверяем функции...');
-
-            const functions = {
-                'loadOperatorData': typeof loadOperatorData,
-                'getCompanyData': typeof getCompanyData,
-                'getDepartmentsData': typeof getDepartmentsData,
-                'getEmployeesData': typeof getEmployeesData
-            };
-
-            for (const [name, type] of Object.entries(functions)) {
-                console.log(`${name}:`, type);
-                updateDebugInfo(`${name}: ${type}`);
-            }
-
-            // Если функции доступны, пробуем загрузить данные
-            if (typeof loadOperatorData === 'function') {
-                updateDebugInfo('Пробуем загрузить данные...');
-
-                // Сначала проверим, можем ли мы вообще делать fetch запросы
-                fetch('callcenter_operator_data.json')
-                    .then(response => {
-                        updateDebugInfo(`Fetch ответ: ${response.status} ${response.statusText}`);
-                        if (!response.ok) {
-                            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                        }
-                        return response.text();
-                    })
-                    .then(text => {
-                        updateDebugInfo(`Получен текст длиной: ${text.length} символов`);
-                        try {
-                            const data = JSON.parse(text);
-                            updateDebugInfo(`JSON распарсен: ${Object.keys(data).length} операторов`);
-
-                            // Теперь пробуем через нашу функцию
-                            return loadOperatorData();
-                        } catch (parseError) {
-                            updateDebugInfo(`Ошибка парсинга JSON: ${parseError.message}`);
-                            throw parseError;
-                        }
-                    })
-                    .then(data => {
-                        if (data) {
-                            updateDebugInfo(`✅ Данные успешно загружены через loadOperatorData: ${Object.keys(data).length} операторов`);
-
-                            // Пробуем получить данные компании
-                            return getCompanyData('2025-07-01', '2025-07-31', 'Месяц', 'Все КЦ');
-                        } else {
-                            updateDebugInfo('❌ loadOperatorData вернула null');
-                        }
-                    })
-                    .then(companyData => {
-                        if (companyData) {
-                            updateDebugInfo(`✅ Данные компании получены: ${companyData.current.total.calls} звонков`);
-                        } else {
-                            updateDebugInfo('❌ Данные компании не получены');
-                        }
-                    })
-                    .catch(error => {
-                        updateDebugInfo(`❌ Ошибка: ${error.message}`);
-                        console.error('Детальная ошибка:', error);
-
-                        // Дополнительная информация об ошибке
-                        if (error.message.includes('CORS')) {
-                            updateDebugInfo('💡 Возможно, нужно запустить локальный сервер');
-                        }
-                        if (error.message.includes('file://')) {
-                            updateDebugInfo('💡 Попробуйте открыть через HTTP сервер, а не file://');
-                        }
-                    });
-            } else {
-                updateDebugInfo('❌ Функция loadOperatorData не найдена!');
-            }
-        }, 1000);
+        console.log('=== Начинаем загрузку скриптов ===');
+        
+        // Проверяем загрузку каждого скрипта
+        window.addEventListener('load', function() {
+            console.log('=== Все ресурсы загружены ===');
+            console.log('Проверяем функции:', {
+                initTableCollapse: typeof initTableCollapse,
+                handleTableRowClick: typeof handleTableRowClick,
+                showLoading: typeof showLoading,
+                createChangeBadge: typeof createChangeBadge
+            });
+        });
+    </script>
+    
+    <!-- Подключение данных -->
+    <script src="js/data/real-data-processor.js" onerror="console.error('Ошибка загрузки real-data-processor.js')"></script>
+    
+    <!-- Подключение модулей -->
+    <script src="js/modules/ui-helpers.js"></script>
+    <script src="js/modules/filters.js"></script>
+    <script src="js/modules/tabs.js"></script>
+    <script src="js/modules/company.js"></script>
+    <script src="js/modules/departments.js"></script>
+    <script src="js/modules/employees.js"></script>
+    <script src="js/modules/app.js"></script>
+    
+    <script>
+        console.log('=== После загрузки всех модулей ===');
+        console.log('Проверяем функции:', {
+            loadOperatorData: typeof loadOperatorData,
+            getDepartmentsData: typeof getDepartmentsData,
+            getPreviousPeriod: typeof getPreviousPeriod,
+            initApp: typeof initApp
+        });
     </script>
 
+    <!-- Инициализация приложения -->
     <script>
-        // Глобальные переменные
-        let currentTab = 'company';
-
-        // Функция для валидации диапазона дат
-        function validateDateRange(startDate, endDate, granularity) {
-            if (!startDate || !endDate) {
-                alert('Пожалуйста, выберите начальную и конечную даты');
-                return false;
-            }
-
-            const start = new Date(startDate);
-            const end = new Date(endDate);
-
-            // Проверяем, что конечная дата не раньше начальной
-            if (end < start) {
-                alert('Конечная дата не может быть раньше начальной даты');
-                return false;
-            }
-
-            const diffTime = Math.abs(end - start);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-            let maxDays;
-            let errorMessage;
-
-            switch (granularity) {
-                case 'День':
-                    maxDays = 1;
-                    errorMessage = 'При выборе режима "День" можно выбрать максимум 1 день';
-                    break;
-                case 'Неделя':
-                    maxDays = 7;
-                    errorMessage = 'При выборе режима "Неделя" можно выбрать максимум 7 дней';
-                    break;
-                case 'Месяц':
-                    maxDays = 31;
-                    errorMessage = 'При выборе режима "Месяц" можно выбрать максимум 31 день';
-                    break;
-                default:
-                    return true;
-            }
-
-            if (diffDays > maxDays) {
-                alert(errorMessage);
-                return false;
-            }
-
-            return true;
-        }
-
-        // Функция для динамической валидации полей дат
-        function validateDateFields() {
-            const startDateField = document.getElementById('startDate');
-            const endDateField = document.getElementById('endDate');
-            
-            if (!startDateField || !endDateField) return;
-            
-            const startDate = startDateField.value;
-            const endDate = endDateField.value;
-            
-            // Устанавливаем минимальную дату для поля "по"
-            if (startDate) {
-                endDateField.min = startDate;
-            }
-            
-            // Сбрасываем стили ошибок
-            startDateField.style.borderColor = '#dee2e6';
-            endDateField.style.borderColor = '#dee2e6';
-            
-            // Если обе даты заполнены, проверяем их
-            if (startDate && endDate) {
-                const start = new Date(startDate);
-                const end = new Date(endDate);
-                
-                if (end < start) {
-                    // Подсвечиваем поля красным
-                    startDateField.style.borderColor = '#dc3545';
-                    endDateField.style.borderColor = '#dc3545';
-                    
-                    // Показываем подсказку
-                    endDateField.title = 'Конечная дата не может быть раньше начальной';
-                    
-                    // Автоматически исправляем конечную дату
-                    endDateField.value = startDate;
-                } else {
-                    // Убираем подсказку об ошибке
-                    endDateField.title = '';
-                }
-            }
-        }
-
-        // Функция для расчета процентного изменения
-        function calculateChange(current, previous) {
-            if (!previous || previous === 0) {
-                return current > 0 ? 100 : 0;
-            }
-
-            const change = ((current - previous) / previous) * 100;
-            return Math.round(change * 10) / 10;
-        }
-
-        // Функция для создания бейджа с изменением
-        function createChangeBadge(current, previous) {
-            const change = calculateChange(current, previous);
-            const sign = change > 0 ? '+' : '';
-            const cssClass = change > 0 ? 'badge-success' : (change < 0 ? 'badge-danger' : 'badge-neutral');
-
-            return `<span class="badge ${cssClass}">${sign}${change}%</span>`;
-        }
-
-        // Функция для получения CSS класса процента
-        function getPercentageClass(percentage) {
-            if (percentage >= 10) {
-                return 'percentage-high';
-            } else if (percentage >= 5) {
-                return 'percentage-medium';
-            } else {
-                return 'percentage-low';
-            }
-        }
-
-        // Функция для обновления информации о периоде
-        function updatePeriodInfo(granularity, elementId) {
-            const periodInfoElement = document.getElementById(elementId);
-            if (!periodInfoElement) return;
-
-            // Получаем выбранные даты
-            const startDate = document.getElementById('startDate').value;
-            const endDate = document.getElementById('endDate').value;
-
-            if (!startDate || !endDate) {
-                periodInfoElement.textContent = '(предыдущий период)';
-                return;
-            }
-
-            // Используем функцию getPreviousPeriod из real-data-processor.js
-            const previousPeriod = getPreviousPeriod(startDate, endDate, granularity);
-
-            let previousPeriodText = '';
-
-            switch (granularity) {
-                case 'День':
-                    const prevDate = new Date(previousPeriod.startDate);
-                    previousPeriodText = `(${prevDate.toLocaleDateString('ru-RU')})`;
-                    break;
-                case 'Неделя':
-                    const prevStartWeek = new Date(previousPeriod.startDate);
-                    const prevEndWeek = new Date(previousPeriod.endDate);
-                    previousPeriodText = `(${prevStartWeek.toLocaleDateString('ru-RU')} - ${prevEndWeek.toLocaleDateString('ru-RU')})`;
-                    break;
-                case 'Месяц':
-                    const prevStartMonth = new Date(previousPeriod.startDate);
-                    const prevEndMonth = new Date(previousPeriod.endDate);
-                    previousPeriodText = `(${prevStartMonth.toLocaleDateString('ru-RU')} - ${prevEndMonth.toLocaleDateString('ru-RU')})`;
-                    break;
-                default:
-                    previousPeriodText = '(предыдущий период)';
-            }
-
-            periodInfoElement.textContent = previousPeriodText;
-        }
-
-        // Функция для отображения ошибки
-        function showError(containerId, message) {
-            const container = document.getElementById(containerId);
-            if (container) {
-                container.innerHTML = `<div class="error">Ошибка: ${message}</div>`;
-            }
-        }
-
-        // Функция для отображения загрузки
-        function showLoading(containerId) {
-            const container = document.getElementById(containerId);
-            if (container) {
-                container.innerHTML = '<div class="loading">Загрузка данных...</div>';
-            }
-        }
-
-        // Функция для раскрытия/скрытия деталей
-        function toggleExpansion(rowId) {
-            const detailRows = document.querySelectorAll(`[id^="${rowId}"]`);
-            const icon = document.getElementById(rowId.replace('-row', '-icon'));
-
-            let isExpanded = false;
-            detailRows.forEach(row => {
-                if (row.style.display === 'none' || row.style.display === '') {
-                    row.style.display = 'table-row';
-                    isExpanded = true;
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-
-            // Обновляем иконку
-            if (icon) {
-                icon.textContent = isExpanded ? '▲' : '▼';
-            }
-        }
-
-        // Функция для создания RPC детализации (для строк)
-        function createRpcDetails(rpcDetailsData, kcKey, rowIdPrefix) {
-            if (!rpcDetailsData || !rpcDetailsData.current[kcKey]) return '';
-            
-            const currentDetails = rpcDetailsData.current[kcKey].details;
-            const previousDetails = rpcDetailsData.previous[kcKey].details || {};
-            
-            let detailsHTML = '';
-            
-            Object.keys(currentDetails).forEach(detailType => {
-                const current = currentDetails[detailType];
-                const previous = previousDetails[detailType] || { calls: 0, deviations: 0, percentage: 0 };
-                
-                detailsHTML += `
-                    <tr class="detail-row" id="${rowIdPrefix}-rpc-${detailType}" style="display: none; background-color: #f0f8ff;">
-                        <td style="padding-left: 50px; font-size: 0.9em; color: #666;">RPC ${detailType}</td>
-                        <td class="text-right" style="font-size: 0.9em;">${current.calls.toLocaleString()} ${createChangeBadge(current.calls, previous.calls)}</td>
-                        <td class="text-right" style="font-size: 0.9em;">${current.deviations.toLocaleString()} ${createChangeBadge(current.deviations, previous.deviations)}</td>
-                        <td class="text-right" style="font-size: 0.9em;"><span class="${getPercentageClass(current.percentage)}">${current.percentage}%</span> ${createChangeBadge(current.percentage, previous.percentage)}</td>
-                    </tr>
-                `;
-            });
-            
-            return detailsHTML;
-        }
-
-        // Функция для создания RPC детализации в колонке (для отдельных КЦ)
-        function createRpcColumnDetails(rpcDetailsData, kcKey, metric) {
-            if (!rpcDetailsData || !rpcDetailsData.current[kcKey]) {
-                return '<div style="font-size: 0.8em; color: #999; margin-top: 5px;">Нет данных</div>';
-            }
-            
-            const currentDetails = rpcDetailsData.current[kcKey].details;
-            const previousDetails = rpcDetailsData.previous[kcKey].details || {};
-            
-            let detailsHTML = '';
-            
-            Object.keys(currentDetails).forEach(detailType => {
-                const current = currentDetails[detailType];
-                const previous = previousDetails[detailType] || { calls: 0, deviations: 0, percentage: 0 };
-                
-                let value, prevValue;
-                switch(metric) {
-                    case 'calls':
-                        value = current.calls.toLocaleString();
-                        prevValue = previous.calls;
-                        break;
-                    case 'deviations':
-                        value = current.deviations.toLocaleString();
-                        prevValue = previous.deviations;
-                        break;
-                    case 'percentage':
-                        value = `${current.percentage}%`;
-                        prevValue = previous.percentage;
-                        break;
-                }
-                
-                detailsHTML += `
-                    <div style="font-size: 0.8em; color: #666; margin-top: 3px; padding-left: 10px;">
-                        ${detailType}: ${value} ${createChangeBadge(current[metric], prevValue)}
-                    </div>
-                `;
-            });
-            
-            return detailsHTML;
-        }
-
-        // Функция для переключения RPC колонки
-        function toggleRpcColumn() {
-            const detailsElements = [
-                document.getElementById('rpc-calls-details'),
-                document.getElementById('rpc-deviations-details'),
-                document.getElementById('rpc-percentage-details')
-            ];
-            
-            const icon = document.getElementById('rpc-column-icon');
-            
-            let isExpanded = false;
-            detailsElements.forEach(element => {
-                if (element) {
-                    if (element.style.display === 'none' || element.style.display === '') {
-                        element.style.display = 'block';
-                        isExpanded = true;
-                    } else {
-                        element.style.display = 'none';
-                    }
-                }
-            });
-            
-            // Обновляем иконку
-            if (icon) {
-                icon.textContent = isExpanded ? '▲' : '▼';
-            }
-        }
-
-        // Функция для обновления данных компании
-        async function updateCompanyData() {
-            console.log('=== updateCompanyData вызвана ===');
-
-            const granularity = document.getElementById('timeGranularity').value;
-            const callCenter = document.getElementById('callCenter').value;
-            const startDate = document.getElementById('startDate').value;
-            const endDate = document.getElementById('endDate').value;
-
-            console.log('Параметры:', { granularity, callCenter, startDate, endDate });
-
-            showLoading('companySummaryTable');
-            updatePeriodInfo(granularity, 'periodInfo');
-
-            try {
-                console.log('Вызываем getCompanyData...');
-                const companyData = await getCompanyData(startDate, endDate, granularity, callCenter);
-                console.log('Получены данные компании:', companyData);
-
-                console.log('Вызываем getRpcDetailsData...');
-                const rpcDetailsData = await getRpcDetailsData(startDate, endDate, granularity, callCenter);
-                console.log('Получены RPC данные:', rpcDetailsData);
-
-                if (!companyData) {
-                    console.error('companyData is null');
-                    showError('companySummaryTable', 'Не удалось загрузить данные компании');
-                    return;
-                }
-
-                console.log('Вызываем renderCompanyTable...');
-                renderCompanyTable(companyData, callCenter, rpcDetailsData);
-                console.log('renderCompanyTable завершена');
-            } catch (error) {
-                console.error('Ошибка при обновлении данных компании:', error);
-                showError('companySummaryTable', error.message);
-            }
-        }
-
-        // Функция для отрисовки таблицы компании
-        function renderCompanyTable(companyData, selectedCallCenter, rpcDetailsData = null) {
-            const tableContainer = document.getElementById('companySummaryTable');
-            if (!tableContainer) return;
-
-            let tableHTML = '';
-
-            // Если выбраны все КЦ, показываем разбивку по КЦ
-            if (selectedCallCenter === 'Все КЦ') {
-                const currentData = companyData.current;
-                const previousData = companyData.previous;
-
-                const totalData = currentData.total;
-                const kc1Data = currentData.kc1;
-                const kc2Data = currentData.kc2;
-                const rpcTotalData = currentData.rpc.total;
-                const nonRpcTotalData = currentData.nonRpc.total;
-                const rpcKc1Data = currentData.rpc.kc1;
-                const nonRpcKc1Data = currentData.nonRpc.kc1;
-                const rpcKc2Data = currentData.rpc.kc2;
-                const nonRpcKc2Data = currentData.nonRpc.kc2;
-
-                // Данные предыдущего периода
-                const prevTotalData = previousData.total;
-                const prevKc1Data = previousData.kc1;
-                const prevKc2Data = previousData.kc2;
-                const prevRpcTotalData = previousData.rpc.total;
-                const prevNonRpcTotalData = previousData.nonRpc.total;
-                const prevRpcKc1Data = previousData.rpc.kc1;
-                const prevNonRpcKc1Data = previousData.nonRpc.kc1;
-                const prevRpcKc2Data = previousData.rpc.kc2;
-                const prevNonRpcKc2Data = previousData.nonRpc.kc2;
-
-                tableHTML = `
-                    <table class="main-table">
-                        <thead>
-                            <tr>
-                                <th>КОЛЛ-ЦЕНТР</th>
-                                <th class="text-right">ВСЕГО ЗВОНКОВ</th>
-                                <th class="text-right">ОТКЛОНЕНИЯ</th>
-                                <th class="text-right">% ОТКЛОНЕНИЙ</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="expandable-row" onclick="toggleExpansion('total-row')">
-                                <td><strong>Всего</strong> <span class="expand-icon" id="total-icon">▼</span></td>
-                                <td class="text-right"><strong>${totalData.calls.toLocaleString()}</strong> ${createChangeBadge(totalData.calls, prevTotalData.calls)}</td>
-                                <td class="text-right"><strong>${totalData.deviations.toLocaleString()}</strong> ${createChangeBadge(totalData.deviations, prevTotalData.deviations)}</td>
-                                <td class="text-right"><strong><span class="${getPercentageClass(totalData.percentage)}">${totalData.percentage}%</span></strong> ${createChangeBadge(totalData.percentage, prevTotalData.percentage)}</td>
-                            </tr>
-                            <tr class="detail-row expandable-row" id="total-row" style="display: none;" onclick="toggleExpansion('total-rpc-row')">
-                                <td style="padding-left: 30px;">RPC <span class="expand-icon" id="total-rpc-icon">▼</span></td>
-                                <td class="text-right">${rpcTotalData.calls.toLocaleString()} ${createChangeBadge(rpcTotalData.calls, prevRpcTotalData.calls)}</td>
-                                <td class="text-right">${rpcTotalData.deviations.toLocaleString()} ${createChangeBadge(rpcTotalData.deviations, prevRpcTotalData.deviations)}</td>
-                                <td class="text-right"><span class="${getPercentageClass(rpcTotalData.percentage)}">${rpcTotalData.percentage}%</span> ${createChangeBadge(rpcTotalData.percentage, prevRpcTotalData.percentage)}</td>
-                            </tr>
-                            ${createRpcDetails(rpcDetailsData, 'total', 'total-rpc-row')}
-                            <tr class="detail-row" id="total-row-2" style="display: none;">
-                                <td style="padding-left: 30px;">Не RPC</td>
-                                <td class="text-right">${nonRpcTotalData.calls.toLocaleString()} ${createChangeBadge(nonRpcTotalData.calls, prevNonRpcTotalData.calls)}</td>
-                                <td class="text-right">${nonRpcTotalData.deviations.toLocaleString()} ${createChangeBadge(nonRpcTotalData.deviations, prevNonRpcTotalData.deviations)}</td>
-                                <td class="text-right"><span class="${getPercentageClass(nonRpcTotalData.percentage)}">${nonRpcTotalData.percentage}%</span> ${createChangeBadge(nonRpcTotalData.percentage, prevNonRpcTotalData.percentage)}</td>
-                            </tr>
-                            <tr class="expandable-row" onclick="toggleExpansion('kc1-row')">
-                                <td>КЦ 1 <span class="expand-icon" id="kc1-icon">▼</span></td>
-                                <td class="text-right">${kc1Data.calls.toLocaleString()} ${createChangeBadge(kc1Data.calls, prevKc1Data.calls)}</td>
-                                <td class="text-right">${kc1Data.deviations.toLocaleString()} ${createChangeBadge(kc1Data.deviations, prevKc1Data.deviations)}</td>
-                                <td class="text-right"><span class="${getPercentageClass(kc1Data.percentage)}">${kc1Data.percentage}%</span> ${createChangeBadge(kc1Data.percentage, prevKc1Data.percentage)}</td>
-                            </tr>
-                            <tr class="detail-row expandable-row" id="kc1-row" style="display: none;" onclick="toggleExpansion('kc1-rpc-row')">
-                                <td style="padding-left: 30px;">RPC <span class="expand-icon" id="kc1-rpc-icon">▼</span></td>
-                                <td class="text-right">${rpcKc1Data.calls.toLocaleString()} ${createChangeBadge(rpcKc1Data.calls, prevRpcKc1Data.calls)}</td>
-                                <td class="text-right">${rpcKc1Data.deviations.toLocaleString()} ${createChangeBadge(rpcKc1Data.deviations, prevRpcKc1Data.deviations)}</td>
-                                <td class="text-right"><span class="${getPercentageClass(rpcKc1Data.percentage)}">${rpcKc1Data.percentage}%</span> ${createChangeBadge(rpcKc1Data.percentage, prevRpcKc1Data.percentage)}</td>
-                            </tr>
-                            ${createRpcDetails(rpcDetailsData, 'kc1', 'kc1-rpc-row')}
-                            <tr class="detail-row" id="kc1-row-2" style="display: none;">
-                                <td style="padding-left: 30px;">Не RPC</td>
-                                <td class="text-right">${nonRpcKc1Data.calls.toLocaleString()} ${createChangeBadge(nonRpcKc1Data.calls, prevNonRpcKc1Data.calls)}</td>
-                                <td class="text-right">${nonRpcKc1Data.deviations.toLocaleString()} ${createChangeBadge(nonRpcKc1Data.deviations, prevNonRpcKc1Data.deviations)}</td>
-                                <td class="text-right"><span class="${getPercentageClass(nonRpcKc1Data.percentage)}">${nonRpcKc1Data.percentage}%</span> ${createChangeBadge(nonRpcKc1Data.percentage, prevNonRpcKc1Data.percentage)}</td>
-                            </tr>
-                            <tr class="expandable-row" onclick="toggleExpansion('kc2-row')">
-                                <td>КЦ 2 <span class="expand-icon" id="kc2-icon">▼</span></td>
-                                <td class="text-right">${kc2Data.calls.toLocaleString()} ${createChangeBadge(kc2Data.calls, prevKc2Data.calls)}</td>
-                                <td class="text-right">${kc2Data.deviations.toLocaleString()} ${createChangeBadge(kc2Data.deviations, prevKc2Data.deviations)}</td>
-                                <td class="text-right"><span class="${getPercentageClass(kc2Data.percentage)}">${kc2Data.percentage}%</span> ${createChangeBadge(kc2Data.percentage, prevKc2Data.percentage)}</td>
-                            </tr>
-                            <tr class="detail-row expandable-row" id="kc2-row" style="display: none;" onclick="toggleExpansion('kc2-rpc-row')">
-                                <td style="padding-left: 30px;">RPC <span class="expand-icon" id="kc2-rpc-icon">▼</span></td>
-                                <td class="text-right">${rpcKc2Data.calls.toLocaleString()} ${createChangeBadge(rpcKc2Data.calls, prevRpcKc2Data.calls)}</td>
-                                <td class="text-right">${rpcKc2Data.deviations.toLocaleString()} ${createChangeBadge(rpcKc2Data.deviations, prevRpcKc2Data.deviations)}</td>
-                                <td class="text-right"><span class="${getPercentageClass(rpcKc2Data.percentage)}">${rpcKc2Data.percentage}%</span> ${createChangeBadge(rpcKc2Data.percentage, prevRpcKc2Data.percentage)}</td>
-                            </tr>
-                            ${createRpcDetails(rpcDetailsData, 'kc2', 'kc2-rpc-row')}
-                            <tr class="detail-row" id="kc2-row-2" style="display: none;">
-                                <td style="padding-left: 30px;">Не RPC</td>
-                                <td class="text-right">${nonRpcKc2Data.calls.toLocaleString()} ${createChangeBadge(nonRpcKc2Data.calls, prevNonRpcKc2Data.calls)}</td>
-                                <td class="text-right">${nonRpcKc2Data.deviations.toLocaleString()} ${createChangeBadge(nonRpcKc2Data.deviations, prevNonRpcKc2Data.deviations)}</td>
-                                <td class="text-right"><span class="${getPercentageClass(nonRpcKc2Data.percentage)}">${nonRpcKc2Data.percentage}%</span> ${createChangeBadge(nonRpcKc2Data.percentage, prevNonRpcKc2Data.percentage)}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                `;
-            } else {
-                // Если выбран конкретный КЦ, показываем стандартную таблицу
-                const currentData = companyData.current;
-                const previousData = companyData.previous;
-
-                const kcKey = selectedCallCenter === 'КЦ 1' ? 'kc1' : 'kc2';
-                const totalData = currentData[kcKey];
-                const rpcData = currentData.rpc[kcKey];
-                const nonRpcData = currentData.nonRpc[kcKey];
-
-                const prevTotalData = previousData[kcKey];
-                const prevRpcData = previousData.rpc[kcKey];
-                const prevNonRpcData = previousData.nonRpc[kcKey];
-
-                tableHTML = `
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>ПАРАМЕТР</th>
-                                <th class="text-right">ВСЕГО</th>
-                                <th class="text-right expandable-row" onclick="toggleRpcColumn()" style="cursor: pointer;">
-                                    RPC <span class="expand-icon" id="rpc-column-icon">▼</span>
-                                </th>
-                                <th class="text-right">НЕ RPC</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Оценено звонков</td>
-                                <td class="text-right">${totalData.calls.toLocaleString()} ${createChangeBadge(totalData.calls, prevTotalData.calls)}</td>
-                                <td class="text-right">
-                                    <div>${rpcData.calls.toLocaleString()} ${createChangeBadge(rpcData.calls, prevRpcData.calls)}</div>
-                                    <div id="rpc-calls-details" style="display: none;">
-                                        ${createRpcColumnDetails(rpcDetailsData, kcKey, 'calls')}
-                                    </div>
-                                </td>
-                                <td class="text-right">${nonRpcData.calls.toLocaleString()} ${createChangeBadge(nonRpcData.calls, prevNonRpcData.calls)}</td>
-                            </tr>
-                            <tr>
-                                <td>Отклонений выявлено</td>
-                                <td class="text-right">${totalData.deviations.toLocaleString()} ${createChangeBadge(totalData.deviations, prevTotalData.deviations)}</td>
-                                <td class="text-right">
-                                    <div>${rpcData.deviations.toLocaleString()} ${createChangeBadge(rpcData.deviations, prevRpcData.deviations)}</div>
-                                    <div id="rpc-deviations-details" style="display: none;">
-                                        ${createRpcColumnDetails(rpcDetailsData, kcKey, 'deviations')}
-                                    </div>
-                                </td>
-                                <td class="text-right">${nonRpcData.deviations.toLocaleString()} ${createChangeBadge(nonRpcData.deviations, prevNonRpcData.deviations)}</td>
-                            </tr>
-                            <tr>
-                                <td>% отклонений</td>
-                                <td class="text-right"><span class="${getPercentageClass(totalData.percentage)}">${totalData.percentage}%</span> ${createChangeBadge(totalData.percentage, prevTotalData.percentage)}</td>
-                                <td class="text-right">
-                                    <div><span class="${getPercentageClass(rpcData.percentage)}">${rpcData.percentage}%</span> ${createChangeBadge(rpcData.percentage, prevRpcData.percentage)}</div>
-                                    <div id="rpc-percentage-details" style="display: none;">
-                                        ${createRpcColumnDetails(rpcDetailsData, kcKey, 'percentage')}
-                                    </div>
-                                </td>
-                                <td class="text-right"><span class="${getPercentageClass(nonRpcData.percentage)}">${nonRpcData.percentage}%</span> ${createChangeBadge(nonRpcData.percentage, prevNonRpcData.percentage)}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                `;
-            }
-
-            tableContainer.innerHTML = tableHTML;
-        }
-
-        // Функция для обновления данных подразделений
-        async function updateDepartmentsData() {
-            const granularity = document.getElementById('timeGranularity').value;
-            const callCenter = document.getElementById('callCenter').value;
-            const startDate = document.getElementById('startDate').value;
-            const endDate = document.getElementById('endDate').value;
-
-            showLoading('departmentsTable');
-            updatePeriodInfo(granularity, 'departmentsPeriodInfo');
-
-            try {
-                const departmentsData = await getDepartmentsData(startDate, endDate, granularity, callCenter);
-
-                if (!departmentsData) {
-                    showError('departmentsTable', 'Не удалось загрузить данные подразделений');
-                    return;
-                }
-
-                renderDepartmentsTable(departmentsData);
-            } catch (error) {
-                console.error('Ошибка при обновлении данных подразделений:', error);
-                showError('departmentsTable', error.message);
-            }
-        }
-
-        // Функция для отрисовки таблицы подразделений
-        function renderDepartmentsTable(departmentsData) {
-            const tableContainer = document.getElementById('departmentsTable');
-            if (!tableContainer) return;
-
-            let tableHTML = `
-                <h4>Подразделения</h4>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ПОДРАЗДЕЛЕНИЕ</th>
-                            <th class="text-right">КОНТАКТ-ЦЕНТР</th>
-                            <th class="text-right">ОЦЕНЕНО ЗВОНКОВ</th>
-                            <th class="text-right">ОТКЛОНЕНИЙ</th>
-                            <th class="text-right">% ОТКЛОНЕНИЙ</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
-
-            departmentsData.current.forEach((dept, index) => {
-                const prevDept = departmentsData.previous[index] || { calls: 0, deviations: 0, percentage: 0 };
-
-                tableHTML += `
-                    <tr>
-                        <td>${dept.name}</td>
-                        <td class="text-right">${dept.callCenter}</td>
-                        <td class="text-right">${dept.calls.toLocaleString()} ${createChangeBadge(dept.calls, prevDept.calls)}</td>
-                        <td class="text-right">${dept.deviations.toLocaleString()} ${createChangeBadge(dept.deviations, prevDept.deviations)}</td>
-                        <td class="text-right"><span class="${getPercentageClass(dept.percentage)}">${dept.percentage}%</span> ${createChangeBadge(dept.percentage, prevDept.percentage)}</td>
-                    </tr>
-                `;
-            });
-
-            tableHTML += `
-                    </tbody>
-                </table>
-            `;
-
-            tableContainer.innerHTML = tableHTML;
-        }
-
-        // Функция для обновления данных сотрудников
-        async function updateEmployeesData() {
-            const granularity = document.getElementById('timeGranularity').value;
-            const callCenter = document.getElementById('callCenter').value;
-            const startDate = document.getElementById('startDate').value;
-            const endDate = document.getElementById('endDate').value;
-
-            showLoading('employeesTable');
-            updatePeriodInfo(granularity, 'employeesPeriodInfo');
-
-            try {
-                const employeesData = await getEmployeesData(startDate, endDate, granularity, callCenter);
-
-                if (!employeesData) {
-                    showError('employeesTable', 'Не удалось загрузить данные сотрудников');
-                    return;
-                }
-
-                renderEmployeesTable(employeesData);
-            } catch (error) {
-                console.error('Ошибка при обновлении данных сотрудников:', error);
-                showError('employeesTable', error.message);
-            }
-        }
-
-        // Функция для отрисовки таблицы сотрудников
-        function renderEmployeesTable(employeesData) {
-            const tableContainer = document.getElementById('employeesTable');
-            if (!tableContainer) return;
-
-            let tableHTML = `
-                <h4>Сотрудники</h4>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>СОТРУДНИК</th>
-                            <th>ПОДРАЗДЕЛЕНИЕ</th>
-                            <th class="text-right">КЦ</th>
-                            <th class="text-right">ОЦЕНЕНО ЗВОНКОВ</th>
-                            <th class="text-right">ОТКЛОНЕНИЙ</th>
-                            <th class="text-right">% ОТКЛОНЕНИЙ</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
-
-            employeesData.current.forEach((emp, index) => {
-                const prevEmp = employeesData.previous[index] || { calls: 0, deviations: 0, percentage: 0 };
-
-                tableHTML += `
-                    <tr>
-                        <td>${emp.name}</td>
-                        <td>${emp.department}</td>
-                        <td class="text-right">${emp.callCenter}</td>
-                        <td class="text-right">${emp.calls.toLocaleString()} ${createChangeBadge(emp.calls, prevEmp.calls)}</td>
-                        <td class="text-right">${emp.deviations.toLocaleString()} ${createChangeBadge(emp.deviations, prevEmp.deviations)}</td>
-                        <td class="text-right"><span class="${getPercentageClass(emp.percentage)}">${emp.percentage}%</span> ${createChangeBadge(emp.percentage, prevEmp.percentage)}</td>
-                    </tr>
-                `;
-            });
-
-            tableHTML += `
-                    </tbody>
-                </table>
-            `;
-
-            tableContainer.innerHTML = tableHTML;
-        }
-
-        // Функция для обновления активной вкладки
-        async function updateActiveTab() {
-            console.log('=== updateActiveTab вызвана ===');
-            console.log('currentTab:', currentTab);
-
-            switch (currentTab) {
-                case 'company':
-                    console.log('Обновляем данные компании...');
-                    await updateCompanyData();
-                    break;
-                case 'departments':
-                    console.log('Обновляем данные подразделений...');
-                    await updateDepartmentsData();
-                    break;
-                case 'employees':
-                    await updateEmployeesData();
-                    break;
-            }
-        }
-
-        // Инициализация при загрузке страницы
         document.addEventListener('DOMContentLoaded', function () {
-            // Инициализация вкладок
-            const tabButtons = document.querySelectorAll('.tab-button');
-            const tabContents = document.querySelectorAll('.tab-content');
-
-            tabButtons.forEach(button => {
-                button.addEventListener('click', function () {
-                    const tabId = this.getAttribute('data-tab');
-
-                    // Убираем активный класс у всех кнопок и содержимого вкладок
-                    tabButtons.forEach(btn => btn.classList.remove('active'));
-                    tabContents.forEach(content => content.classList.remove('active'));
-
-                    // Добавляем активный класс выбранной кнопке и содержимому
-                    this.classList.add('active');
-                    document.getElementById(tabId + 'Tab').classList.add('active');
-
-                    // Обновляем текущую вкладку
-                    currentTab = tabId;
-
-                    // Загружаем данные для новой активной вкладки
-                    setTimeout(updateActiveTab, 100);
-                });
-            });
-
-            // Обработчик кнопки "Обновить"
-            document.getElementById('updateButton').addEventListener('click', async function () {
-                console.log('=== Кнопка "Обновить" нажата ===');
-                const startDate = document.getElementById('startDate').value;
-                const endDate = document.getElementById('endDate').value;
-                const granularity = document.getElementById('timeGranularity').value;
-
-                console.log('Значения фильтров:', { startDate, endDate, granularity });
-
-                // Проверяем валидность диапазона дат
-                if (!validateDateRange(startDate, endDate, granularity)) {
-                    return;
-                }
-
-                await updateActiveTab();
-            });
-
-            // Отладка полей дат
-            const startDateField = document.getElementById('startDate');
-            const endDateField = document.getElementById('endDate');
-            
-            console.log('Поля дат найдены:', { startDateField, endDateField });
-            
-            if (startDateField) {
-                startDateField.addEventListener('click', function() {
-                    console.log('Клик по полю startDate');
-                    // Принудительно показываем календарь
-                    try {
-                        this.showPicker();
-                    } catch (e) {
-                        console.log('showPicker не поддерживается:', e);
-                    }
-                });
-                startDateField.addEventListener('focus', function() {
-                    console.log('Фокус на поле startDate');
-                });
-                startDateField.addEventListener('change', function() {
-                    console.log('Изменение startDate:', this.value);
-                    validateDateFields();
-                });
-            }
-            
-            if (endDateField) {
-                endDateField.addEventListener('click', function() {
-                    console.log('Клик по полю endDate');
-                    // Принудительно показываем календарь
-                    try {
-                        this.showPicker();
-                    } catch (e) {
-                        console.log('showPicker не поддерживается:', e);
-                    }
-                });
-                endDateField.addEventListener('focus', function() {
-                    console.log('Фокус на поле endDate');
-                });
-                endDateField.addEventListener('change', function() {
-                    console.log('Изменение endDate:', this.value);
-                    validateDateFields();
-                });
-            }
-
-            // Обработчики изменения фильтров убраны - данные обновляются только по кнопке "Обновить"
-
-            // Устанавливаем начальные ограничения для полей дат
-            validateDateFields();
-            
-            // Загружаем данные для начальной вкладки
-            setTimeout(updateActiveTab, 500);
+            console.log('=== DOM загружен, инициализируем приложение ===');
+            initApp();
         });
     </script>
 </body>
