@@ -188,6 +188,21 @@ function renderEmployeesTable(employeesData) {
 
     tableContainer.innerHTML = tableHTML;
     
+    // Показываем графики и инициализируем их
+    const chartsContainer = document.getElementById('employeesCharts');
+    const chartsContent = document.getElementById('employeesChartsContent');
+    if (chartsContainer && typeof initEmployeeCharts === 'function') {
+        chartsContainer.style.display = 'grid';
+        // Проверяем, не свернут ли блок графиков
+        const isChartsCollapsed = chartsContent && chartsContent.classList.contains('collapsed');
+        if (!isChartsCollapsed) {
+            // Небольшая задержка для корректной отрисовки canvas элементов
+            setTimeout(() => {
+                initEmployeeCharts(cachedEmployeesData);
+            }, 200);
+        }
+    }
+    
     // Добавляем обработчики кликов для сортировки
     setTimeout(() => {
         const sortableHeaders = document.querySelectorAll('#employeesTable .sortable-header');
@@ -211,6 +226,14 @@ function renderEmployeesTable(employeesData) {
                 renderEmployeesTable(cachedEmployeesData);
             });
         });
+        
+        // Обновляем высоту сворачивающегося блока после отрисовки
+        const content = document.getElementById('employeesTableContent');
+        if (content && !content.classList.contains('collapsed')) {
+            setTimeout(() => {
+                content.style.maxHeight = content.scrollHeight + 'px';
+            }, 50);
+        }
     }, 100);
 }
 
@@ -220,6 +243,10 @@ function setupEmployeeFilters() {
     
     // Настройка выпадающих списков
     setupEmployeeDropdowns();
+    
+    // Настройка сворачивающихся блоков
+    setupEmployeeCollapsibleTable();
+    setupEmployeeCollapsibleCharts();
     
     // Обработчик кнопки обновления для команды
     const empUpdateButton = document.getElementById('empUpdateButton');
@@ -435,6 +462,77 @@ function loadTestEmployeesData() {
     renderEmployeesTable(testEmployeesData);
 }
 
+// Настройка сворачивающегося блока таблицы сотрудников
+function setupEmployeeCollapsibleTable() {
+    const header = document.getElementById('employeesTableHeader');
+    const content = document.getElementById('employeesTableContent');
+    const arrow = header ? header.querySelector('.collapse-arrow') : null;
+    
+    if (header && content && arrow) {
+        header.addEventListener('click', function() {
+            const isCollapsed = content.classList.contains('collapsed');
+            
+            if (isCollapsed) {
+                // Разворачиваем
+                content.classList.remove('collapsed');
+                arrow.classList.remove('collapsed');
+                content.style.maxHeight = content.scrollHeight + 'px';
+            } else {
+                // Сворачиваем
+                content.classList.add('collapsed');
+                arrow.classList.add('collapsed');
+                content.style.maxHeight = '0px';
+            }
+        });
+        
+        // Устанавливаем начальную высоту
+        setTimeout(() => {
+            if (!content.classList.contains('collapsed')) {
+                content.style.maxHeight = content.scrollHeight + 'px';
+            }
+        }, 100);
+    }
+}
+
+// Настройка сворачивающегося блока графиков сотрудников
+function setupEmployeeCollapsibleCharts() {
+    const header = document.getElementById('employeesChartsHeader');
+    const content = document.getElementById('employeesChartsContent');
+    const arrow = header ? header.querySelector('.collapse-arrow') : null;
+    
+    if (header && content && arrow) {
+        header.addEventListener('click', function() {
+            const isCollapsed = content.classList.contains('collapsed');
+            
+            if (isCollapsed) {
+                // Разворачиваем
+                content.classList.remove('collapsed');
+                arrow.classList.remove('collapsed');
+                content.style.maxHeight = content.scrollHeight + 'px';
+                
+                // Перерисовываем графики после разворачивания
+                if (cachedEmployeesData && typeof initEmployeeCharts === 'function') {
+                    setTimeout(() => {
+                        initEmployeeCharts(cachedEmployeesData);
+                    }, 300);
+                }
+            } else {
+                // Сворачиваем
+                content.classList.add('collapsed');
+                arrow.classList.add('collapsed');
+                content.style.maxHeight = '0px';
+            }
+        });
+        
+        // Устанавливаем начальную высоту
+        setTimeout(() => {
+            if (!content.classList.contains('collapsed')) {
+                content.style.maxHeight = content.scrollHeight + 'px';
+            }
+        }, 100);
+    }
+}
+
 // Экспорт для браузера
 if (typeof window !== 'undefined') {
     window.updateEmployeesData = updateEmployeesData;
@@ -444,4 +542,6 @@ if (typeof window !== 'undefined') {
     window.handleEmployeeDepartmentCheckboxChange = handleEmployeeDepartmentCheckboxChange;
     window.handleEmployeeCheckboxChange = handleEmployeeCheckboxChange;
     window.loadTestEmployeesData = loadTestEmployeesData;
+    window.setupEmployeeCollapsibleTable = setupEmployeeCollapsibleTable;
+    window.setupEmployeeCollapsibleCharts = setupEmployeeCollapsibleCharts;
 }

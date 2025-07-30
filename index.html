@@ -238,8 +238,10 @@
 
         <!-- Employees Tab Content -->
         <div id="employeesTab" class="tab-content">
-            <!-- Фильтры для команды -->
-            <div class="filters-container">
+            <!-- Закрепленная панель фильтров -->
+            <div class="sticky-header">
+                <!-- Фильтры для команды -->
+                <div class="filters-container">
                 <div class="filter-group">
                     <div class="filter-item">
                         <span class="filter-label">Период с:</span>
@@ -404,17 +406,64 @@
                 </div>
             </div>
 
-            <!-- Информационное примечание -->
-            <div class="warning-icon" style="margin-bottom: 15px; display: inline-block;">
-                <span style="background-color: #e3f2fd; color: #1976d2; padding: 8px 12px; border-radius: 4px; font-size: 14px; font-weight: normal;">
-                    ℹ️ Изменения показаны относительно предыдущего периода
-                    <span id="employeesPeriodInfo">(01.06.2025 - 30.06.2025)</span>
-                </span>
+                <!-- Информационное примечание -->
+                <div class="warning-icon" style="margin-bottom: 15px; display: inline-block;">
+                    <span style="background-color: #e3f2fd; color: #1976d2; padding: 8px 12px; border-radius: 4px; font-size: 14px; font-weight: normal;">
+                        ℹ️ Изменения показаны относительно предыдущего периода
+                        <span id="employeesPeriodInfo">(01.06.2025 - 30.06.2025)</span>
+                    </span>
+                </div>
             </div>
 
-            <!-- Таблица сотрудников -->
-            <div id="employeesTable" class="mt-4">
-                <div class="loading">Загрузка данных...</div>
+            <!-- Прокручиваемый контент -->
+            <div class="scrollable-content">
+                <!-- Сворачивающийся блок с таблицей сотрудников -->
+                <div class="collapsible-section">
+                    <div class="collapsible-header" id="employeesTableHeader">
+                        <h4 style="margin: 0; display: flex; align-items: center;">
+                            <span class="collapse-arrow">▼</span>
+                            <span style="margin-left: 10px;">Сотрудники</span>
+                        </h4>
+                    </div>
+                    <div class="collapsible-content" id="employeesTableContent">
+                        <div id="employeesTable" class="mt-4">
+                            <div class="loading">Загрузка данных...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Сворачивающийся блок с графиками сотрудников -->
+                <div class="collapsible-section">
+                    <div class="collapsible-header" id="employeesChartsHeader">
+                        <h4 style="margin: 0; display: flex; align-items: center;">
+                            <span class="collapse-arrow">▼</span>
+                            <span style="margin-left: 10px;">Графики</span>
+                        </h4>
+                    </div>
+                    <div class="collapsible-content" id="employeesChartsContent">
+                        <div id="employeesCharts" class="charts-container">
+                            <div class="chart-card">
+                                <h5>Доля отклонений</h5>
+                                <div class="pie-chart-wrapper">
+                                    <canvas id="employeesPieChart"></canvas>
+                                </div>
+                                <div id="employeesPieChartLegend" class="custom-legend"></div>
+                            </div>
+                            <div class="chart-card">
+                                <h5>Количество отклонений</h5>
+                                <div class="chart-wrapper">
+                                    <canvas id="employeesDeviationsBarChart"></canvas>
+                                </div>
+                            </div>
+                            <div class="chart-card" style="grid-column: 1 / -1;">
+                                <h5>Процент отклонений</h5>
+                                <div class="chart-wrapper">
+                                    <canvas id="employeesPercentageBarChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
