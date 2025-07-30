@@ -157,7 +157,7 @@ function createPieChart(chartData) {
                             
                             // Основной текст
                             ctx.fillStyle = textColor;
-                            ctx.fillText(value + '%', position.x, position.y);
+                            ctx.fillText(value.toFixed(1) + '%', position.x, position.y);
                             
                             // Сбрасываем тень
                             ctx.shadowColor = 'transparent';
@@ -188,7 +188,7 @@ function createCustomLegend(chartData) {
         legendHTML += `
             <div class="legend-item">
                 <div class="legend-color" style="background-color: ${color};"></div>
-                <span>${department}: ${percentage}%</span>
+                <span>${department}: ${percentage.toFixed(1)}%</span>
             </div>
         `;
     });
@@ -209,6 +209,12 @@ function createDeviationsBarChart(chartData) {
 
     const sortedDepartments = sortedData.map(item => item.department);
     const sortedDeviations = sortedData.map(item => item.deviations);
+
+    // Вычисляем диапазон для обрезки диаграммы
+    const minValue = Math.min(...sortedDeviations);
+    const maxValue = Math.max(...sortedDeviations);
+    // Обрезаем от 70% минимального значения, но не меньше 0
+    const cutoffValue = Math.max(0, Math.floor(minValue * 0.7));
 
     // Уничтожаем предыдущий график если есть
     if (window.deviationsBarChartInstance) {
@@ -244,7 +250,8 @@ function createDeviationsBarChart(chartData) {
             },
             scales: {
                 x: {
-                    beginAtZero: true,
+                    min: cutoffValue, // Начинаем от 70% минимального значения
+                    max: maxValue * 1.1, // Увеличиваем отступ для размещения текста
                     ticks: {
                         callback: function(value) {
                             return value.toLocaleString();
@@ -264,18 +271,37 @@ function createDeviationsBarChart(chartData) {
             id: 'datalabels',
             afterDatasetsDraw: function(chart) {
                 const ctx = chart.ctx;
+                const cutoff = cutoffValue;
+                
                 chart.data.datasets.forEach((dataset, i) => {
                     const meta = chart.getDatasetMeta(i);
                     meta.data.forEach((element, index) => {
                         const value = dataset.data[index];
                         if (value > 0) {
-                            const position = element.tooltipPosition();
-                            ctx.fillStyle = '#333';
+                            // Вычисляем позицию для размещения текста в центре видимой части столбца
+                            const cutoffPixel = chart.scales.x.getPixelForValue(cutoff);
+                            const valuePixel = chart.scales.x.getPixelForValue(value);
+                            const textX = cutoffPixel + (valuePixel - cutoffPixel) / 2;
+                            
+                            ctx.fillStyle = '#fff';
                             ctx.font = 'bold 12px Arial';
-                            ctx.textAlign = 'left';
+                            ctx.textAlign = 'center';
                             ctx.textBaseline = 'middle';
-                            // Для горизонтальной диаграммы размещаем текст справа от столбца
-                            ctx.fillText(value.toLocaleString(), element.x + 5, position.y);
+                            
+                            // Добавляем тень для лучшей читаемости
+                            ctx.shadowColor = '#000';
+                            ctx.shadowBlur = 2;
+                            ctx.shadowOffsetX = 1;
+                            ctx.shadowOffsetY = 1;
+                            
+                            // Размещаем текст в центре видимой части столбца
+                            ctx.fillText(value.toLocaleString(), textX, element.y);
+                            
+                            // Сбрасываем тень
+                            ctx.shadowColor = 'transparent';
+                            ctx.shadowBlur = 0;
+                            ctx.shadowOffsetX = 0;
+                            ctx.shadowOffsetY = 0;
                         }
                     });
                 });
@@ -290,6 +316,12 @@ function createPercentageBarChart(chartData) {
     if (!ctx) return;
 
     // Данные уже отсортированы в prepareDepartmentChartData по убыванию процентов
+
+    // Вычисляем диапазон для обрезки диаграммы
+    const minValue = Math.min(...chartData.percentages);
+    const maxValue = Math.max(...chartData.percentages);
+    // Обрезаем от 70% минимального значения, но не меньше 0
+    const cutoffValue = Math.max(0, minValue * 0.7);
 
     // Уничтожаем предыдущий график если есть
     if (window.percentageBarChartInstance) {
@@ -325,8 +357,8 @@ function createPercentageBarChart(chartData) {
             },
             scales: {
                 x: {
-                    beginAtZero: true,
-                    max: Math.max(...chartData.percentages) * 1.2,
+                    min: cutoffValue, // 70% от минимального значения
+                    max: maxValue * 1.1, // Увеличиваем отступ для размещения текста
                     ticks: {
                         callback: function(value) {
                             return value + '%';
@@ -346,18 +378,37 @@ function createPercentageBarChart(chartData) {
             id: 'datalabels',
             afterDatasetsDraw: function(chart) {
                 const ctx = chart.ctx;
+                const cutoff = cutoffValue;
+                
                 chart.data.datasets.forEach((dataset, i) => {
                     const meta = chart.getDatasetMeta(i);
                     meta.data.forEach((element, index) => {
                         const value = dataset.data[index];
                         if (value > 0) {
-                            const position = element.tooltipPosition();
-                            ctx.fillStyle = '#333';
+                            // Вычисляем позицию для размещения текста в центре видимой части столбца
+                            const cutoffPixel = chart.scales.x.getPixelForValue(cutoff);
+                            const valuePixel = chart.scales.x.getPixelForValue(value);
+                            const textX = cutoffPixel + (valuePixel - cutoffPixel) / 2;
+                            
+                            ctx.fillStyle = '#fff';
                             ctx.font = 'bold 12px Arial';
-                            ctx.textAlign = 'left';
+                            ctx.textAlign = 'center';
                             ctx.textBaseline = 'middle';
-                            // Для горизонтальной диаграммы размещаем текст справа от столбца
-                            ctx.fillText(value + '%', element.x + 5, position.y);
+                            
+                            // Добавляем тень для лучшей читаемости
+                            ctx.shadowColor = '#000';
+                            ctx.shadowBlur = 2;
+                            ctx.shadowOffsetX = 1;
+                            ctx.shadowOffsetY = 1;
+                            
+                            // Размещаем текст в центре видимой части столбца
+                            ctx.fillText(value.toFixed(1) + '%', textX, element.y);
+                            
+                            // Сбрасываем тень
+                            ctx.shadowColor = 'transparent';
+                            ctx.shadowBlur = 0;
+                            ctx.shadowOffsetX = 0;
+                            ctx.shadowOffsetY = 0;
                         }
                     });
                 });
@@ -481,7 +532,7 @@ function createEmployeePieChart(chartData) {
                             
                             // Основной текст
                             ctx.fillStyle = textColor;
-                            ctx.fillText(value + '%', position.x, position.y);
+                            ctx.fillText(value.toFixed(1) + '%', position.x, position.y);
                             
                             // Сбрасываем тень
                             ctx.shadowColor = 'transparent';
@@ -512,7 +563,7 @@ function createEmployeeCustomLegend(chartData) {
         legendHTML += `
             <div class="legend-item">
                 <div class="legend-color" style="background-color: ${color};"></div>
-                <span>${employee}: ${percentage}%</span>
+                <span>${employee}: ${percentage.toFixed(1)}%</span>
             </div>
         `;
     });
@@ -533,6 +584,12 @@ function createEmployeeDeviationsBarChart(chartData) {
 
     const sortedEmployees = sortedData.map(item => item.employee);
     const sortedDeviations = sortedData.map(item => item.deviations);
+
+    // Вычисляем диапазон для обрезки диаграммы
+    const minValue = Math.min(...sortedDeviations);
+    const maxValue = Math.max(...sortedDeviations);
+    // Обрезаем от 70% минимального значения, но не меньше 0
+    const cutoffValue = Math.max(0, Math.floor(minValue * 0.7));
 
     // Уничтожаем предыдущий график если есть
     if (window.employeesDeviationsBarChartInstance) {
@@ -568,7 +625,8 @@ function createEmployeeDeviationsBarChart(chartData) {
             },
             scales: {
                 x: {
-                    beginAtZero: true,
+                    min: cutoffValue, // Начинаем от 70% минимального значения
+                    max: maxValue * 1.1, // Увеличиваем отступ для размещения текста
                     ticks: {
                         callback: function(value) {
                             return value.toLocaleString();
@@ -588,18 +646,37 @@ function createEmployeeDeviationsBarChart(chartData) {
             id: 'datalabels',
             afterDatasetsDraw: function(chart) {
                 const ctx = chart.ctx;
+                const cutoff = cutoffValue;
+                
                 chart.data.datasets.forEach((dataset, i) => {
                     const meta = chart.getDatasetMeta(i);
                     meta.data.forEach((element, index) => {
                         const value = dataset.data[index];
                         if (value > 0) {
-                            const position = element.tooltipPosition();
-                            ctx.fillStyle = '#333';
+                            // Вычисляем позицию для размещения текста в центре видимой части столбца
+                            const cutoffPixel = chart.scales.x.getPixelForValue(cutoff);
+                            const valuePixel = chart.scales.x.getPixelForValue(value);
+                            const textX = cutoffPixel + (valuePixel - cutoffPixel) / 2;
+                            
+                            ctx.fillStyle = '#fff';
                             ctx.font = 'bold 10px Arial';
-                            ctx.textAlign = 'left';
+                            ctx.textAlign = 'center';
                             ctx.textBaseline = 'middle';
-                            // Для горизонтальной диаграммы размещаем текст справа от столбца
-                            ctx.fillText(value.toLocaleString(), element.x + 5, position.y);
+                            
+                            // Добавляем тень для лучшей читаемости
+                            ctx.shadowColor = '#000';
+                            ctx.shadowBlur = 2;
+                            ctx.shadowOffsetX = 1;
+                            ctx.shadowOffsetY = 1;
+                            
+                            // Размещаем текст в центре видимой части столбца
+                            ctx.fillText(value.toLocaleString(), textX, element.y);
+                            
+                            // Сбрасываем тень
+                            ctx.shadowColor = 'transparent';
+                            ctx.shadowBlur = 0;
+                            ctx.shadowOffsetX = 0;
+                            ctx.shadowOffsetY = 0;
                         }
                     });
                 });
@@ -614,6 +691,12 @@ function createEmployeePercentageBarChart(chartData) {
     if (!ctx) return;
 
     // Данные уже отсортированы в prepareEmployeeChartData по убыванию процентов
+
+    // Вычисляем диапазон для обрезки диаграммы
+    const minValue = Math.min(...chartData.percentages);
+    const maxValue = Math.max(...chartData.percentages);
+    // Обрезаем от 70% минимального значения, но не меньше 0
+    const cutoffValue = Math.max(0, minValue * 0.7);
 
     // Уничтожаем предыдущий график если есть
     if (window.employeesPercentageBarChartInstance) {
@@ -649,8 +732,8 @@ function createEmployeePercentageBarChart(chartData) {
             },
             scales: {
                 x: {
-                    beginAtZero: true,
-                    max: Math.max(...chartData.percentages) * 1.2,
+                    min: cutoffValue, // Начинаем от 70% минимального значения
+                    max: maxValue * 1.1, // Увеличиваем отступ для размещения текста
                     ticks: {
                         callback: function(value) {
                             return value + '%';
@@ -670,18 +753,37 @@ function createEmployeePercentageBarChart(chartData) {
             id: 'datalabels',
             afterDatasetsDraw: function(chart) {
                 const ctx = chart.ctx;
+                const cutoff = cutoffValue;
+                
                 chart.data.datasets.forEach((dataset, i) => {
                     const meta = chart.getDatasetMeta(i);
                     meta.data.forEach((element, index) => {
                         const value = dataset.data[index];
                         if (value > 0) {
-                            const position = element.tooltipPosition();
-                            ctx.fillStyle = '#333';
+                            // Вычисляем позицию для размещения текста в центре видимой части столбца
+                            const cutoffPixel = chart.scales.x.getPixelForValue(cutoff);
+                            const valuePixel = chart.scales.x.getPixelForValue(value);
+                            const textX = cutoffPixel + (valuePixel - cutoffPixel) / 2;
+                            
+                            ctx.fillStyle = '#fff';
                             ctx.font = 'bold 10px Arial';
-                            ctx.textAlign = 'left';
+                            ctx.textAlign = 'center';
                             ctx.textBaseline = 'middle';
-                            // Для горизонтальной диаграммы размещаем текст справа от столбца
-                            ctx.fillText(value + '%', element.x + 5, position.y);
+                            
+                            // Добавляем тень для лучшей читаемости
+                            ctx.shadowColor = '#000';
+                            ctx.shadowBlur = 2;
+                            ctx.shadowOffsetX = 1;
+                            ctx.shadowOffsetY = 1;
+                            
+                            // Размещаем текст в центре видимой части столбца
+                            ctx.fillText(value.toFixed(1) + '%', textX, element.y);
+                            
+                            // Сбрасываем тень
+                            ctx.shadowColor = 'transparent';
+                            ctx.shadowBlur = 0;
+                            ctx.shadowOffsetX = 0;
+                            ctx.shadowOffsetY = 0;
                         }
                     });
                 });
