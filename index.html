@@ -180,9 +180,42 @@
                 </span>
             </div>
 
-            <!-- Таблица подразделений -->
-            <div id="departmentsTable" class="mt-4">
-                <div class="loading">Загрузка данных...</div>
+            <!-- Сворачивающийся блок с таблицей подразделений -->
+            <div class="collapsible-section">
+                <div class="collapsible-header" id="departmentsTableHeader">
+                    <h4 style="margin: 0; display: flex; align-items: center;">
+                        <span class="collapse-arrow">▼</span>
+                        <span style="margin-left: 10px;">Подразделения</span>
+                    </h4>
+                </div>
+                <div class="collapsible-content" id="departmentsTableContent">
+                    <div id="departmentsTable" class="mt-4">
+                        <div class="loading">Загрузка данных...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Графики подразделений -->
+            <div id="departmentsCharts" class="charts-container" style="display: none;">
+                <div class="chart-card">
+                    <h5>Доля отклонений</h5>
+                    <div class="pie-chart-wrapper">
+                        <canvas id="pieChart"></canvas>
+                    </div>
+                    <div id="pieChartLegend" class="custom-legend"></div>
+                </div>
+                <div class="chart-card">
+                    <h5>Количество отклонений</h5>
+                    <div class="chart-wrapper">
+                        <canvas id="deviationsBarChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card" style="grid-column: 1 / -1;">
+                    <h5>Процент отклонений</h5>
+                    <div class="chart-wrapper">
+                        <canvas id="percentageBarChart"></canvas>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -385,6 +418,9 @@
         });
     </script>
     
+    <!-- Подключение Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    
     <!-- Подключение данных -->
     <script src="js/data/real-data-processor.js" onerror="console.error('Ошибка загрузки real-data-processor.js')"></script>
     
@@ -395,6 +431,7 @@
     <script src="js/modules/company.js"></script>
     <script src="js/modules/departments.js"></script>
     <script src="js/modules/employees.js"></script>
+    <script src="js/modules/charts.js"></script>
     <script src="js/modules/app.js"></script>
     
     <script>

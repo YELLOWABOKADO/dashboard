@@ -2,6 +2,25 @@
  * Модуль управления подразделениями
  */
 
+// Состояние сортировки для подразделений
+let departmentsSortState = {
+    column: 'percentage', // по умолчанию сортируем по % отклонений
+    direction: 'desc' // по убыванию (сначала худшие показатели)
+};
+
+// Сохраняем данные для повторного использования при сортировке
+let cachedDepartmentsData = null;
+
+// Функция для получения индикатора сортировки
+function getSortIndicator(column) {
+    if (departmentsSortState.column !== column) {
+        return '<span class="sort-indicator">↕</span>';
+    }
+    return departmentsSortState.direction === 'asc' 
+        ? '<span class="sort-indicator active">↑</span>' 
+        : '<span class="sort-indicator active">↓</span>';
+}
+
 // Обновление данных подразделений
 async function updateDepartmentsData() {
     console.log('=== updateDepartmentsData вызвана ===');
@@ -52,6 +71,9 @@ function renderDepartmentsTable(departmentsData) {
     if (!tableContainer) return;
 
     console.log('=== renderDepartmentsTable вызвана ===', departmentsData);
+    
+    // Сохраняем данные для повторного использования при сортировке
+    cachedDepartmentsData = departmentsData;
 
     if (!departmentsData || Object.keys(departmentsData).length === 0) {
         tableContainer.innerHTML = `
@@ -68,47 +90,86 @@ function renderDepartmentsTable(departmentsData) {
         <table>
             <thead>
                 <tr>
-                    <th>ПОДРАЗДЕЛЕНИЕ</th>
-                    <th class="text-right">КОНТАКТ-ЦЕНТР</th>
-                    <th class="text-right">ОЦЕНЕНО ЗВОНКОВ</th>
-                    <th class="text-right">ОТКЛОНЕНИЙ</th>
-                    <th class="text-right">% ОТКЛОНЕНИЙ</th>
+                    <th class="sortable-header" data-column="name">ПОДРАЗДЕЛЕНИЕ ${getSortIndicator('name')}</th>
+                    <th class="text-right sortable-header" data-column="callCenter">КОНТАКТ-ЦЕНТР ${getSortIndicator('callCenter')}</th>
+                    <th class="text-right sortable-header" data-column="calls">ОЦЕНЕНО ЗВОНКОВ ${getSortIndicator('calls')}</th>
+                    <th class="text-right sortable-header" data-column="deviations">ОТКЛОНЕНИЙ ${getSortIndicator('deviations')}</th>
+                    <th class="text-right sortable-header" data-column="percentage">% ОТКЛОНЕНИЙ ${getSortIndicator('percentage')}</th>
                 </tr>
             </thead>
             <tbody>
     `;
 
-    // Обрабатываем данные как объект с ключами департаментов
-    Object.keys(departmentsData).forEach(deptKey => {
+    // Преобразуем данные в массив для сортировки
+    const departmentsArray = Object.keys(departmentsData).map(deptKey => {
         const dept = departmentsData[deptKey];
+        return {
+            key: deptKey,
+            name: dept.name,
+            callCenter: dept.callCenter,
+            current: dept.current,
+            previous: dept.previous
+        };
+    });
+
+    // Сортируем данные
+    departmentsArray.sort((a, b) => {
+        let valueA, valueB;
         
-        console.log('Обрабатываем департамент:', deptKey, dept);
-        
-        if (!dept) {
-            console.error('Департамент undefined:', deptKey);
-            return;
+        switch (departmentsSortState.column) {
+            case 'name':
+                valueA = a.name.toLowerCase();
+                valueB = b.name.toLowerCase();
+                break;
+            case 'callCenter':
+                valueA = a.callCenter;
+                valueB = b.callCenter;
+                break;
+            case 'calls':
+                valueA = a.current.calls;
+                valueB = b.current.calls;
+                break;
+            case 'deviations':
+                valueA = a.current.deviations;
+                valueB = b.current.deviations;
+                break;
+            case 'percentage':
+                valueA = a.current.percentage;
+                valueB = b.current.percentage;
+                break;
+            default:
+                return 0;
         }
         
-        if (!dept.current) {
-            console.error('dept.current undefined для:', deptKey, dept);
-            return;
+        if (valueA < valueB) {
+            return departmentsSortState.direction === 'asc' ? -1 : 1;
         }
+        if (valueA > valueB) {
+            return departmentsSortState.direction === 'asc' ? 1 : -1;
+        }
+        return 0;
+    });
+
+    // Обрабатываем отсортированные данные
+    departmentsArray.forEach(dept => {
+        console.log('Обрабатываем департамент:', dept.key, dept);
         
-        if (!dept.previous) {
-            console.error('dept.previous undefined для:', deptKey, dept);
+        if (!dept.current || !dept.previous) {
+            console.error('Отсутствуют данные для департамента:', dept.key);
             return;
         }
 
-        const callsChange = dept.current.calls - dept.previous.calls;
-        const deviationsChange = dept.current.deviations - dept.previous.deviations;
+        // Вычисляем процентные изменения
+        const callsChangePercent = dept.previous.calls > 0 ? ((dept.current.calls - dept.previous.calls) / dept.previous.calls * 100) : 0;
+        const deviationsChangePercent = dept.previous.deviations > 0 ? ((dept.current.deviations - dept.previous.deviations) / dept.previous.deviations * 100) : 0;
         const percentageChange = dept.current.percentage - dept.previous.percentage;
 
         tableHTML += `
             <tr>
                 <td>${dept.name}</td>
                 <td class="text-right">${dept.callCenter}</td>
-                <td class="text-right">${dept.current.calls.toLocaleString()} ${createChangeBadge(callsChange, 'number')}</td>
-                <td class="text-right">${dept.current.deviations.toLocaleString()} ${createChangeBadge(deviationsChange, 'number')}</td>
+                <td class="text-right">${dept.current.calls.toLocaleString()} ${createChangeBadge(callsChangePercent, 'percentage')}</td>
+                <td class="text-right">${dept.current.deviations.toLocaleString()} ${createChangeBadge(deviationsChangePercent, 'percentage')}</td>
                 <td class="text-right"><span class="${getPercentageClass(dept.current.percentage)}">${dept.current.percentage}%</span> ${createChangeBadge(percentageChange, 'percentage')}</td>
             </tr>
         `;
@@ -121,10 +182,46 @@ function renderDepartmentsTable(departmentsData) {
 
     tableContainer.innerHTML = tableHTML;
     
-    // Инициализируем функциональность сворачивания после отрисовки таблицы
+    // Показываем графики и инициализируем их
+    const chartsContainer = document.getElementById('departmentsCharts');
+    if (chartsContainer && typeof initDepartmentCharts === 'function') {
+        chartsContainer.style.display = 'grid';
+        // Небольшая задержка для корректной отрисовки canvas элементов
+        setTimeout(() => {
+            initDepartmentCharts(cachedDepartmentsData);
+        }, 200);
+    }
+    
+    // Добавляем обработчики кликов для сортировки
     setTimeout(() => {
-        if (typeof initTableCollapse === 'function') {
-            initTableCollapse();
+        const sortableHeaders = document.querySelectorAll('#departmentsTable .sortable-header');
+        sortableHeaders.forEach(header => {
+            header.addEventListener('click', function() {
+                const column = this.getAttribute('data-column');
+                console.log('Клик по заголовку:', column);
+                
+                // Если кликнули по той же колонке, меняем направление
+                if (departmentsSortState.column === column) {
+                    departmentsSortState.direction = departmentsSortState.direction === 'asc' ? 'desc' : 'asc';
+                } else {
+                    // Если новая колонка, устанавливаем направление по умолчанию
+                    departmentsSortState.column = column;
+                    departmentsSortState.direction = column === 'percentage' ? 'desc' : 'asc';
+                }
+                
+                console.log('Новое состояние сортировки:', departmentsSortState);
+                
+                // Перерисовываем таблицу с новой сортировкой
+                renderDepartmentsTable(cachedDepartmentsData);
+            });
+        });
+        
+        // Обновляем высоту сворачивающегося блока после отрисовки
+        const content = document.getElementById('departmentsTableContent');
+        if (content && !content.classList.contains('collapsed')) {
+            setTimeout(() => {
+                content.style.maxHeight = content.scrollHeight + 'px';
+            }, 50);
         }
     }, 100);
 }
@@ -135,6 +232,9 @@ function setupDepartmentFilters() {
     
     // Настройка выпадающих списков
     setupDepartmentDropdowns();
+    
+    // Настройка сворачивающегося блока таблицы
+    setupCollapsibleTable();
     
     // Обработчик кнопки обновления для подразделений
     const deptUpdateButton = document.getElementById('deptUpdateButton');
@@ -153,6 +253,38 @@ function setupDepartmentFilters() {
         deptUpdateButton.disabled = false;
     } else {
         console.error('Кнопка deptUpdateButton не найдена!');
+    }
+}
+
+// Настройка сворачивающегося блока таблицы
+function setupCollapsibleTable() {
+    const header = document.getElementById('departmentsTableHeader');
+    const content = document.getElementById('departmentsTableContent');
+    const arrow = header ? header.querySelector('.collapse-arrow') : null;
+    
+    if (header && content && arrow) {
+        header.addEventListener('click', function() {
+            const isCollapsed = content.classList.contains('collapsed');
+            
+            if (isCollapsed) {
+                // Разворачиваем
+                content.classList.remove('collapsed');
+                arrow.classList.remove('collapsed');
+                content.style.maxHeight = content.scrollHeight + 'px';
+            } else {
+                // Сворачиваем
+                content.classList.add('collapsed');
+                arrow.classList.add('collapsed');
+                content.style.maxHeight = '0px';
+            }
+        });
+        
+        // Устанавливаем начальную высоту
+        setTimeout(() => {
+            if (!content.classList.contains('collapsed')) {
+                content.style.maxHeight = content.scrollHeight + 'px';
+            }
+        }, 100);
     }
 }
 
@@ -230,4 +362,5 @@ if (typeof window !== 'undefined') {
     window.renderDepartmentsTable = renderDepartmentsTable;
     window.setupDepartmentFilters = setupDepartmentFilters;
     window.setupDepartmentDropdowns = setupDepartmentDropdowns;
+    window.setupCollapsibleTable = setupCollapsibleTable;
 }
