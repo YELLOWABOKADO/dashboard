@@ -14,6 +14,22 @@ body {
     background-color: #fff;
 }
 
+/* Стили для закрепленной панели */
+.sticky-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background-color: #fff;
+    border-bottom: 1px solid #e9ecef;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 0;
+}
+
+/* Стили для прокручиваемого контента */
+.scrollable-content {
+    padding-top: 20px;
+}
+
 /* Стили для фильтров */
 .filters-container {
     padding: 15px 0;
@@ -446,7 +462,7 @@ tr:hover {
 
 .chart-wrapper {
     position: relative;
-    height: 300px;
+    height: 400px;
     width: 100%;
 }
 
@@ -531,7 +547,7 @@ tr:hover {
     }
     
     .chart-wrapper {
-        height: 250px;
+        height: 350px;
     }
     
     .pie-chart-wrapper {
@@ -544,5 +560,14 @@ tr:hover {
     
     .collapsible-content {
         padding: 0 15px 15px 15px;
+    }
+    
+    .sticky-header {
+        position: relative; /* На мобильных убираем sticky */
+        box-shadow: none;
+    }
+    
+    .scrollable-content {
+        padding-top: 10px;
     }
 }

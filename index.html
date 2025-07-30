@@ -83,8 +83,10 @@
 
         <!-- Departments Tab Content -->
         <div id="departmentsTab" class="tab-content">
-            <!-- Фильтры для подразделений -->
-            <div class="filters-container">
+            <!-- Закрепленная панель фильтров -->
+            <div class="sticky-header">
+                <!-- Фильтры для подразделений -->
+                <div class="filters-container">
                 <div class="filter-group">
                     <div class="filter-item">
                         <span class="filter-label">Период с:</span>
@@ -172,13 +174,17 @@
                 </div>
             </div>
 
-            <!-- Информационное примечание -->
-            <div class="warning-icon" style="margin-bottom: 15px; display: inline-block;">
-                <span style="background-color: #e3f2fd; color: #1976d2; padding: 8px 12px; border-radius: 4px; font-size: 14px; font-weight: normal;">
-                    ℹ️ Изменения показаны относительно предыдущего периода
-                    <span id="departmentsPeriodInfo">(01.06.2025 - 30.06.2025)</span>
-                </span>
+                <!-- Информационное примечание -->
+                <div class="warning-icon" style="margin-bottom: 15px; display: inline-block;">
+                    <span style="background-color: #e3f2fd; color: #1976d2; padding: 8px 12px; border-radius: 4px; font-size: 14px; font-weight: normal;">
+                        ℹ️ Изменения показаны относительно предыдущего периода
+                        <span id="departmentsPeriodInfo">(01.06.2025 - 30.06.2025)</span>
+                    </span>
+                </div>
             </div>
+
+            <!-- Прокручиваемый контент -->
+            <div class="scrollable-content">
 
             <!-- Сворачивающийся блок с таблицей подразделений -->
             <div class="collapsible-section">
@@ -195,27 +201,38 @@
                 </div>
             </div>
 
-            <!-- Графики подразделений -->
-            <div id="departmentsCharts" class="charts-container" style="display: none;">
-                <div class="chart-card">
-                    <h5>Доля отклонений</h5>
-                    <div class="pie-chart-wrapper">
-                        <canvas id="pieChart"></canvas>
-                    </div>
-                    <div id="pieChartLegend" class="custom-legend"></div>
+            <!-- Сворачивающийся блок с графиками -->
+            <div class="collapsible-section">
+                <div class="collapsible-header" id="departmentsChartsHeader">
+                    <h4 style="margin: 0; display: flex; align-items: center;">
+                        <span class="collapse-arrow">▼</span>
+                        <span style="margin-left: 10px;">Графики</span>
+                    </h4>
                 </div>
-                <div class="chart-card">
-                    <h5>Количество отклонений</h5>
-                    <div class="chart-wrapper">
-                        <canvas id="deviationsBarChart"></canvas>
+                <div class="collapsible-content" id="departmentsChartsContent">
+                    <div id="departmentsCharts" class="charts-container">
+                        <div class="chart-card">
+                            <h5>Доля отклонений</h5>
+                            <div class="pie-chart-wrapper">
+                                <canvas id="pieChart"></canvas>
+                            </div>
+                            <div id="pieChartLegend" class="custom-legend"></div>
+                        </div>
+                        <div class="chart-card">
+                            <h5>Количество отклонений</h5>
+                            <div class="chart-wrapper">
+                                <canvas id="deviationsBarChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-card" style="grid-column: 1 / -1;">
+                            <h5>Процент отклонений</h5>
+                            <div class="chart-wrapper">
+                                <canvas id="percentageBarChart"></canvas>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="chart-card" style="grid-column: 1 / -1;">
-                    <h5>Процент отклонений</h5>
-                    <div class="chart-wrapper">
-                        <canvas id="percentageBarChart"></canvas>
-                    </div>
-                </div>
+            </div>
             </div>
         </div>
 

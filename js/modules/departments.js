@@ -184,12 +184,17 @@ function renderDepartmentsTable(departmentsData) {
     
     // Показываем графики и инициализируем их
     const chartsContainer = document.getElementById('departmentsCharts');
+    const chartsContent = document.getElementById('departmentsChartsContent');
     if (chartsContainer && typeof initDepartmentCharts === 'function') {
         chartsContainer.style.display = 'grid';
-        // Небольшая задержка для корректной отрисовки canvas элементов
-        setTimeout(() => {
-            initDepartmentCharts(cachedDepartmentsData);
-        }, 200);
+        // Проверяем, не свернут ли блок графиков
+        const isChartsCollapsed = chartsContent && chartsContent.classList.contains('collapsed');
+        if (!isChartsCollapsed) {
+            // Небольшая задержка для корректной отрисовки canvas элементов
+            setTimeout(() => {
+                initDepartmentCharts(cachedDepartmentsData);
+            }, 200);
+        }
     }
     
     // Добавляем обработчики кликов для сортировки
@@ -233,8 +238,9 @@ function setupDepartmentFilters() {
     // Настройка выпадающих списков
     setupDepartmentDropdowns();
     
-    // Настройка сворачивающегося блока таблицы
+    // Настройка сворачивающихся блоков
     setupCollapsibleTable();
+    setupCollapsibleCharts();
     
     // Обработчик кнопки обновления для подразделений
     const deptUpdateButton = document.getElementById('deptUpdateButton');
@@ -271,6 +277,45 @@ function setupCollapsibleTable() {
                 content.classList.remove('collapsed');
                 arrow.classList.remove('collapsed');
                 content.style.maxHeight = content.scrollHeight + 'px';
+            } else {
+                // Сворачиваем
+                content.classList.add('collapsed');
+                arrow.classList.add('collapsed');
+                content.style.maxHeight = '0px';
+            }
+        });
+        
+        // Устанавливаем начальную высоту
+        setTimeout(() => {
+            if (!content.classList.contains('collapsed')) {
+                content.style.maxHeight = content.scrollHeight + 'px';
+            }
+        }, 100);
+    }
+}
+
+// Настройка сворачивающегося блока графиков
+function setupCollapsibleCharts() {
+    const header = document.getElementById('departmentsChartsHeader');
+    const content = document.getElementById('departmentsChartsContent');
+    const arrow = header ? header.querySelector('.collapse-arrow') : null;
+    
+    if (header && content && arrow) {
+        header.addEventListener('click', function() {
+            const isCollapsed = content.classList.contains('collapsed');
+            
+            if (isCollapsed) {
+                // Разворачиваем
+                content.classList.remove('collapsed');
+                arrow.classList.remove('collapsed');
+                content.style.maxHeight = content.scrollHeight + 'px';
+                
+                // Перерисовываем графики после разворачивания
+                if (cachedDepartmentsData && typeof initDepartmentCharts === 'function') {
+                    setTimeout(() => {
+                        initDepartmentCharts(cachedDepartmentsData);
+                    }, 300);
+                }
             } else {
                 // Сворачиваем
                 content.classList.add('collapsed');
@@ -363,4 +408,5 @@ if (typeof window !== 'undefined') {
     window.setupDepartmentFilters = setupDepartmentFilters;
     window.setupDepartmentDropdowns = setupDepartmentDropdowns;
     window.setupCollapsibleTable = setupCollapsibleTable;
+    window.setupCollapsibleCharts = setupCollapsibleCharts;
 }

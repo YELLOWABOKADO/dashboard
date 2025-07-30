@@ -227,6 +227,7 @@ function createDeviationsBarChart(chartData) {
             }]
         },
         options: {
+            indexAxis: 'y', // Делаем диаграмму горизонтальной
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
@@ -236,17 +237,24 @@ function createDeviationsBarChart(chartData) {
                 tooltip: {
                     callbacks: {
                         label: function(context) {
-                            return 'Отклонений: ' + context.parsed.y.toLocaleString();
+                            return 'Отклонений: ' + context.parsed.x.toLocaleString();
                         }
                     }
                 }
             },
             scales: {
-                y: {
+                x: {
                     beginAtZero: true,
                     ticks: {
                         callback: function(value) {
                             return value.toLocaleString();
+                        }
+                    }
+                },
+                y: {
+                    ticks: {
+                        font: {
+                            size: 12
                         }
                     }
                 }
@@ -264,9 +272,10 @@ function createDeviationsBarChart(chartData) {
                             const position = element.tooltipPosition();
                             ctx.fillStyle = '#333';
                             ctx.font = 'bold 12px Arial';
-                            ctx.textAlign = 'center';
-                            ctx.textBaseline = 'bottom';
-                            ctx.fillText(value.toLocaleString(), position.x, element.y - 5);
+                            ctx.textAlign = 'left';
+                            ctx.textBaseline = 'middle';
+                            // Для горизонтальной диаграммы размещаем текст справа от столбца
+                            ctx.fillText(value.toLocaleString(), element.x + 5, position.y);
                         }
                     });
                 });
@@ -299,6 +308,7 @@ function createPercentageBarChart(chartData) {
             }]
         },
         options: {
+            indexAxis: 'y', // Делаем диаграмму горизонтальной
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
@@ -308,18 +318,25 @@ function createPercentageBarChart(chartData) {
                 tooltip: {
                     callbacks: {
                         label: function(context) {
-                            return 'Процент: ' + context.parsed.y + '%';
+                            return 'Процент: ' + context.parsed.x + '%';
                         }
                     }
                 }
             },
             scales: {
-                y: {
+                x: {
                     beginAtZero: true,
                     max: Math.max(...chartData.percentages) * 1.2,
                     ticks: {
                         callback: function(value) {
                             return value + '%';
+                        }
+                    }
+                },
+                y: {
+                    ticks: {
+                        font: {
+                            size: 12
                         }
                     }
                 }
@@ -337,9 +354,10 @@ function createPercentageBarChart(chartData) {
                             const position = element.tooltipPosition();
                             ctx.fillStyle = '#333';
                             ctx.font = 'bold 12px Arial';
-                            ctx.textAlign = 'center';
-                            ctx.textBaseline = 'bottom';
-                            ctx.fillText(value + '%', position.x, element.y - 5);
+                            ctx.textAlign = 'left';
+                            ctx.textBaseline = 'middle';
+                            // Для горизонтальной диаграммы размещаем текст справа от столбца
+                            ctx.fillText(value + '%', element.x + 5, position.y);
                         }
                     });
                 });
