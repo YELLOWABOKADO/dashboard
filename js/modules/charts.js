@@ -116,13 +116,13 @@ function createPieChart(chartData) {
                         size: 14
                     },
                     formatter: (value, context) => {
-                        return value + '%';
+                        return value.toFixed(2) + '%';
                     }
                 },
                 tooltip: {
                     callbacks: {
                         label: function(context) {
-                            return context.label + ': ' + context.parsed + '%';
+                            return context.label + ': ' + context.parsed.toFixed(2) + '%';
                         }
                     }
                 }
@@ -157,7 +157,7 @@ function createPieChart(chartData) {
                             
                             // Основной текст
                             ctx.fillStyle = textColor;
-                            ctx.fillText(value.toFixed(1) + '%', position.x, position.y);
+                            ctx.fillText(value.toFixed(2) + '%', position.x, position.y);
                             
                             // Сбрасываем тень
                             ctx.shadowColor = 'transparent';
@@ -188,7 +188,7 @@ function createCustomLegend(chartData) {
         legendHTML += `
             <div class="legend-item">
                 <div class="legend-color" style="background-color: ${color};"></div>
-                <span>${department}: ${percentage.toFixed(1)}%</span>
+                <span>${department}: ${percentage.toFixed(2)}%</span>
             </div>
         `;
     });
@@ -350,7 +350,7 @@ function createPercentageBarChart(chartData) {
                 tooltip: {
                     callbacks: {
                         label: function(context) {
-                            return 'Процент: ' + context.parsed.x + '%';
+                            return 'Процент: ' + context.parsed.x.toFixed(2) + '%';
                         }
                     }
                 }
@@ -361,7 +361,7 @@ function createPercentageBarChart(chartData) {
                     max: maxValue * 1.1, // Увеличиваем отступ для размещения текста
                     ticks: {
                         callback: function(value) {
-                            return value + '%';
+                            return value.toFixed(1) + '%';
                         }
                     }
                 },
@@ -402,7 +402,7 @@ function createPercentageBarChart(chartData) {
                             ctx.shadowOffsetY = 1;
                             
                             // Размещаем текст в центре видимой части столбца
-                            ctx.fillText(value.toFixed(1) + '%', textX, element.y);
+                            ctx.fillText(value.toFixed(2) + '%', textX, element.y);
                             
                             // Сбрасываем тень
                             ctx.shadowColor = 'transparent';
@@ -497,7 +497,7 @@ function createEmployeePieChart(chartData) {
                 tooltip: {
                     callbacks: {
                         label: function(context) {
-                            return context.label + ': ' + context.parsed + '%';
+                            return context.label + ': ' + context.parsed.toFixed(2) + '%';
                         }
                     }
                 }
@@ -532,7 +532,7 @@ function createEmployeePieChart(chartData) {
                             
                             // Основной текст
                             ctx.fillStyle = textColor;
-                            ctx.fillText(value.toFixed(1) + '%', position.x, position.y);
+                            ctx.fillText(value.toFixed(2) + '%', position.x, position.y);
                             
                             // Сбрасываем тень
                             ctx.shadowColor = 'transparent';
@@ -563,7 +563,7 @@ function createEmployeeCustomLegend(chartData) {
         legendHTML += `
             <div class="legend-item">
                 <div class="legend-color" style="background-color: ${color};"></div>
-                <span>${employee}: ${percentage.toFixed(1)}%</span>
+                <span>${employee}: ${percentage.toFixed(2)}%</span>
             </div>
         `;
     });
@@ -725,7 +725,7 @@ function createEmployeePercentageBarChart(chartData) {
                 tooltip: {
                     callbacks: {
                         label: function(context) {
-                            return 'Процент: ' + context.parsed.x + '%';
+                            return 'Процент: ' + context.parsed.x.toFixed(2) + '%';
                         }
                     }
                 }
@@ -736,7 +736,7 @@ function createEmployeePercentageBarChart(chartData) {
                     max: maxValue * 1.1, // Увеличиваем отступ для размещения текста
                     ticks: {
                         callback: function(value) {
-                            return value + '%';
+                            return value.toFixed(1) + '%';
                         }
                     }
                 },
@@ -777,7 +777,7 @@ function createEmployeePercentageBarChart(chartData) {
                             ctx.shadowOffsetY = 1;
                             
                             // Размещаем текст в центре видимой части столбца
-                            ctx.fillText(value.toFixed(1) + '%', textX, element.y);
+                            ctx.fillText(value.toFixed(2) + '%', textX, element.y);
                             
                             // Сбрасываем тень
                             ctx.shadowColor = 'transparent';
