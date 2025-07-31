@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест сворачивающихся блоков</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Тест сворачивающихся блоков</h2>
+        
+        <!-- Блок таблицы (должен быть развернут) -->
+        <div class="collapsible-section">
+            <div class="collapsible-header" id="testTableHeader">
+                <h4 style="margin: 0; display: flex; align-items: center;">
+                    <span class="collapse-arrow">▼</span>
+                    <span style="margin-left: 10px;">Таблица (развернута)</span>
+                </h4>
+            </div>
+            <div class="collapsible-content" id="testTableContent">
+                <div style="padding: 20px; background: #f8f9fa; border-radius: 4px;">
+                    <p>Это содержимое таблицы. Должно быть видно сразу.</p>
+                    <table style="width: 100%; border: 1px solid #ddd;">
+                        <tr><td>Строка 1</td><td>Данные 1</td></tr>
+                        <tr><td>Строка 2</td><td>Данные 2</td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Блок графиков (должен быть свернут) -->
+        <div class="collapsible-section">
+            <div class="collapsible-header" id="testChartsHeader">
+                <h4 style="margin: 0; display: flex; align-items: center;">
+                    <span class="collapse-arrow">▼</span>
+                    <span style="margin-left: 10px;">Графики (свернуты)</span>
+                </h4>
+            </div>
+            <div class="collapsible-content" id="testChartsContent">
+                <div style="padding: 20px; background: #e3f2fd; border-radius: 4px;">
+                    <p>Это содержимое графиков. Должно быть скрыто изначально.</p>
+                    <div style="height: 200px; background: #ccc; border-radius: 4px; display: flex; align-items: center; justify-content: center;">
+                        Место для графика
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Блок динамики (должен быть свернут) -->
+        <div class="collapsible-section">
+            <div class="collapsible-header" id="testDetailsHeader">
+                <h4 style="margin: 0; display: flex; align-items: center;">
+                    <span class="collapse-arrow">▼</span>
+                    <span style="margin-left: 10px;">Динамика (свернута)</span>
+                </h4>
+            </div>
+            <div class="collapsible-content" id="testDetailsContent">
+                <div style="padding: 20px; background: #fff3e0; border-radius: 4px;">
+                    <p>Это содержимое динамики. Должно быть скрыто изначально.</p>
+                    <div style="height: 150px; background: #ffcc80; border-radius: 4px; display: flex; align-items: center; justify-content: center;">
+                        Детализация данных
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/modules/ui-helpers.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Инициализируем тестовые сворачивающиеся блоки...');
+            if (typeof initCollapsibleSections === 'function') {
+                initCollapsibleSections();
+            } else {
+                console.error('Функция initCollapsibleSections не найдена!');
+            }
+        });
+    </script>
+</body>
+</html>

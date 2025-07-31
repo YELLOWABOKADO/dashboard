@@ -182,8 +182,15 @@ function toggleCollapsibleSection(headerId, contentId) {
             arrow.classList.remove('collapsed');
         }
         
-        // Устанавливаем max-height для анимации
-        content.style.maxHeight = content.scrollHeight + 'px';
+        // Сначала убираем max-height, чтобы получить реальную высоту
+        content.style.maxHeight = 'none';
+        const realHeight = content.scrollHeight;
+        content.style.maxHeight = '0px';
+        
+        // Запускаем анимацию
+        setTimeout(() => {
+            content.style.maxHeight = realHeight + 'px';
+        }, 10);
         
         // Специальная обработка для блоков с графиками
         if (contentId.includes('Charts')) {
@@ -197,7 +204,9 @@ function toggleCollapsibleSection(headerId, contentId) {
                 
                 // Обновляем max-height после перерисовки графиков
                 setTimeout(() => {
-                    content.style.maxHeight = content.scrollHeight + 'px';
+                    content.style.maxHeight = 'none';
+                    const newHeight = content.scrollHeight;
+                    content.style.maxHeight = newHeight + 'px';
                 }, 100);
             }, 300);
         }
@@ -252,19 +261,34 @@ function initCollapsibleSections() {
         
         // Проверяем, что контент существует
         const content = document.getElementById(contentId);
+        const arrow = header.querySelector('.collapse-arrow');
+        
         if (!content) {
             console.warn(`Контент ${contentId} не найден для заголовка ${headerId}`);
         } else {
             console.log(`✅ Блок ${headerId} -> ${contentId} успешно инициализирован`);
             
-            // Устанавливаем начальную высоту для развернутых блоков
+            // Устанавливаем правильное начальное состояние
             setTimeout(() => {
-                if (!content.classList.contains('collapsed')) {
+                // Определяем, должен ли блок быть изначально развернут
+                const shouldBeExpanded = !contentId.includes('Charts') && !contentId.includes('Details') && !contentId.includes('Dynamics');
+                
+                if (shouldBeExpanded) {
+                    // Блок должен быть развернут
+                    content.classList.remove('collapsed');
+                    if (arrow) {
+                        arrow.classList.remove('collapsed');
+                    }
                     content.style.maxHeight = content.scrollHeight + 'px';
-                    console.log(`Установлена начальная высота для ${contentId}: ${content.scrollHeight}px`);
+                    console.log(`Блок ${contentId} развернут по умолчанию, высота: ${content.scrollHeight}px`);
                 } else {
+                    // Блок должен быть свернут
+                    content.classList.add('collapsed');
+                    if (arrow) {
+                        arrow.classList.add('collapsed');
+                    }
                     content.style.maxHeight = '0px';
-                    console.log(`Блок ${contentId} изначально свернут`);
+                    console.log(`Блок ${contentId} свернут по умолчанию`);
                 }
             }, 100);
         }
