@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест сворачивающихся блоков</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Тест функциональности сворачивания</h1>
+        
+        <div style="margin-bottom: 20px;">
+            <button onclick="debugCollapsibleSections()" class="btn btn-primary">Отладка блоков</button>
+            <button onclick="testToggleBlock('testHeader1')" class="btn btn-primary">Тест блока 1</button>
+            <button onclick="forceInitCollapsible()" class="btn btn-primary">Переинициализация</button>
+        </div>
+        
+        <!-- Тестовые сворачивающиеся блоки -->
+        <div class="collapsible-section">
+            <div class="collapsible-header" id="testHeader1">
+                <h4 style="margin: 0; display: flex; align-items: center;">
+                    <span class="collapse-arrow">▼</span>
+                    <span style="margin-left: 10px;">Тестовый блок 1</span>
+                </h4>
+            </div>
+            <div class="collapsible-content" id="testContent1">
+                <div style="padding: 20px;">
+                    <p>Содержимое первого тестового блока</p>
+                    <p>Дополнительный текст для увеличения высоты</p>
+                    <p>Еще одна строка</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="collapsible-section">
+            <div class="collapsible-header" id="testHeader2">
+                <h4 style="margin: 0; display: flex; align-items: center;">
+                    <span class="collapse-arrow">▼</span>
+                    <span style="margin-left: 10px;">Тестовый блок 2</span>
+                </h4>
+            </div>
+            <div class="collapsible-content" id="testContent2">
+                <div style="padding: 20px;">
+                    <p>Содержимое второго тестового блока</p>
+                    <p>Больше контента для тестирования</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="collapsible-section">
+            <div class="collapsible-header" id="testChartsHeader">
+                <h4 style="margin: 0; display: flex; align-items: center;">
+                    <span class="collapse-arrow">▼</span>
+                    <span style="margin-left: 10px;">Тестовые графики</span>
+                </h4>
+            </div>
+            <div class="collapsible-content" id="testChartsContent">
+                <div style="padding: 20px;">
+                    <p>Содержимое блока с графиками (тест специальной обработки)</p>
+                    <div style="height: 100px; background: #f0f0f0; margin: 10px 0;">Имитация графика</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Подключение модулей -->
+    <script src="js/modules/ui-helpers.js"></script>
+    <script src="debug-collapsible.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('=== Тестирование сворачивающихся блоков ===');
+            
+            // Инициализируем сворачивающиеся блоки
+            if (typeof initCollapsibleSections === 'function') {
+                initCollapsibleSections();
+                console.log('✅ initCollapsibleSections вызвана');
+                
+                // Показываем отладочную информацию через 1 секунду
+                setTimeout(() => {
+                    debugCollapsibleSections();
+                }, 1000);
+            } else {
+                console.error('❌ initCollapsibleSections не найдена');
+            }
+        });
+    </script>
+</body>
+</html>

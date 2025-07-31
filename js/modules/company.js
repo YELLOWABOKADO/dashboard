@@ -38,7 +38,6 @@ async function updateCompanyData() {
     }
     
     showLoading('companySummaryTable');
-    updatePeriodInfo(granularity, 'periodInfo');
     
     try {
         // Проверяем, что функция getCompanyData загружена

@@ -67,13 +67,7 @@
                 </div>
             </div>
 
-            <!-- Информационное примечание -->
-            <div class="warning-icon" style="margin-bottom: 15px; display: inline-block;">
-                <span style="background-color: #e3f2fd; color: #1976d2; padding: 8px 12px; border-radius: 4px; font-size: 14px; font-weight: normal;">
-                    ℹ️ Изменения показаны относительно предыдущего периода
-                    <span id="periodInfo">(01.06.2025 - 30.06.2025)</span>
-                </span>
-            </div>
+
 
             <!-- Таблица с данными сводной информации -->
             <div id="companySummaryTable" class="mt-4">
@@ -174,13 +168,7 @@
                 </div>
             </div>
 
-                <!-- Информационное примечание -->
-                <div class="warning-icon" style="margin-bottom: 15px; display: inline-block;">
-                    <span style="background-color: #e3f2fd; color: #1976d2; padding: 8px 12px; border-radius: 4px; font-size: 14px; font-weight: normal;">
-                        ℹ️ Изменения показаны относительно предыдущего периода
-                        <span id="departmentsPeriodInfo">(01.06.2025 - 30.06.2025)</span>
-                    </span>
-                </div>
+
             </div>
 
             <!-- Прокручиваемый контент -->
@@ -197,6 +185,24 @@
                 <div class="collapsible-content" id="departmentsTableContent">
                     <div id="departmentsTable" class="mt-4">
                         <div class="loading">Загрузка данных...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Сворачивающийся блок с динамикой -->
+            <div class="collapsible-section">
+                <div class="collapsible-header" id="departmentsDynamicsHeader">
+                    <h4 style="margin: 0; display: flex; align-items: center;">
+                        <span class="collapse-arrow">▼</span>
+                        <span style="margin-left: 10px;">Динамика</span>
+                    </h4>
+                </div>
+                <div class="collapsible-content" id="departmentsDynamicsContent">
+                    <div id="departmentsDynamics" class="details-container">
+                        <div style="padding: 20px; text-align: center; background: #f8f9fa; border-radius: 4px; border-left: 4px solid #007bff;">
+                            <h4>🚧 В разработке</h4>
+                            <p>Функционал динамики для подразделений находится в разработке</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -406,13 +412,7 @@
                 </div>
             </div>
 
-                <!-- Информационное примечание -->
-                <div class="warning-icon" style="margin-bottom: 15px; display: inline-block;">
-                    <span style="background-color: #e3f2fd; color: #1976d2; padding: 8px 12px; border-radius: 4px; font-size: 14px; font-weight: normal;">
-                        ℹ️ Изменения показаны относительно предыдущего периода
-                        <span id="employeesPeriodInfo">(01.06.2025 - 30.06.2025)</span>
-                    </span>
-                </div>
+
             </div>
 
             <!-- Прокручиваемый контент -->
@@ -464,6 +464,21 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Сворачивающийся блок с динамикой -->
+                <div class="collapsible-section">
+                    <div class="collapsible-header" id="employeesDetailsHeader">
+                        <h4 style="margin: 0; display: flex; align-items: center;">
+                            <span class="collapse-arrow">▼</span>
+                            <span style="margin-left: 10px;">Динамика</span>
+                        </h4>
+                    </div>
+                    <div class="collapsible-content" id="employeesDetailsContent">
+                        <div id="employeesDetails" class="details-container">
+                            <div class="loading">Загрузка динамики...</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -479,10 +494,15 @@
                 initTableCollapse: typeof initTableCollapse,
                 handleTableRowClick: typeof handleTableRowClick,
                 showLoading: typeof showLoading,
-                createChangeBadge: typeof createChangeBadge
+                createChangeBadge: typeof createChangeBadge,
+                toggleCollapsibleSection: typeof toggleCollapsibleSection,
+                initCollapsibleSections: typeof initCollapsibleSections
             });
         });
     </script>
+    
+    <!-- Скрипт для отладки -->
+    <script src="debug-collapsible.js"></script>
     
     <!-- Подключение Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
@@ -497,6 +517,7 @@
     <script src="js/modules/company.js"></script>
     <script src="js/modules/departments.js"></script>
     <script src="js/modules/employees.js"></script>
+    <script src="js/modules/details.js"></script>
     <script src="js/modules/charts.js"></script>
     <script src="js/modules/app.js"></script>
     

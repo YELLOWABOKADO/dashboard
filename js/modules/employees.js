@@ -16,40 +16,39 @@ function getEmployeesSortIndicator(column) {
     if (employeesSortState.column !== column) {
         return '<span class="sort-indicator">↕</span>';
     }
-    return employeesSortState.direction === 'asc' 
-        ? '<span class="sort-indicator active">↑</span>' 
+    return employeesSortState.direction === 'asc'
+        ? '<span class="sort-indicator active">↑</span>'
         : '<span class="sort-indicator active">↓</span>';
 }
 
 // Обновление данных сотрудников
 async function updateEmployeesData() {
     console.log('=== updateEmployeesData вызвана ===');
-    
+
     // Проверяем критически важные элементы
     if (!document.getElementById('employeesTable')) {
         console.error('Элемент employeesTable не найден!');
         return;
     }
-    
+
     const startDate = document.getElementById('empStartDate').value;
     const endDate = document.getElementById('empEndDate').value;
     const granularity = document.getElementById('empTimeGranularity').value;
     const callCenter = document.getElementById('empCallCenter').value;
-    
+
     // Получаем выбранные группы и сотрудников
     const selectedDepartments = getSelectedMultiSelectValues('empDepartmentsDropdown');
     const selectedEmployees = getSelectedMultiSelectValues('empEmployeesDropdown');
-    
+
     console.log('Параметры команды:', { startDate, endDate, granularity, callCenter, selectedDepartments, selectedEmployees });
-    
+
     if (!validateDateRange(startDate, endDate, granularity)) {
         console.log('Валидация дат не прошла');
         return;
     }
-    
+
     showLoading('employeesTable');
-    updatePeriodInfo(granularity, 'employeesPeriodInfo');
-    
+
     try {
         // Проверяем, что функция getEmployeesData загружена
         if (typeof getEmployeesData !== 'function') {
@@ -58,12 +57,28 @@ async function updateEmployeesData() {
             loadTestEmployeesData();
             return;
         }
-        
+
         const employeesData = await getEmployeesData(startDate, endDate, granularity, callCenter, selectedDepartments, selectedEmployees);
         console.log('Получены данные команды:', employeesData);
-        
+
         if (employeesData && employeesData.current && employeesData.current.length > 0) {
             renderEmployeesTable(employeesData);
+
+            // Загружаем детализацию
+            if (typeof loadRealEmployeeDetails === 'function') {
+                console.log('Загружаем реальную детализацию...');
+                setTimeout(loadRealEmployeeDetails, 200);
+            } else if (typeof loadEmployeeDetails === 'function') {
+                const filters = {
+                    startDate,
+                    endDate,
+                    timeGranularity: granularity,
+                    callCenter,
+                    departments: selectedDepartments,
+                    employees: selectedEmployees
+                };
+                loadEmployeeDetails(filters);
+            }
         } else {
             console.log('employeesData пустые, загружаем тестовые данные');
             loadTestEmployeesData();
@@ -81,7 +96,7 @@ function renderEmployeesTable(employeesData) {
     if (!tableContainer) return;
 
     console.log('=== renderEmployeesTable вызвана ===', employeesData);
-    
+
     // Сохраняем данные для повторного использования при сортировке
     cachedEmployeesData = employeesData;
 
@@ -123,7 +138,7 @@ function renderEmployeesTable(employeesData) {
     // Сортируем данные
     employeesArray.sort((a, b) => {
         let valueA, valueB;
-        
+
         switch (employeesSortState.column) {
             case 'name':
                 valueA = a.name.toLowerCase();
@@ -152,7 +167,7 @@ function renderEmployeesTable(employeesData) {
             default:
                 return 0;
         }
-        
+
         if (valueA < valueB) {
             return employeesSortState.direction === 'asc' ? -1 : 1;
         }
@@ -187,7 +202,7 @@ function renderEmployeesTable(employeesData) {
     `;
 
     tableContainer.innerHTML = tableHTML;
-    
+
     // Показываем графики и инициализируем их
     const chartsContainer = document.getElementById('employeesCharts');
     const chartsContent = document.getElementById('employeesChartsContent');
@@ -202,15 +217,15 @@ function renderEmployeesTable(employeesData) {
             }, 200);
         }
     }
-    
+
     // Добавляем обработчики кликов для сортировки
     setTimeout(() => {
         const sortableHeaders = document.querySelectorAll('#employeesTable .sortable-header');
         sortableHeaders.forEach(header => {
-            header.addEventListener('click', function() {
+            header.addEventListener('click', function () {
                 const column = this.getAttribute('data-column');
                 console.log('Клик по заголовку сотрудников:', column);
-                
+
                 // Если кликнули по той же колонке, меняем направление
                 if (employeesSortState.column === column) {
                     employeesSortState.direction = employeesSortState.direction === 'asc' ? 'desc' : 'asc';
@@ -219,14 +234,14 @@ function renderEmployeesTable(employeesData) {
                     employeesSortState.column = column;
                     employeesSortState.direction = column === 'percentage' ? 'desc' : 'asc';
                 }
-                
+
                 console.log('Новое состояние сортировки сотрудников:', employeesSortState);
-                
+
                 // Перерисовываем таблицу с новой сортировкой
                 renderEmployeesTable(cachedEmployeesData);
             });
         });
-        
+
         // Обновляем высоту сворачивающегося блока после отрисовки
         const content = document.getElementById('employeesTableContent');
         if (content && !content.classList.contains('collapsed')) {
@@ -240,26 +255,24 @@ function renderEmployeesTable(employeesData) {
 // Настройка фильтров сотрудников
 function setupEmployeeFilters() {
     console.log('=== setupEmployeeFilters вызвана ===');
-    
+
     // Настройка выпадающих списков
     setupEmployeeDropdowns();
-    
-    // Настройка сворачивающихся блоков
-    setupEmployeeCollapsibleTable();
-    setupEmployeeCollapsibleCharts();
-    
+
+    // Сворачивающиеся блоки настраиваются через общую систему initCollapsibleSections
+
     // Обработчик кнопки обновления для команды
     const empUpdateButton = document.getElementById('empUpdateButton');
     console.log('Кнопка обновления команды:', empUpdateButton);
-    
+
     if (empUpdateButton) {
         console.log('Добавляем обработчик для кнопки команды');
-        empUpdateButton.addEventListener('click', function(e) {
+        empUpdateButton.addEventListener('click', function (e) {
             console.log('=== Клик по кнопке обновления команды ===');
             e.preventDefault();
             updateEmployeesData();
         });
-        
+
         // Убираем возможные блокировки
         empUpdateButton.style.pointerEvents = 'auto';
         empUpdateButton.disabled = false;
@@ -272,7 +285,7 @@ function setupEmployeeFilters() {
 function handleEmployeeDepartmentCheckboxChange(checkbox) {
     const dropdown = document.getElementById('empDepartmentsDropdown');
     const allCheckbox = dropdown.querySelector('input[value="all"]');
-    
+
     if (checkbox.value === 'all') {
         // Если выбран "Все", снимаем остальные
         if (checkbox.checked) {
@@ -292,7 +305,7 @@ function handleEmployeeDepartmentCheckboxChange(checkbox) {
             }
         }
     }
-    
+
     updateMultiSelectButtonText('empDepartmentsDropdown', 'empDepartmentsText');
 }
 
@@ -300,7 +313,7 @@ function handleEmployeeDepartmentCheckboxChange(checkbox) {
 function handleEmployeeCheckboxChange(checkbox) {
     const dropdown = document.getElementById('empEmployeesDropdown');
     const allCheckbox = dropdown.querySelector('input[value="all"]');
-    
+
     if (checkbox.value === 'all') {
         // Если выбран "Все", снимаем остальные
         if (checkbox.checked) {
@@ -320,7 +333,7 @@ function handleEmployeeCheckboxChange(checkbox) {
             }
         }
     }
-    
+
     updateMultiSelectButtonText('empEmployeesDropdown', 'empEmployeesText');
 }
 
@@ -329,9 +342,9 @@ function setupEmployeeDropdowns() {
     // Настройка выпадающего списка групп
     const empDepartmentsButton = document.getElementById('empDepartmentsButton');
     const empDepartmentsDropdown = document.getElementById('empDepartmentsDropdown');
-    
+
     if (empDepartmentsButton && empDepartmentsDropdown) {
-        empDepartmentsButton.addEventListener('click', function(e) {
+        empDepartmentsButton.addEventListener('click', function (e) {
             e.stopPropagation();
             // Закрываем другие выпадающие списки
             document.querySelectorAll('.multi-select-dropdown').forEach(dd => {
@@ -346,22 +359,22 @@ function setupEmployeeDropdowns() {
                 empDepartmentsDropdown.style.display = 'block';
             }
         });
-        
+
         // Обработчики чекбоксов групп
-        empDepartmentsDropdown.addEventListener('click', function(e) {
+        empDepartmentsDropdown.addEventListener('click', function (e) {
             e.stopPropagation();
             if (e.target.type === 'checkbox') {
                 handleEmployeeDepartmentCheckboxChange(e.target);
             }
         });
     }
-    
+
     // Настройка выпадающего списка сотрудников
     const empEmployeesButton = document.getElementById('empEmployeesButton');
     const empEmployeesDropdown = document.getElementById('empEmployeesDropdown');
-    
+
     if (empEmployeesButton && empEmployeesDropdown) {
-        empEmployeesButton.addEventListener('click', function(e) {
+        empEmployeesButton.addEventListener('click', function (e) {
             e.stopPropagation();
             // Закрываем другие выпадающие списки
             document.querySelectorAll('.multi-select-dropdown').forEach(dd => {
@@ -376,18 +389,18 @@ function setupEmployeeDropdowns() {
                 empEmployeesDropdown.style.display = 'block';
             }
         });
-        
+
         // Обработчики чекбоксов сотрудников
-        empEmployeesDropdown.addEventListener('click', function(e) {
+        empEmployeesDropdown.addEventListener('click', function (e) {
             e.stopPropagation();
             if (e.target.type === 'checkbox') {
                 handleEmployeeCheckboxChange(e.target);
             }
         });
     }
-    
+
     // Закрытие выпадающих списков при клике вне их
-    document.addEventListener('click', function() {
+    document.addEventListener('click', function () {
         document.querySelectorAll('.multi-select-dropdown').forEach(dd => {
             dd.style.display = 'none';
         });
@@ -397,7 +410,7 @@ function setupEmployeeDropdowns() {
 // Функция для загрузки тестовых данных (для отладки)
 function loadTestEmployeesData() {
     console.log('Загружаем тестовые данные для вкладки "Команда"');
-    
+
     const testEmployeesData = {
         current: [
             {
@@ -410,7 +423,7 @@ function loadTestEmployeesData() {
             },
             {
                 name: "Ермошина С. В.",
-                department: "Гридчина - группа", 
+                department: "Гридчина - группа",
                 callCenter: "КЦ1",
                 calls: 993,
                 deviations: 298,
@@ -419,7 +432,7 @@ function loadTestEmployeesData() {
             {
                 name: "Кузнецова В. Ю.",
                 department: "Гридчина - группа",
-                callCenter: "КЦ1", 
+                callCenter: "КЦ1",
                 calls: 1022,
                 deviations: 247,
                 percentage: 1.64
@@ -458,78 +471,71 @@ function loadTestEmployeesData() {
             { calls: 1150, deviations: 210, percentage: 1.5 }
         ]
     };
-    
-    renderEmployeesTable(testEmployeesData);
-}
 
-// Настройка сворачивающегося блока таблицы сотрудников
-function setupEmployeeCollapsibleTable() {
-    const header = document.getElementById('employeesTableHeader');
-    const content = document.getElementById('employeesTableContent');
-    const arrow = header ? header.querySelector('.collapse-arrow') : null;
-    
-    if (header && content && arrow) {
-        header.addEventListener('click', function() {
-            const isCollapsed = content.classList.contains('collapsed');
-            
-            if (isCollapsed) {
-                // Разворачиваем
-                content.classList.remove('collapsed');
-                arrow.classList.remove('collapsed');
-                content.style.maxHeight = content.scrollHeight + 'px';
-            } else {
-                // Сворачиваем
-                content.classList.add('collapsed');
-                arrow.classList.add('collapsed');
-                content.style.maxHeight = '0px';
-            }
-        });
-        
-        // Устанавливаем начальную высоту
-        setTimeout(() => {
-            if (!content.classList.contains('collapsed')) {
-                content.style.maxHeight = content.scrollHeight + 'px';
-            }
-        }, 100);
+    renderEmployeesTable(testEmployeesData);
+
+    // Загружаем детализацию с тестовыми фильтрами
+    console.log('Пробуем загрузить детализацию из loadTestEmployeesData...');
+    if (typeof loadRealEmployeeDetails === 'function') {
+        console.log('Загружаем реальную детализацию...');
+        setTimeout(loadRealEmployeeDetails, 200);
+    } else if (typeof loadSimpleEmployeeDetails === 'function') {
+        console.log('Загружаем простую детализацию...');
+        setTimeout(loadSimpleEmployeeDetails, 200);
+    } else if (typeof loadEmployeeDetails === 'function') {
+        console.log('Загружаем полную детализацию...');
+        const filters = {
+            startDate: document.getElementById('empStartDate')?.value || '2025-07-01',
+            endDate: document.getElementById('empEndDate')?.value || '2025-07-31',
+            timeGranularity: document.getElementById('empTimeGranularity')?.value || 'Месяц',
+            callCenter: 'Все КЦ',
+            departments: ['all'],
+            employees: ['all']
+        };
+        setTimeout(() => loadEmployeeDetails(filters), 200);
+    } else {
+        console.error('Функции детализации не найдены в loadTestEmployeesData');
     }
 }
 
-// Настройка сворачивающегося блока графиков сотрудников
-function setupEmployeeCollapsibleCharts() {
-    const header = document.getElementById('employeesChartsHeader');
-    const content = document.getElementById('employeesChartsContent');
-    const arrow = header ? header.querySelector('.collapse-arrow') : null;
-    
-    if (header && content && arrow) {
-        header.addEventListener('click', function() {
-            const isCollapsed = content.classList.contains('collapsed');
-            
-            if (isCollapsed) {
-                // Разворачиваем
-                content.classList.remove('collapsed');
-                arrow.classList.remove('collapsed');
-                content.style.maxHeight = content.scrollHeight + 'px';
-                
-                // Перерисовываем графики после разворачивания
-                if (cachedEmployeesData && typeof initEmployeeCharts === 'function') {
-                    setTimeout(() => {
-                        initEmployeeCharts(cachedEmployeesData);
-                    }, 300);
-                }
+// Сворачивающиеся блоки теперь управляются через общую систему initCollapsibleSections
+
+// Инициализация модуля сотрудников
+function initEmployeesModule() {
+    console.log('=== Инициализация модуля сотрудников ===');
+
+    // Инициализируем детализацию
+    console.log('Проверяем наличие функции initEmployeeDetails:', typeof initEmployeeDetails);
+    if (typeof initEmployeeDetails === 'function') {
+        console.log('Вызываем initEmployeeDetails...');
+        initEmployeeDetails();
+    } else {
+        console.error('Функция initEmployeeDetails не найдена!');
+    }
+
+    // Настраиваем обработчики для обновления детализации
+    const empUpdateButton = document.getElementById('empUpdateButton');
+    if (empUpdateButton) {
+        console.log('Кнопка обновления найдена, добавляем обработчик');
+        empUpdateButton.addEventListener('click', function () {
+            console.log('Кнопка обновления нажата');
+            updateEmployeesData();
+            // Обновляем детализацию при обновлении данных
+            if (typeof loadRealEmployeeDetails === 'function') {
+                console.log('Загружаем реальную детализацию...');
+                setTimeout(loadRealEmployeeDetails, 100);
+            } else if (typeof updateEmployeeDetails === 'function') {
+                console.log('Обновляем детализацию...');
+                setTimeout(updateEmployeeDetails, 100);
+            } else if (typeof loadSimpleEmployeeDetails === 'function') {
+                console.log('Загружаем простую детализацию...');
+                setTimeout(loadSimpleEmployeeDetails, 100);
             } else {
-                // Сворачиваем
-                content.classList.add('collapsed');
-                arrow.classList.add('collapsed');
-                content.style.maxHeight = '0px';
+                console.error('Функции детализации не найдены');
             }
         });
-        
-        // Устанавливаем начальную высоту
-        setTimeout(() => {
-            if (!content.classList.contains('collapsed')) {
-                content.style.maxHeight = content.scrollHeight + 'px';
-            }
-        }, 100);
+    } else {
+        console.error('Кнопка обновления не найдена');
     }
 }
 
@@ -542,6 +548,7 @@ if (typeof window !== 'undefined') {
     window.handleEmployeeDepartmentCheckboxChange = handleEmployeeDepartmentCheckboxChange;
     window.handleEmployeeCheckboxChange = handleEmployeeCheckboxChange;
     window.loadTestEmployeesData = loadTestEmployeesData;
-    window.setupEmployeeCollapsibleTable = setupEmployeeCollapsibleTable;
-    window.setupEmployeeCollapsibleCharts = setupEmployeeCollapsibleCharts;
+    // setupEmployeeCollapsibleTable и setupEmployeeCollapsibleCharts удалены - используется общая система
+    window.initEmployeesModule = initEmployeesModule;
+    console.log('=== employees.js загружен ===');
 }

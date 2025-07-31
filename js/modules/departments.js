@@ -41,7 +41,6 @@ async function updateDepartmentsData() {
     }
     
     showLoading('departmentsTable');
-    updatePeriodInfo(granularity, 'departmentsPeriodInfo');
     
     try {
         // Проверяем, что функция getDepartmentsData загружена
@@ -238,9 +237,7 @@ function setupDepartmentFilters() {
     // Настройка выпадающих списков
     setupDepartmentDropdowns();
     
-    // Настройка сворачивающихся блоков
-    setupCollapsibleTable();
-    setupCollapsibleCharts();
+    // Сворачивающиеся блоки настраиваются через общую систему initCollapsibleSections
     
     // Обработчик кнопки обновления для подразделений
     const deptUpdateButton = document.getElementById('deptUpdateButton');
@@ -262,76 +259,7 @@ function setupDepartmentFilters() {
     }
 }
 
-// Настройка сворачивающегося блока таблицы
-function setupCollapsibleTable() {
-    const header = document.getElementById('departmentsTableHeader');
-    const content = document.getElementById('departmentsTableContent');
-    const arrow = header ? header.querySelector('.collapse-arrow') : null;
-    
-    if (header && content && arrow) {
-        header.addEventListener('click', function() {
-            const isCollapsed = content.classList.contains('collapsed');
-            
-            if (isCollapsed) {
-                // Разворачиваем
-                content.classList.remove('collapsed');
-                arrow.classList.remove('collapsed');
-                content.style.maxHeight = content.scrollHeight + 'px';
-            } else {
-                // Сворачиваем
-                content.classList.add('collapsed');
-                arrow.classList.add('collapsed');
-                content.style.maxHeight = '0px';
-            }
-        });
-        
-        // Устанавливаем начальную высоту
-        setTimeout(() => {
-            if (!content.classList.contains('collapsed')) {
-                content.style.maxHeight = content.scrollHeight + 'px';
-            }
-        }, 100);
-    }
-}
-
-// Настройка сворачивающегося блока графиков
-function setupCollapsibleCharts() {
-    const header = document.getElementById('departmentsChartsHeader');
-    const content = document.getElementById('departmentsChartsContent');
-    const arrow = header ? header.querySelector('.collapse-arrow') : null;
-    
-    if (header && content && arrow) {
-        header.addEventListener('click', function() {
-            const isCollapsed = content.classList.contains('collapsed');
-            
-            if (isCollapsed) {
-                // Разворачиваем
-                content.classList.remove('collapsed');
-                arrow.classList.remove('collapsed');
-                content.style.maxHeight = content.scrollHeight + 'px';
-                
-                // Перерисовываем графики после разворачивания
-                if (cachedDepartmentsData && typeof initDepartmentCharts === 'function') {
-                    setTimeout(() => {
-                        initDepartmentCharts(cachedDepartmentsData);
-                    }, 300);
-                }
-            } else {
-                // Сворачиваем
-                content.classList.add('collapsed');
-                arrow.classList.add('collapsed');
-                content.style.maxHeight = '0px';
-            }
-        });
-        
-        // Устанавливаем начальную высоту
-        setTimeout(() => {
-            if (!content.classList.contains('collapsed')) {
-                content.style.maxHeight = content.scrollHeight + 'px';
-            }
-        }, 100);
-    }
-}
+// Сворачивающиеся блоки теперь управляются через общую систему initCollapsibleSections
 
 // Обработка изменений чекбоксов подразделений
 function handleDepartmentCheckboxChange(checkbox) {
@@ -407,6 +335,5 @@ if (typeof window !== 'undefined') {
     window.renderDepartmentsTable = renderDepartmentsTable;
     window.setupDepartmentFilters = setupDepartmentFilters;
     window.setupDepartmentDropdowns = setupDepartmentDropdowns;
-    window.setupCollapsibleTable = setupCollapsibleTable;
-    window.setupCollapsibleCharts = setupCollapsibleCharts;
+    // setupCollapsibleTable и setupCollapsibleCharts удалены - используется общая система
 }

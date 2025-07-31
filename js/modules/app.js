@@ -47,6 +47,11 @@ function initApp() {
         initTableCollapse();
     }
     
+    // Инициализируем сворачивающиеся блоки
+    if (typeof initCollapsibleSections === 'function') {
+        initCollapsibleSections();
+    }
+    
     // Обработчик кнопки "Обновить" на главной вкладке
     const updateButton = document.getElementById('updateButton');
     if (updateButton) {
@@ -72,6 +77,21 @@ function initApp() {
         console.log('Инициализируем фильтры с задержкой...');
         setupDepartmentFilters();
         setupEmployeeFilters();
+        
+        // Инициализируем модуль сотрудников (включая детализацию)
+        console.log('Проверяем наличие функции initEmployeesModule:', typeof initEmployeesModule);
+        if (typeof initEmployeesModule === 'function') {
+            console.log('Вызываем initEmployeesModule...');
+            initEmployeesModule();
+        } else {
+            console.error('Функция initEmployeesModule не найдена!');
+        }
+        
+        // Повторно инициализируем сворачивающиеся блоки после загрузки всех модулей
+        if (typeof initCollapsibleSections === 'function') {
+            console.log('Повторная инициализация сворачивающихся блоков...');
+            initCollapsibleSections();
+        }
     }, 300);
     
     // Загружаем данные для начальной вкладки с проверкой готовности функций

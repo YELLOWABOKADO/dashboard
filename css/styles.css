@@ -571,3 +571,210 @@ tr:hover {
         padding-top: 10px;
     }
 }
+/* Стили 
+для детализации */
+.details-container {
+    margin: 20px 0;
+}
+
+.details-table-container {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.details-mode-selector {
+    padding: 15px 20px;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.details-mode-label {
+    font-weight: 600;
+    color: #495057;
+    font-size: 14px;
+}
+
+.details-table-wrapper {
+    overflow-x: auto;
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.details-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.details-table thead {
+    background-color: #f8f9fa;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.details-table th {
+    padding: 12px 8px;
+    text-align: center;
+    font-weight: 600;
+    color: #495057;
+    border-bottom: 2px solid #dee2e6;
+    white-space: nowrap;
+    min-width: 80px;
+}
+
+.details-header-employee {
+    text-align: left !important;
+    padding-left: 16px !important;
+    min-width: 150px !important;
+    position: sticky;
+    left: 0;
+    background-color: #f8f9fa;
+    z-index: 11;
+}
+
+.details-header-period {
+    min-width: 90px;
+}
+
+.details-table tbody tr {
+    border-bottom: 1px solid #e9ecef;
+    transition: background-color 0.2s ease;
+}
+
+.details-table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.details-table td {
+    padding: 10px 8px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.details-employee-name {
+    text-align: left !important;
+    padding-left: 16px !important;
+    font-weight: 500;
+    color: #495057;
+    position: sticky;
+    left: 0;
+    background-color: #fff;
+    z-index: 5;
+    border-right: 1px solid #e9ecef;
+    min-width: 150px;
+}
+
+.details-table tbody tr:hover .details-employee-name {
+    background-color: #f8f9fa;
+}
+
+.details-cell {
+    position: relative;
+}
+
+.details-cell-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.details-percentage {
+    font-weight: 600;
+    color: #495057;
+    font-size: 13px;
+}
+
+.details-change {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 1px 4px;
+    border-radius: 3px;
+    white-space: nowrap;
+}
+
+.details-change.positive {
+    color: #28a745;
+    background-color: #d4edda;
+}
+
+.details-change.negative {
+    color: #dc3545;
+    background-color: #f8d7da;
+}
+
+/* Адаптивность для детализации */
+@media (max-width: 768px) {
+    .details-table {
+        font-size: 12px;
+    }
+    
+    .details-table th,
+    .details-table td {
+        padding: 8px 6px;
+    }
+    
+    .details-header-employee,
+    .details-employee-name {
+        min-width: 120px !important;
+    }
+    
+    .details-header-period {
+        min-width: 70px;
+    }
+}
+
+/* Стили для прокручиваемой детализации */
+.details-table-wrapper.scrollable {
+    max-height: 400px;
+    overflow-x: auto;
+    overflow-y: auto;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+}
+
+.details-table-wrapper.scrollable .details-table {
+    border: none;
+}
+
+.details-table-wrapper.scrollable .details-table thead th {
+    position: sticky;
+    top: 0;
+    background-color: #f8f9fa;
+    z-index: 10;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.details-table-wrapper.scrollable .details-table .details-header-employee {
+    position: sticky;
+    left: 0;
+    background-color: #f8f9fa;
+    z-index: 11;
+    border-right: 2px solid #dee2e6;
+}
+
+.details-table-wrapper.scrollable .details-table .details-employee-name {
+    position: sticky;
+    left: 0;
+    background-color: #fff;
+    z-index: 9;
+    border-right: 1px solid #dee2e6;
+    font-weight: 500;
+}
+
+/* Стили для состояний загрузки и ошибок в детализации */
+.details-container .loading,
+.details-container .no-data,
+.details-container .error {
+    text-align: center;
+    padding: 40px 20px;
+    color: #6c757d;
+    font-style: italic;
+}
+
+.details-container .error {
+    color: #dc3545;
+}

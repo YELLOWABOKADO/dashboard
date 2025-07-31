@@ -65,50 +65,7 @@ function getPercentageClass(percentage) {
     }
 }
 
-// Функция для обновления информации о периоде
-function updatePeriodInfo(granularity, elementId) {
-    const periodInfoElement = document.getElementById(elementId);
-    if (!periodInfoElement) return;
 
-    // Получаем выбранные даты
-    const startDate = document.getElementById('startDate').value;
-    const endDate = document.getElementById('endDate').value;
-
-    if (!startDate || !endDate) {
-        periodInfoElement.textContent = '(предыдущий период)';
-        return;
-    }
-
-    // Используем функцию getPreviousPeriod из real-data-processor.js
-    if (typeof getPreviousPeriod !== 'function') {
-        console.error('getPreviousPeriod не загружена');
-        periodInfoElement.textContent = '(предыдущий период)';
-        return;
-    }
-    
-    const previousPeriod = getPreviousPeriod(startDate, endDate, granularity);
-
-    let previousPeriodText = '';
-
-    switch (granularity) {
-        case 'День':
-            const prevDate = new Date(previousPeriod.startDate);
-            previousPeriodText = `(${prevDate.toLocaleDateString('ru-RU')})`;
-            break;
-        case 'Неделя':
-            const prevStartWeek = new Date(previousPeriod.startDate);
-            const prevEndWeek = new Date(previousPeriod.endDate);
-            previousPeriodText = `(${prevStartWeek.toLocaleDateString('ru-RU')} - ${prevEndWeek.toLocaleDateString('ru-RU')})`;
-            break;
-        case 'Месяц':
-            const prevStartMonth = new Date(previousPeriod.startDate);
-            const prevEndMonth = new Date(previousPeriod.endDate);
-            previousPeriodText = `(${prevStartMonth.toLocaleDateString('ru-RU')} - ${prevEndMonth.toLocaleDateString('ru-RU')})`;
-            break;
-    }
-
-    periodInfoElement.textContent = previousPeriodText;
-}
 
 // Функция для инициализации сворачивания строк таблицы
 function initTableCollapse() {
@@ -201,14 +158,145 @@ function handleTableRowClick(event) {
     }
 }
 
+// Функция для переключения состояния сворачивающихся блоков
+function toggleCollapsibleSection(headerId, contentId) {
+    console.log(`=== toggleCollapsibleSection вызвана для ${headerId} -> ${contentId} ===`);
+    
+    const header = document.getElementById(headerId);
+    const content = document.getElementById(contentId);
+    const arrow = header ? header.querySelector('.collapse-arrow') : null;
+    
+    if (!header || !content) {
+        console.error('Не найдены элементы:', { header: !!header, content: !!content });
+        return;
+    }
+    
+    // Проверяем текущее состояние
+    const isCollapsed = content.classList.contains('collapsed');
+    
+    if (isCollapsed) {
+        // Разворачиваем
+        console.log(`Разворачиваем блок ${contentId}`);
+        content.classList.remove('collapsed');
+        if (arrow) {
+            arrow.classList.remove('collapsed');
+        }
+        
+        // Устанавливаем max-height для анимации
+        content.style.maxHeight = content.scrollHeight + 'px';
+        
+        // Специальная обработка для блоков с графиками
+        if (contentId.includes('Charts')) {
+            setTimeout(() => {
+                // Перерисовываем графики после разворачивания
+                if (contentId === 'departmentsChartsContent' && typeof cachedDepartmentsData !== 'undefined' && typeof initDepartmentCharts === 'function') {
+                    initDepartmentCharts(cachedDepartmentsData);
+                } else if (contentId === 'employeesChartsContent' && typeof cachedEmployeesData !== 'undefined' && typeof initEmployeeCharts === 'function') {
+                    initEmployeeCharts(cachedEmployeesData);
+                }
+                
+                // Обновляем max-height после перерисовки графиков
+                setTimeout(() => {
+                    content.style.maxHeight = content.scrollHeight + 'px';
+                }, 100);
+            }, 300);
+        }
+        
+        console.log(`Блок ${contentId} развернут`);
+    } else {
+        // Сворачиваем
+        console.log(`Сворачиваем блок ${contentId}`);
+        content.classList.add('collapsed');
+        if (arrow) {
+            arrow.classList.add('collapsed');
+        }
+        
+        // Устанавливаем max-height в 0 для анимации
+        content.style.maxHeight = '0px';
+        
+        console.log(`Блок ${contentId} свернут`);
+    }
+}
+
+// Функция для инициализации всех сворачивающихся блоков
+function initCollapsibleSections() {
+    console.log('=== Инициализация сворачивающихся блоков ===');
+    
+    // Находим все заголовки сворачивающихся блоков
+    const headers = document.querySelectorAll('.collapsible-header');
+    console.log(`Найдено ${headers.length} сворачивающихся блоков`);
+    
+    headers.forEach(header => {
+        const headerId = header.id;
+        const contentId = headerId.replace('Header', 'Content');
+        
+        console.log(`Настраиваем блок: ${headerId} -> ${contentId}`);
+        
+        // Проверяем, не инициализирован ли уже этот блок
+        if (header.dataset.collapsibleInitialized === 'true') {
+            console.log(`Блок ${headerId} уже инициализирован, пропускаем`);
+            return;
+        }
+        
+        // Создаем обработчик
+        const clickHandler = function() {
+            toggleCollapsibleSection(headerId, contentId);
+        };
+        
+        // Добавляем обработчик
+        header.addEventListener('click', clickHandler);
+        
+        // Помечаем как инициализированный
+        header.dataset.collapsibleInitialized = 'true';
+        header._clickHandler = clickHandler; // Сохраняем ссылку для возможного удаления
+        
+        // Проверяем, что контент существует
+        const content = document.getElementById(contentId);
+        if (!content) {
+            console.warn(`Контент ${contentId} не найден для заголовка ${headerId}`);
+        } else {
+            console.log(`✅ Блок ${headerId} -> ${contentId} успешно инициализирован`);
+            
+            // Устанавливаем начальную высоту для развернутых блоков
+            setTimeout(() => {
+                if (!content.classList.contains('collapsed')) {
+                    content.style.maxHeight = content.scrollHeight + 'px';
+                    console.log(`Установлена начальная высота для ${contentId}: ${content.scrollHeight}px`);
+                } else {
+                    content.style.maxHeight = '0px';
+                    console.log(`Блок ${contentId} изначально свернут`);
+                }
+            }, 100);
+        }
+    });
+}
+
+// Функция для сброса инициализации сворачивающихся блоков
+function resetCollapsibleSections() {
+    console.log('=== Сброс инициализации сворачивающихся блоков ===');
+    
+    const headers = document.querySelectorAll('.collapsible-header');
+    headers.forEach(header => {
+        if (header._clickHandler) {
+            header.removeEventListener('click', header._clickHandler);
+            delete header._clickHandler;
+        }
+        delete header.dataset.collapsibleInitialized;
+    });
+    
+    console.log('Инициализация сброшена для всех блоков');
+}
+
 // Экспорт для браузера
 if (typeof window !== 'undefined') {
     window.showLoading = showLoading;
     window.showError = showError;
     window.createChangeBadge = createChangeBadge;
     window.getPercentageClass = getPercentageClass;
-    window.updatePeriodInfo = updatePeriodInfo;
     window.initTableCollapse = initTableCollapse;
     window.handleTableRowClick = handleTableRowClick;
+    window.toggleCollapsibleSection = toggleCollapsibleSection;
+    window.initCollapsibleSections = initCollapsibleSections;
+    window.resetCollapsibleSections = resetCollapsibleSections;
     console.log('=== ui-helpers.js загружен, функции экспортированы ===');
 }

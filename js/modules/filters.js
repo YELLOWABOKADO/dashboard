@@ -18,33 +18,7 @@ function validateDateRange(startDate, endDate, granularity) {
         return false;
     }
 
-    // Проверяем ограничения по гранулярности
-    const diffTime = Math.abs(end - start);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-
-    let maxDays, errorMessage;
-
-    switch (granularity) {
-        case 'День':
-            maxDays = 1;
-            errorMessage = 'Для режима "День" можно выбрать только один день';
-            break;
-        case 'Неделя':
-            maxDays = 7;
-            errorMessage = 'Для режима "Неделя" максимальный период - 7 дней';
-            break;
-        case 'Месяц':
-            maxDays = 31;
-            errorMessage = 'Для режима "Месяц" максимальный период - 31 день';
-            break;
-        default:
-            return true;
-    }
-
-    if (diffDays > maxDays) {
-        alert(errorMessage);
-        return false;
-    }
+    // Ограничения по гранулярности отключены - можно выбирать любой диапазон дат
 
     return true;
 }
