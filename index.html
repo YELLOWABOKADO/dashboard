@@ -16,6 +16,7 @@
             <button class="tab-button active" data-tab="company">Компания</button>
             <button class="tab-button" data-tab="departments">Подразделения</button>
             <button class="tab-button" data-tab="employees">Команда</button>
+            <button class="tab-button" data-tab="dynamics">Динамика</button>
         </div>
 
         <!-- Company Tab Content -->
@@ -189,24 +190,6 @@
                 </div>
             </div>
 
-            <!-- Сворачивающийся блок с динамикой -->
-            <div class="collapsible-section">
-                <div class="collapsible-header" id="departmentsDynamicsHeader">
-                    <h4 style="margin: 0; display: flex; align-items: center;">
-                        <span class="collapse-arrow">▼</span>
-                        <span style="margin-left: 10px;">Динамика</span>
-                    </h4>
-                </div>
-                <div class="collapsible-content" id="departmentsDynamicsContent">
-                    <div id="departmentsDynamics" class="details-container">
-                        <div style="padding: 20px; text-align: center; background: #f8f9fa; border-radius: 4px; border-left: 4px solid #007bff;">
-                            <h4>🚧 В разработке</h4>
-                            <p>Функционал динамики для подразделений находится в разработке</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <!-- Сворачивающийся блок с графиками -->
             <div class="collapsible-section">
                 <div class="collapsible-header" id="departmentsChartsHeader">
@@ -339,24 +322,24 @@
                                     <label for="emp_markina">Маркина И. М.</label>
                                 </div>
                                 <div class="multi-select-option">
-                                    <input type="checkbox" id="emp_petrova" value="Петрова А. С.">
-                                    <label for="emp_petrova">Петрова А. С.</label>
+                                    <input type="checkbox" id="emp_ermoshina" value="Ермошина С. В.">
+                                    <label for="emp_ermoshina">Ермошина С. В.</label>
                                 </div>
                                 <div class="multi-select-option">
-                                    <input type="checkbox" id="emp_sidorov" value="Сидоров В. П.">
-                                    <label for="emp_sidorov">Сидоров В. П.</label>
+                                    <input type="checkbox" id="emp_kuznetsova" value="Кузнецова В. Ю.">
+                                    <label for="emp_kuznetsova">Кузнецова В. Ю.</label>
                                 </div>
                                 <div class="multi-select-option">
-                                    <input type="checkbox" id="emp_ivanova" value="Иванова М. К.">
-                                    <label for="emp_ivanova">Иванова М. К.</label>
+                                    <input type="checkbox" id="emp_anpilogov" value="Анпилогов Е. А.">
+                                    <label for="emp_anpilogov">Анпилогов Е. А.</label>
                                 </div>
                                 <div class="multi-select-option">
-                                    <input type="checkbox" id="emp_smirnov" value="Смирнов Д. А.">
-                                    <label for="emp_smirnov">Смирнов Д. А.</label>
+                                    <input type="checkbox" id="emp_tarasova" value="Тарасова К. И.">
+                                    <label for="emp_tarasova">Тарасова К. И.</label>
                                 </div>
                                 <div class="multi-select-option">
-                                    <input type="checkbox" id="emp_kozlova" value="Козлова Е. В.">
-                                    <label for="emp_kozlova">Козлова Е. В.</label>
+                                    <input type="checkbox" id="emp_borisova" value="Борисова В. А.">
+                                    <label for="emp_borisova">Борисова В. А.</label>
                                 </div>
                                 <div class="multi-select-option">
                                     <input type="checkbox" id="emp_ermoshina" value="Ермошина С. В.">
@@ -404,6 +387,14 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+
+                    <div class="filter-item">
+                        <span class="filter-label">Дашборд:</span>
+                        <select id="empDashboard">
+                            <option value="Автооценка" selected>Автооценка</option>
+                            <option value="Автооценка УАВ/ПреХард">Автооценка УАВ/ПреХард</option>
+                        </select>
                     </div>
 
                     <div class="filter-item">
@@ -465,17 +456,218 @@
                     </div>
                 </div>
 
-                <!-- Сворачивающийся блок с динамикой -->
+
+            </div>
+        </div>
+
+        <!-- Dynamics Tab Content -->
+        <div id="dynamicsTab" class="tab-content">
+            <!-- Закрепленная панель фильтров -->
+            <div class="sticky-header">
+                <!-- Фильтры для динамики -->
+                <div class="filters-container">
+                <div class="filter-group">
+                    <div class="filter-item">
+                        <span class="filter-label">Период с:</span>
+                        <input type="date" id="dynStartDate" value="2025-07-01" class="date-input">
+                    </div>
+                    <div class="filter-item">
+                        <span class="filter-label">по:</span>
+                        <input type="date" id="dynEndDate" value="2025-07-31" class="date-input">
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <div class="filter-item">
+                        <span class="filter-label">Режим отображения:</span>
+                        <select id="dynTimeGranularity">
+                            <option value="День">День</option>
+                            <option value="Неделя">Неделя</option>
+                            <option value="Месяц" selected>Месяц</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-item">
+                        <span class="filter-label">КЦ:</span>
+                        <select id="dynCallCenter">
+                            <option value="Все КЦ">Все КЦ</option>
+                            <option value="КЦ 1">КЦ 1</option>
+                            <option value="КЦ 2">КЦ 2</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-item">
+                        <span class="filter-label">Группы:</span>
+                        <div class="multi-select-container">
+                            <button type="button" class="multi-select-button" id="dynDepartmentsButton">
+                                <span id="dynDepartmentsText">Все группы</span>
+                                <span class="multi-select-arrow">▼</span>
+                            </button>
+                            <div class="multi-select-dropdown" id="dynDepartmentsDropdown" style="display: none;">
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="dyn_dept_all" value="all" checked>
+                                    <label for="dyn_dept_all">Все группы</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="dyn_dept_gridchina" value="Гридчина">
+                                    <label for="dyn_dept_gridchina">Гридчина - группа</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="dyn_dept_korovina" value="Коровина">
+                                    <label for="dyn_dept_korovina">Коровина - группа</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="dyn_dept_melnikova" value="Мельникова">
+                                    <label for="dyn_dept_melnikova">Мельникова - группа</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="dyn_dept_sycheva" value="Сычева">
+                                    <label for="dyn_dept_sycheva">Сычева - группа</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="dyn_dept_group1" value="группа 1">
+                                    <label for="dyn_dept_group1">Группа 1 - группа</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="dyn_dept_group2" value="группа 2">
+                                    <label for="dyn_dept_group2">Группа 2 - группа</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="dyn_dept_group3" value="группа 3">
+                                    <label for="dyn_dept_group3">Группа 3 - группа</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="filter-item">
+                        <span class="filter-label">Сотрудники:</span>
+                        <div class="multi-select-container">
+                            <button type="button" class="multi-select-button" id="dynEmployeesButton">
+                                <span id="dynEmployeesText">Все сотрудники</span>
+                                <span class="multi-select-arrow">▼</span>
+                            </button>
+                            <div class="multi-select-dropdown" id="dynEmployeesDropdown" style="display: none;">
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="dyn_emp_all" value="all" checked>
+                                    <label for="dyn_emp_all">Все сотрудники</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="dyn_emp_markina" value="Маркина И. М.">
+                                    <label for="dyn_emp_markina">Маркина И. М.</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="dyn_emp_ermoshina" value="Ермошина С. В.">
+                                    <label for="dyn_emp_ermoshina">Ермошина С. В.</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="dyn_emp_kuznetsova" value="Кузнецова В. Ю.">
+                                    <label for="dyn_emp_kuznetsova">Кузнецова В. Ю.</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="dyn_emp_anpilogov" value="Анпилогов Е. А.">
+                                    <label for="dyn_emp_anpilogov">Анпилогов Е. А.</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="dyn_emp_tarasova" value="Тарасова К. И.">
+                                    <label for="dyn_emp_tarasova">Тарасова К. И.</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="dyn_emp_borisova" value="Борисова В. А.">
+                                    <label for="dyn_emp_borisova">Борисова В. А.</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="dyn_emp_ermoshina" value="Ермошина С. В.">
+                                    <label for="dyn_emp_ermoshina">Ермошина С. В.</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="dyn_emp_kuznetsova" value="Кузнецова В. Ю.">
+                                    <label for="dyn_emp_kuznetsova">Кузнецова В. Ю.</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="dyn_emp_anpilogov" value="Анпилогов Е. А.">
+                                    <label for="dyn_emp_anpilogov">Анпилогов Е. А.</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="dyn_emp_tarasova" value="Тарасова К. И.">
+                                    <label for="dyn_emp_tarasova">Тарасова К. И.</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="dyn_emp_borisova" value="Борисова В. А.">
+                                    <label for="dyn_emp_borisova">Борисова В. А.</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="dyn_emp_moiseenko" value="Моисеенко А. А.">
+                                    <label for="dyn_emp_moiseenko">Моисеенко А. А.</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="dyn_emp_ladygina" value="Ладыгина Д. В.">
+                                    <label for="dyn_emp_ladygina">Ладыгина Д. В.</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="dyn_emp_zabrovskaya" value="Забровская А. В.">
+                                    <label for="dyn_emp_zabrovskaya">Забровская А. В.</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="dyn_emp_sukhorukova" value="Сухорукова И. В.">
+                                    <label for="dyn_emp_sukhorukova">Сухорукова И. В.</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="dyn_emp_korotenko" value="Коротенко П. Р.">
+                                    <label for="dyn_emp_korotenko">Коротенко П. Р.</label>
+                                </div>
+                                <div class="multi-select-option">
+                                    <input type="checkbox" id="dyn_emp_bakina" value="Бакина В. О.">
+                                    <label for="dyn_emp_bakina">Бакина В. О.</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="filter-item">
+                        <span class="filter-label">Дашборд:</span>
+                        <select id="dynDashboard">
+                            <option value="Автооценка" selected>Автооценка</option>
+                            <option value="Автооценка УАВ/ПреХард">Автооценка УАВ/ПреХард</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-item">
+                        <button id="dynUpdateButton" class="btn btn-primary">Обновить</button>
+                    </div>
+                </div>
+            </div>
+
+            </div>
+
+            <!-- Прокручиваемый контент -->
+            <div class="scrollable-content">
+                <!-- Блок с динамикой по команде -->
                 <div class="collapsible-section">
-                    <div class="collapsible-header" id="employeesDetailsHeader">
+                    <div class="collapsible-header" id="dynamicsTeamDetailsHeader">
                         <h4 style="margin: 0; display: flex; align-items: center;">
                             <span class="collapse-arrow">▼</span>
-                            <span style="margin-left: 10px;">Динамика</span>
+                            <span style="margin-left: 10px;">Динамика по команде</span>
                         </h4>
                     </div>
-                    <div class="collapsible-content" id="employeesDetailsContent">
-                        <div id="employeesDetails" class="details-container">
-                            <div class="loading">Загрузка динамики...</div>
+                    <div class="collapsible-content" id="dynamicsTeamDetailsContent">
+                        <div id="dynamicsTeamDetails" class="details-container">
+                            <div class="loading">Загрузка динамики по команде...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Блок с динамикой по подразделениям -->
+                <div class="collapsible-section">
+                    <div class="collapsible-header" id="dynamicsDepartmentsDetailsHeader">
+                        <h4 style="margin: 0; display: flex; align-items: center;">
+                            <span class="collapse-arrow">▼</span>
+                            <span style="margin-left: 10px;">Динамика по подразделениям</span>
+                        </h4>
+                    </div>
+                    <div class="collapsible-content" id="dynamicsDepartmentsDetailsContent">
+                        <div id="dynamicsDepartmentsDetails" class="details-container">
+                            <div class="loading">Загрузка динамики по подразделениям...</div>
                         </div>
                     </div>
                 </div>
@@ -518,6 +710,7 @@
     <script src="js/modules/departments.js"></script>
     <script src="js/modules/employees.js"></script>
     <script src="js/modules/details.js"></script>
+    <script src="js/modules/dynamics.js"></script>
     <script src="js/modules/charts.js"></script>
     <script src="js/modules/app.js"></script>
     

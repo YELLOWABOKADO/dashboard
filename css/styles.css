@@ -779,3 +779,62 @@ tr:hover {
 .details-container .error {
     color: #dc3545;
 }
+/
+* Стили для раскрывающихся блоков RPC */
+.collapsible-row {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.collapsible-row:hover {
+    background-color: #e9ecef !important;
+}
+
+.collapse-icon {
+    display: inline-block;
+    margin-right: 8px;
+    font-size: 12px;
+    color: #007bff;
+    transition: transform 0.2s ease;
+}
+
+.rpc-detail-row {
+    background-color: #f0f8ff !important;
+    border-left: 3px solid #007bff;
+}
+
+.rpc-detail-row td {
+    font-size: 0.9em;
+    color: #495057;
+}
+
+.rpc-detail-row:hover {
+    background-color: #e6f3ff !important;
+}
+
+/* Анимация для плавного раскрытия */
+.rpc-detail-row {
+    transition: all 0.3s ease;
+}
+
+/* Стили для индикаторов сортировки */
+.sortable-header {
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.2s ease;
+}
+
+.sortable-header:hover {
+    background-color: #f8f9fa;
+}
+
+.sort-indicator {
+    font-size: 12px;
+    color: #6c757d;
+    margin-left: 4px;
+}
+
+.sort-indicator.active {
+    color: #007bff;
+    font-weight: bold;
+}

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест исправления динамики</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 3px; }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .info { background-color: #d1ecf1; color: #0c5460; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>Тест исправления динамики</h1>
+    <p>Этот тест проверяет, что динамика теперь рассчитывается на основе диапазона дат, а не режима отображения.</p>
+
+    <div class="test-section">
+        <h2>Тест 1: Функция getPreviousPeriod</h2>
+        <div id="test1-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Тест 2: Диапазон 30 дней</h2>
+        <div id="test2-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Тест 3: Диапазон 7 дней</h2>
+        <div id="test3-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Тест 4: Диапазон 1 день</h2>
+        <div id="test4-result"></div>
+    </div>
+
+    <script src="js/data/real-data-processor.js"></script>
+    <script>
+        function runTests() {
+            console.log('=== Запуск тестов ===');
+
+            // Тест 1: Проверяем, что функция getPreviousPeriod существует
+            const test1Result = document.getElementById('test1-result');
+            if (typeof getPreviousPeriod === 'function') {
+                test1Result.innerHTML = '<div class="test-result success">✅ Функция getPreviousPeriod загружена</div>';
+            } else {
+                test1Result.innerHTML = '<div class="test-result error">❌ Функция getPreviousPeriod не найдена</div>';
+                return;
+            }
+
+            // Тест 2: Диапазон 30 дней (01.07.2025 - 31.07.2025)
+            const test2Result = document.getElementById('test2-result');
+            try {
+                const result2 = getPreviousPeriod('2025-07-01', '2025-07-31', 'Месяц');
+                const expectedStart = '2025-06-01'; // 31 день назад от 01.07
+                const expectedEnd = '2025-06-30';   // день перед началом диапазона
+                
+                let html = '<div class="test-result info">Диапазон: 01.07.2025 - 31.07.2025 (31 день)</div>';
+                html += `<pre>Результат: ${JSON.stringify(result2, null, 2)}</pre>`;
+                
+                if (result2.startDate === expectedStart && result2.endDate === expectedEnd) {
+                    html += '<div class="test-result success">✅ Правильно: предыдущий период равен по длительности текущему</div>';
+                } else {
+                    html += `<div class="test-result error">❌ Ошибка: ожидался ${expectedStart} - ${expectedEnd}</div>`;
+                }
+                
+                test2Result.innerHTML = html;
+            } catch (error) {
+                test2Result.innerHTML = `<div class="test-result error">❌ Ошибка: ${error.message}</div>`;
+            }
+
+            // Тест 3: Диапазон 7 дней (15.07.2025 - 21.07.2025)
+            const test3Result = document.getElementById('test3-result');
+            try {
+                const result3 = getPreviousPeriod('2025-07-15', '2025-07-21', 'Неделя');
+                const expectedStart = '2025-07-07'; // 7 дней назад от 15.07
+                const expectedEnd = '2025-07-14';   // день перед началом диапазона
+                
+                let html = '<div class="test-result info">Диапазон: 15.07.2025 - 21.07.2025 (7 дней)</div>';
+                html += `<pre>Результат: ${JSON.stringify(result3, null, 2)}</pre>`;
+                
+                if (result3.startDate === expectedStart && result3.endDate === expectedEnd) {
+                    html += '<div class="test-result success">✅ Правильно: предыдущий период равен по длительности текущему</div>';
+                } else {
+                    html += `<div class="test-result error">❌ Ошибка: ожидался ${expectedStart} - ${expectedEnd}</div>`;
+                }
+                
+                test3Result.innerHTML = html;
+            } catch (error) {
+                test3Result.innerHTML = `<div class="test-result error">❌ Ошибка: ${error.message}</div>`;
+            }
+
+            // Тест 4: Диапазон 1 день (20.07.2025)
+            const test4Result = document.getElementById('test4-result');
+            try {
+                const result4 = getPreviousPeriod('2025-07-20', '2025-07-20', 'День');
+                const expectedStart = '2025-07-19'; // 1 день назад от 20.07
+                const expectedEnd = '2025-07-19';   // день перед началом диапазона
+                
+                let html = '<div class="test-result info">Диапазон: 20.07.2025 - 20.07.2025 (1 день)</div>';
+                html += `<pre>Результат: ${JSON.stringify(result4, null, 2)}</pre>`;
+                
+                if (result4.startDate === expectedStart && result4.endDate === expectedEnd) {
+                    html += '<div class="test-result success">✅ Правильно: предыдущий период равен по длительности текущему</div>';
+                } else {
+                    html += `<div class="test-result error">❌ Ошибка: ожидался ${expectedStart} - ${expectedEnd}</div>`;
+                }
+                
+                test4Result.innerHTML = html;
+            } catch (error) {
+                test4Result.innerHTML = `<div class="test-result error">❌ Ошибка: ${error.message}</div>`;
+            }
+        }
+
+        // Запускаем тесты после загрузки
+        document.addEventListener('DOMContentLoaded', runTests);
+    </script>
+</body>
+</html>
+</content>
+</invoke>

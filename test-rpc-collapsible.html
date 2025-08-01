@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест RPC раскрывающихся блоков</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Тест RPC раскрывающихся блоков</h1>
+        
+        <!-- Фильтры -->
+        <div class="filters-container">
+            <div class="filter-group">
+                <div class="filter-item">
+                    <label class="filter-label">Начальная дата:</label>
+                    <input type="date" id="startDate" class="date-input" value="2025-07-01">
+                </div>
+                <div class="filter-item">
+                    <label class="filter-label">Конечная дата:</label>
+                    <input type="date" id="endDate" class="date-input" value="2025-07-31">
+                </div>
+                <div class="filter-item">
+                    <label class="filter-label">Период:</label>
+                    <select id="timeGranularity" class="date-input">
+                        <option value="Месяц">Месяц</option>
+                        <option value="Неделя">Неделя</option>
+                        <option value="День">День</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label class="filter-label">КЦ:</label>
+                    <select id="callCenter" class="date-input">
+                        <option value="Все КЦ">Все КЦ</option>
+                        <option value="КЦ 1">КЦ 1</option>
+                        <option value="КЦ 2">КЦ 2</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" onclick="testRpcCollapsible()">Загрузить данные</button>
+            </div>
+        </div>
+
+        <!-- Контейнер для таблицы компании -->
+        <div id="companySummaryTable">
+            <div class="loading">Загрузка данных...</div>
+        </div>
+    </div>
+
+    <!-- Подключаем скрипты -->
+    <script src="js/modules/ui-helpers.js"></script>
+    <script src="js/data/real-data-processor.js"></script>
+    <script src="js/modules/company.js"></script>
+
+    <script>
+        // Функция для тестирования RPC раскрывающихся блоков
+        async function testRpcCollapsible() {
+            console.log('=== Тестирование RPC раскрывающихся блоков ===');
+            
+            try {
+                // Загружаем данные компании
+                await updateCompanyData();
+                console.log('Данные компании загружены');
+            } catch (error) {
+                console.error('Ошибка при загрузке данных:', error);
+                
+                // Показываем тестовую таблицу
+                const container = document.getElementById('companySummaryTable');
+                container.innerHTML = `
+                    <h4>Сводная информация по компании (тестовые данные)</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>КОЛЛ-ЦЕНТР</th>
+                                <th class="text-right">ВСЕГО ЗВОНКОВ</th>
+                                <th class="text-right">ОТКЛОНЕНИЙ</th>
+                                <th class="text-right">% ОТКЛОНЕНИЙ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Всего</strong></td>
+                                <td class="text-right"><strong>141,082</strong></td>
+                                <td class="text-right"><strong>4,689</strong></td>
+                                <td class="text-right"><strong><span class="percentage-high">3.32%</span></strong></td>
+                            </tr>
+                            <tr style="background-color: #f8f9fa;" class="collapsible-row" data-target="rpc-total-details">
+                                <td style="padding-left: 20px; cursor: pointer;">
+                                    <span class="collapse-icon">▼</span> RPC
+                                </td>
+                                <td class="text-right">42,325</td>
+                                <td class="text-right">1,407</td>
+                                <td class="text-right"><span class="percentage-high">3.32%</span></td>
+                            </tr>
+                            <tr class="rpc-detail-row rpc-total-details" style="display: none; background-color: #f0f8ff;">
+                                <td style="padding-left: 300px; text-align: right; padding-right: 20px;">Д</td>
+                                <td class="text-right">42,325 <span class="badge badge-danger">-1.8%</span></td>
+                                <td class="text-right">1,407 <span class="badge badge-danger">-32.3%</span></td>
+                                <td class="text-right"><span class="percentage-high">3.32%</span> <span class="badge badge-neutral">-0.0%</span></td>
+                            </tr>
+                            <tr class="rpc-detail-row rpc-total-details" style="display: none; background-color: #f0f8ff;">
+                                <td style="padding-left: 300px; text-align: right; padding-right: 20px;">П</td>
+                                <td class="text-right">28,217 <span class="badge badge-danger">-1.8%</span></td>
+                                <td class="text-right">938 <span class="badge badge-danger">-32.3%</span></td>
+                                <td class="text-right"><span class="percentage-high">3.32%</span> <span class="badge badge-neutral">-0.0%</span></td>
+                            </tr>
+                            <tr class="rpc-detail-row rpc-total-details" style="display: none; background-color: #f0f8ff;">
+                                <td style="padding-left: 300px; text-align: right; padding-right: 20px;">Р</td>
+                                <td class="text-right">42,325 <span class="badge badge-danger">-1.8%</span></td>
+                                <td class="text-right">1,407 <span class="badge badge-danger">-32.3%</span></td>
+                                <td class="text-right"><span class="percentage-high">3.32%</span> <span class="badge badge-neutral">-0.0%</span></td>
+                            </tr>
+                            <tr class="rpc-detail-row rpc-total-details" style="display: none; background-color: #f0f8ff;">
+                                <td style="padding-left: 300px; text-align: right; padding-right: 20px;">Т/Л</td>
+                                <td class="text-right">28,215 <span class="badge badge-danger">-1.8%</span></td>
+                                <td class="text-right">937 <span class="badge badge-danger">-32.3%</span></td>
+                                <td class="text-right"><span class="percentage-high">3.32%</span> <span class="badge badge-neutral">-0.0%</span></td>
+                            </tr>
+                            <tr style="background-color: #f8f9fa;">
+                                <td style="padding-left: 20px;">Не RPC</td>
+                                <td class="text-right">98,757 <span class="badge badge-danger">-1.8%</span></td>
+                                <td class="text-right">3,282 <span class="badge badge-danger">-32.2%</span></td>
+                                <td class="text-right"><span class="percentage-high">3.32%</span> <span class="badge badge-neutral">-0.0%</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                `;
+                
+                // Инициализируем обработчики
+                initCollapsibleHandlers();
+            }
+        }
+
+        // Автоматически загружаем данные при загрузке страницы
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                testRpcCollapsible();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

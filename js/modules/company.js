@@ -45,6 +45,12 @@ async function updateCompanyData() {
             throw new Error('getCompanyData не загружена. Проверьте подключение real-data-processor.js');
         }
         
+        // Загружаем RPC данные для детализации
+        if (typeof loadRpcDetailsData === 'function') {
+            window.rpcDetailsData = await loadRpcDetailsData();
+            console.log('RPC данные загружены для детализации:', window.rpcDetailsData);
+        }
+        
         const companyData = await getCompanyData(startDate, endDate, granularity, callCenter);
         console.log('Получены данные компании:', companyData);
         
@@ -121,7 +127,7 @@ function renderCompanyTable(companyData) {
 
         // RPC и не-RPC данные (всегда видимы)
         if (companyData.current.rpc && companyData.current.nonRpc) {
-            // RPC данные
+            // RPC данные с раскрывающимся блоком
             const rpcCurrent = companyData.current.rpc.total;
             const rpcPrevious = companyData.previous.rpc.total;
             
@@ -130,13 +136,18 @@ function renderCompanyTable(companyData) {
             const rpcPercentageChange = rpcCurrent.percentage - rpcPrevious.percentage;
 
             tableHTML += `
-                <tr style="background-color: #f8f9fa;">
-                    <td style="padding-left: 20px;">├─ RPC</td>
+                <tr style="background-color: #f8f9fa;" class="collapsible-row" data-target="rpc-total-details">
+                    <td style="padding-left: 20px; cursor: pointer;">
+                        <span class="collapse-icon">▼</span> RPC
+                    </td>
                     <td class="text-right">${rpcCurrent.calls.toLocaleString()} ${createChangeBadge(rpcCallsChangePercent, 'percentage')}</td>
                     <td class="text-right">${rpcCurrent.deviations.toLocaleString()} ${createChangeBadge(rpcDeviationsChangePercent, 'percentage')}</td>
                     <td class="text-right"><span class="${getPercentageClass(rpcCurrent.percentage)}">${rpcCurrent.percentage}%</span> ${createChangeBadge(rpcPercentageChange, 'percentage')}</td>
                 </tr>
             `;
+
+            // Добавляем детализацию RPC (скрытую по умолчанию)
+            tableHTML += generateRpcDetailsRows('total', 'rpc-total-details');
 
             // Не-RPC данные
             const nonRpcCurrent = companyData.current.nonRpc.total;
@@ -148,7 +159,7 @@ function renderCompanyTable(companyData) {
 
             tableHTML += `
                 <tr style="background-color: #f8f9fa;">
-                    <td style="padding-left: 20px;">└─ Не RPC</td>
+                    <td style="padding-left: 20px;">Не RPC</td>
                     <td class="text-right">${nonRpcCurrent.calls.toLocaleString()} ${createChangeBadge(nonRpcCallsChangePercent, 'percentage')}</td>
                     <td class="text-right">${nonRpcCurrent.deviations.toLocaleString()} ${createChangeBadge(nonRpcDeviationsChangePercent, 'percentage')}</td>
                     <td class="text-right"><span class="${getPercentageClass(nonRpcCurrent.percentage)}">${nonRpcCurrent.percentage}%</span> ${createChangeBadge(nonRpcPercentageChange, 'percentage')}</td>
@@ -179,7 +190,7 @@ function renderCompanyTable(companyData) {
 
         // КЦ1 RPC и не-RPC данные (всегда видимы)
         if (companyData.current.rpc.kc1 && companyData.current.nonRpc.kc1) {
-            // КЦ1 RPC данные
+            // КЦ1 RPC данные с раскрывающимся блоком
             const kc1RpcCurrent = companyData.current.rpc.kc1;
             const kc1RpcPrevious = companyData.previous.rpc.kc1;
             
@@ -188,13 +199,18 @@ function renderCompanyTable(companyData) {
             const kc1RpcPercentageChange = kc1RpcCurrent.percentage - kc1RpcPrevious.percentage;
 
             tableHTML += `
-                <tr style="background-color: #f8f9fa;">
-                    <td style="padding-left: 20px;">├─ RPC</td>
+                <tr style="background-color: #f8f9fa;" class="collapsible-row" data-target="rpc-kc1-details">
+                    <td style="padding-left: 20px; cursor: pointer;">
+                        <span class="collapse-icon">▼</span> RPC
+                    </td>
                     <td class="text-right">${kc1RpcCurrent.calls.toLocaleString()} ${createChangeBadge(kc1RpcCallsChangePercent, 'percentage')}</td>
                     <td class="text-right">${kc1RpcCurrent.deviations.toLocaleString()} ${createChangeBadge(kc1RpcDeviationsChangePercent, 'percentage')}</td>
                     <td class="text-right"><span class="${getPercentageClass(kc1RpcCurrent.percentage)}">${kc1RpcCurrent.percentage}%</span> ${createChangeBadge(kc1RpcPercentageChange, 'percentage')}</td>
                 </tr>
             `;
+
+            // Добавляем детализацию RPC для КЦ1 (скрытую по умолчанию)
+            tableHTML += generateRpcDetailsRows('kc1', 'rpc-kc1-details');
 
             // КЦ1 Не-RPC данные
             const kc1NonRpcCurrent = companyData.current.nonRpc.kc1;
@@ -206,7 +222,7 @@ function renderCompanyTable(companyData) {
 
             tableHTML += `
                 <tr style="background-color: #f8f9fa;">
-                    <td style="padding-left: 20px;">└─ Не RPC</td>
+                    <td style="padding-left: 20px;">Не RPC</td>
                     <td class="text-right">${kc1NonRpcCurrent.calls.toLocaleString()} ${createChangeBadge(kc1NonRpcCallsChangePercent, 'percentage')}</td>
                     <td class="text-right">${kc1NonRpcCurrent.deviations.toLocaleString()} ${createChangeBadge(kc1NonRpcDeviationsChangePercent, 'percentage')}</td>
                     <td class="text-right"><span class="${getPercentageClass(kc1NonRpcCurrent.percentage)}">${kc1NonRpcCurrent.percentage}%</span> ${createChangeBadge(kc1NonRpcPercentageChange, 'percentage')}</td>
@@ -236,7 +252,7 @@ function renderCompanyTable(companyData) {
 
         // КЦ2 RPC и не-RPC данные (всегда видимы)
         if (companyData.current.rpc.kc2 && companyData.current.nonRpc.kc2) {
-            // КЦ2 RPC данные
+            // КЦ2 RPC данные с раскрывающимся блоком
             const kc2RpcCurrent = companyData.current.rpc.kc2;
             const kc2RpcPrevious = companyData.previous.rpc.kc2;
             
@@ -245,13 +261,18 @@ function renderCompanyTable(companyData) {
             const kc2RpcPercentageChange = kc2RpcCurrent.percentage - kc2RpcPrevious.percentage;
 
             tableHTML += `
-                <tr style="background-color: #f8f9fa;">
-                    <td style="padding-left: 20px;">├─ RPC</td>
+                <tr style="background-color: #f8f9fa;" class="collapsible-row" data-target="rpc-kc2-details">
+                    <td style="padding-left: 20px; cursor: pointer;">
+                        <span class="collapse-icon">▼</span> RPC
+                    </td>
                     <td class="text-right">${kc2RpcCurrent.calls.toLocaleString()} ${createChangeBadge(kc2RpcCallsChangePercent, 'percentage')}</td>
                     <td class="text-right">${kc2RpcCurrent.deviations.toLocaleString()} ${createChangeBadge(kc2RpcDeviationsChangePercent, 'percentage')}</td>
                     <td class="text-right"><span class="${getPercentageClass(kc2RpcCurrent.percentage)}">${kc2RpcCurrent.percentage}%</span> ${createChangeBadge(kc2RpcPercentageChange, 'percentage')}</td>
                 </tr>
             `;
+
+            // Добавляем детализацию RPC для КЦ2 (скрытую по умолчанию)
+            tableHTML += generateRpcDetailsRows('kc2', 'rpc-kc2-details');
 
             // КЦ2 Не-RPC данные
             const kc2NonRpcCurrent = companyData.current.nonRpc.kc2;
@@ -263,7 +284,7 @@ function renderCompanyTable(companyData) {
 
             tableHTML += `
                 <tr style="background-color: #f8f9fa;">
-                    <td style="padding-left: 20px;">└─ Не RPC</td>
+                    <td style="padding-left: 20px;">Не RPC</td>
                     <td class="text-right">${kc2NonRpcCurrent.calls.toLocaleString()} ${createChangeBadge(kc2NonRpcCallsChangePercent, 'percentage')}</td>
                     <td class="text-right">${kc2NonRpcCurrent.deviations.toLocaleString()} ${createChangeBadge(kc2NonRpcDeviationsChangePercent, 'percentage')}</td>
                     <td class="text-right"><span class="${getPercentageClass(kc2NonRpcCurrent.percentage)}">${kc2NonRpcCurrent.percentage}%</span> ${createChangeBadge(kc2NonRpcPercentageChange, 'percentage')}</td>
@@ -279,6 +300,9 @@ function renderCompanyTable(companyData) {
 
     tableContainer.innerHTML = tableHTML;
     console.log('=== Таблица с RPC разбивкой отрисована ===');
+    
+    // Инициализируем обработчики раскрытия/сворачивания
+    initCollapsibleHandlers();
     
     // Добавляем обработчики кликов для сортировки
     setTimeout(() => {
@@ -354,7 +378,7 @@ function renderCompanyTableSorted(companyData) {
                 deviations: rpcCurrent.deviations,
                 percentage: rpcCurrent.percentage,
                 type: 'sub',
-                html: generateRowHTML('├─ RPC', rpcCurrent, rpcPrevious, 'sub')
+                html: generateRowHTML('RPC', rpcCurrent, rpcPrevious, 'sub')
             });
 
             const nonRpcCurrent = companyData.current.nonRpc.total;
@@ -366,7 +390,7 @@ function renderCompanyTableSorted(companyData) {
                 deviations: nonRpcCurrent.deviations,
                 percentage: nonRpcCurrent.percentage,
                 type: 'sub',
-                html: generateRowHTML('└─ Не RPC', nonRpcCurrent, nonRpcPrevious, 'sub')
+                html: generateRowHTML('Не RPC', nonRpcCurrent, nonRpcPrevious, 'sub')
             });
         }
     }
@@ -396,7 +420,7 @@ function renderCompanyTableSorted(companyData) {
                 deviations: kc1RpcCurrent.deviations,
                 percentage: kc1RpcCurrent.percentage,
                 type: 'sub',
-                html: generateRowHTML('├─ RPC', kc1RpcCurrent, kc1RpcPrevious, 'sub')
+                html: generateRowHTML('RPC', kc1RpcCurrent, kc1RpcPrevious, 'sub')
             });
 
             const kc1NonRpcCurrent = companyData.current.nonRpc.kc1;
@@ -408,7 +432,7 @@ function renderCompanyTableSorted(companyData) {
                 deviations: kc1NonRpcCurrent.deviations,
                 percentage: kc1NonRpcCurrent.percentage,
                 type: 'sub',
-                html: generateRowHTML('└─ Не RPC', kc1NonRpcCurrent, kc1NonRpcPrevious, 'sub')
+                html: generateRowHTML('Не RPC', kc1NonRpcCurrent, kc1NonRpcPrevious, 'sub')
             });
         }
     }
@@ -438,7 +462,7 @@ function renderCompanyTableSorted(companyData) {
                 deviations: kc2RpcCurrent.deviations,
                 percentage: kc2RpcCurrent.percentage,
                 type: 'sub',
-                html: generateRowHTML('├─ RPC', kc2RpcCurrent, kc2RpcPrevious, 'sub')
+                html: generateRowHTML('RPC', kc2RpcCurrent, kc2RpcPrevious, 'sub')
             });
 
             const kc2NonRpcCurrent = companyData.current.nonRpc.kc2;
@@ -450,7 +474,7 @@ function renderCompanyTableSorted(companyData) {
                 deviations: kc2NonRpcCurrent.deviations,
                 percentage: kc2NonRpcCurrent.percentage,
                 type: 'sub',
-                html: generateRowHTML('└─ Не RPC', kc2NonRpcCurrent, kc2NonRpcPrevious, 'sub')
+                html: generateRowHTML('Не RPC', kc2NonRpcCurrent, kc2NonRpcPrevious, 'sub')
             });
         }
     }
@@ -517,6 +541,9 @@ function renderCompanyTableSorted(companyData) {
     tableContainer.innerHTML = tableHTML;
     console.log('=== Отсортированная таблица компании отрисована ===');
     
+    // Инициализируем обработчики раскрытия/сворачивания
+    initCollapsibleHandlers();
+    
     // Добавляем обработчики кликов для сортировки
     setTimeout(() => {
         const sortableHeaders = document.querySelectorAll('#companySummaryTable .sortable-header');
@@ -571,11 +598,114 @@ function generateRowHTML(name, current, previous, type) {
     `;
 }
 
+// Функция для генерации строк детализации RPC
+function generateRpcDetailsRows(kcKey, detailsId) {
+    try {
+        // Используем глобальные RPC данные, если они загружены
+        if (!window.rpcDetailsData) {
+            return '';
+        }
+
+        // Получаем текущий и предыдущий периоды из фильтров
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+        const granularity = document.getElementById('timeGranularity').value;
+        
+        const currentPeriodKey = startDate.substring(0, 7); // "2025-07"
+        const previousPeriod = getPreviousPeriod(startDate, endDate, granularity);
+        const previousPeriodKey = previousPeriod.startDate.substring(0, 7); // "2025-06"
+        
+        if (!window.rpcDetailsData[currentPeriodKey]) {
+            return '';
+        }
+
+        const currentPeriodData = window.rpcDetailsData[currentPeriodKey];
+        const previousPeriodData = window.rpcDetailsData[previousPeriodKey];
+        
+        let currentTargetData, previousTargetData;
+
+        // Выбираем данные по КЦ для текущего периода
+        if (kcKey === 'kc1') {
+            currentTargetData = currentPeriodData.kc1;
+            previousTargetData = previousPeriodData?.kc1;
+        } else if (kcKey === 'kc2') {
+            currentTargetData = currentPeriodData.kc2;
+            previousTargetData = previousPeriodData?.kc2;
+        } else {
+            currentTargetData = currentPeriodData.total;
+            previousTargetData = previousPeriodData?.total;
+        }
+
+        if (!currentTargetData || !currentTargetData.details) {
+            return '';
+        }
+
+        let detailsHTML = '';
+        const rpcTypes = ['Д', 'П', 'Р', 'Т/Л'];
+
+        rpcTypes.forEach(rpcType => {
+            if (currentTargetData.details[rpcType]) {
+                const currentDetail = currentTargetData.details[rpcType];
+                const previousDetail = previousTargetData?.details?.[rpcType];
+
+                // Вычисляем изменения в процентах
+                const callsChangePercent = previousDetail?.calls > 0 ? 
+                    ((currentDetail.calls - previousDetail.calls) / previousDetail.calls * 100) : 0;
+                const deviationsChangePercent = previousDetail?.deviations > 0 ? 
+                    ((currentDetail.deviations - previousDetail.deviations) / previousDetail.deviations * 100) : 0;
+                const percentageChange = previousDetail ? 
+                    (currentDetail.percentage - previousDetail.percentage) : 0;
+
+                detailsHTML += `
+                    <tr class="rpc-detail-row ${detailsId}" style="display: none; background-color: #f0f8ff;">
+                        <td style="padding-left: 300px; text-align: right; padding-right: 20px;">${rpcType}</td>
+                        <td class="text-right">${currentDetail.calls.toLocaleString()} ${createChangeBadge(callsChangePercent, 'percentage')}</td>
+                        <td class="text-right">${currentDetail.deviations.toLocaleString()} ${createChangeBadge(deviationsChangePercent, 'percentage')}</td>
+                        <td class="text-right"><span class="${getPercentageClass(currentDetail.percentage)}">${currentDetail.percentage}%</span> ${createChangeBadge(percentageChange, 'percentage')}</td>
+                    </tr>
+                `;
+            }
+        });
+
+        return detailsHTML;
+    } catch (error) {
+        console.error('Ошибка при генерации RPC детализации:', error);
+        return '';
+    }
+}
+
+// Функция для инициализации обработчиков раскрытия/сворачивания
+function initCollapsibleHandlers() {
+    setTimeout(() => {
+        const collapsibleRows = document.querySelectorAll('.collapsible-row');
+        
+        collapsibleRows.forEach(row => {
+            row.addEventListener('click', function() {
+                const targetClass = this.getAttribute('data-target');
+                const detailRows = document.querySelectorAll(`.${targetClass}`);
+                const icon = this.querySelector('.collapse-icon');
+                
+                if (detailRows.length > 0) {
+                    const isVisible = detailRows[0].style.display !== 'none';
+                    
+                    detailRows.forEach(detailRow => {
+                        detailRow.style.display = isVisible ? 'none' : 'table-row';
+                    });
+                    
+                    icon.textContent = isVisible ? '▼' : '▲';
+                }
+            });
+        });
+    }, 100);
+}
+
 // Экспорт для браузера
 if (typeof window !== 'undefined') {
     window.updateCompanyData = updateCompanyData;
     window.renderCompanyTable = renderCompanyTable;
     window.renderCompanyTableSorted = renderCompanyTableSorted;
     window.generateRowHTML = generateRowHTML;
+    window.generateRpcDetailsRows = generateRpcDetailsRows;
+    window.initCollapsibleHandlers = initCollapsibleHandlers;
     console.log('=== company.js загружен, функции экспортированы ===');
 }

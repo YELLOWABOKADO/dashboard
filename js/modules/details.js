@@ -395,6 +395,13 @@ if (typeof window !== 'undefined') {
     window.forceInitDetails = forceInitDetails;
     window.testDetailsContainer = testDetailsContainer;
     
+    // Экспортируем вспомогательные функции для модуля динамики
+    window.getPeriods = getPeriods;
+    window.aggregateDetailsDataForPeriod = aggregateDetailsDataForPeriod;
+    window.calculatePercentageChange = calculatePercentageChange;
+    window.getDetailsDateRange = getDetailsDateRange;
+    window.formatDateForHeader = formatDateForHeader;
+    
     console.log('=== details.js загружен ===');
     console.log('Функции экспортированы:', {
         initEmployeeDetails: typeof window.initEmployeeDetails,

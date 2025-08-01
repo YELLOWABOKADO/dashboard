@@ -32,6 +32,10 @@ async function updateActiveTab() {
             console.log('Обновляем данные команды...');
             await updateEmployeesData();
             break;
+        case 'dynamics':
+            console.log('Обновляем данные динамики...');
+            await updateDynamicsData();
+            break;
     }
 }
 
@@ -85,6 +89,15 @@ function initApp() {
             initEmployeesModule();
         } else {
             console.error('Функция initEmployeesModule не найдена!');
+        }
+        
+        // Инициализируем модуль динамики
+        console.log('Проверяем наличие функции initDynamicsModule:', typeof initDynamicsModule);
+        if (typeof initDynamicsModule === 'function') {
+            console.log('Вызываем initDynamicsModule...');
+            initDynamicsModule();
+        } else {
+            console.error('Функция initDynamicsModule не найдена!');
         }
         
         // Повторно инициализируем сворачивающиеся блоки после загрузки всех модулей
