@@ -56,6 +56,14 @@ async function updateCompanyData() {
         
         if (companyData) {
             renderCompanyTable(companyData);
+            
+            // Загружаем динамику компании
+            if (typeof loadCompanyDynamics === 'function') {
+                console.log('Загружаем динамику компании...');
+                await loadCompanyDynamics();
+            } else {
+                console.error('Функция loadCompanyDynamics не найдена');
+            }
         } else {
             console.log('companyData пустые, показываем заглушку');
             showError('companySummaryTable', 'Нет данных для выбранных фильтров');

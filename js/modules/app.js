@@ -100,6 +100,15 @@ function initApp() {
             console.error('Функция initDynamicsModule не найдена!');
         }
         
+        // Инициализируем динамику компании
+        console.log('Проверяем наличие функции initCompanyDynamics:', typeof initCompanyDynamics);
+        if (typeof initCompanyDynamics === 'function') {
+            console.log('Вызываем initCompanyDynamics...');
+            initCompanyDynamics();
+        } else {
+            console.error('Функция initCompanyDynamics не найдена!');
+        }
+        
         // Повторно инициализируем сворачивающиеся блоки после загрузки всех модулей
         if (typeof initCollapsibleSections === 'function') {
             console.log('Повторная инициализация сворачивающихся блоков...');

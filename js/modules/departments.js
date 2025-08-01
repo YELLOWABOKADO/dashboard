@@ -27,15 +27,14 @@ async function updateDepartmentsData() {
     
     const startDate = document.getElementById('deptStartDate').value;
     const endDate = document.getElementById('deptEndDate').value;
-    const granularity = document.getElementById('deptTimeGranularity').value;
     const callCenter = document.getElementById('deptCallCenter').value;
     
     // Получаем выбранные группы (подразделения)
     const selectedDepartments = getSelectedMultiSelectValues('deptDepartmentsDropdown');
     
-    console.log('Параметры групп:', { startDate, endDate, granularity, callCenter, selectedDepartments });
+    console.log('Параметры групп:', { startDate, endDate, callCenter, selectedDepartments });
     
-    if (!validateDateRange(startDate, endDate, granularity)) {
+    if (!validateDateRange(startDate, endDate, 'Месяц')) {
         console.log('Валидация дат не прошла');
         return;
     }
@@ -49,7 +48,7 @@ async function updateDepartmentsData() {
         }
         
         // Пока используем функцию getDepartmentsData, но передаем правильные параметры
-        const departmentsData = await getDepartmentsData(startDate, endDate, granularity, callCenter, selectedDepartments);
+        const departmentsData = await getDepartmentsData(startDate, endDate, 'Месяц', callCenter, selectedDepartments);
         console.log('Получены данные групп:', departmentsData);
         
         if (departmentsData) {

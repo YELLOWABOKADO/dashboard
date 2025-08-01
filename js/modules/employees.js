@@ -33,16 +33,15 @@ async function updateEmployeesData() {
 
     const startDate = document.getElementById('empStartDate').value;
     const endDate = document.getElementById('empEndDate').value;
-    const granularity = document.getElementById('empTimeGranularity').value;
     const callCenter = document.getElementById('empCallCenter').value;
 
     // Получаем выбранные группы и сотрудников
     const selectedDepartments = getSelectedMultiSelectValues('empDepartmentsDropdown');
     const selectedEmployees = getSelectedMultiSelectValues('empEmployeesDropdown');
 
-    console.log('Параметры команды:', { startDate, endDate, granularity, callCenter, selectedDepartments, selectedEmployees });
+    console.log('Параметры команды:', { startDate, endDate, callCenter, selectedDepartments, selectedEmployees });
 
-    if (!validateDateRange(startDate, endDate, granularity)) {
+    if (!validateDateRange(startDate, endDate, 'Месяц')) {
         console.log('Валидация дат не прошла');
         return;
     }
@@ -58,7 +57,7 @@ async function updateEmployeesData() {
             return;
         }
 
-        const employeesData = await getEmployeesData(startDate, endDate, granularity, callCenter, selectedDepartments, selectedEmployees);
+        const employeesData = await getEmployeesData(startDate, endDate, 'Месяц', callCenter, selectedDepartments, selectedEmployees);
         console.log('Получены данные команды:', employeesData);
 
         if (employeesData && employeesData.current && employeesData.current.length > 0) {
@@ -72,7 +71,7 @@ async function updateEmployeesData() {
                 const filters = {
                     startDate,
                     endDate,
-                    timeGranularity: granularity,
+                    timeGranularity: 'Месяц',
                     callCenter,
                     departments: selectedDepartments,
                     employees: selectedEmployees
@@ -487,7 +486,7 @@ function loadTestEmployeesData() {
         const filters = {
             startDate: document.getElementById('empStartDate')?.value || '2025-07-01',
             endDate: document.getElementById('empEndDate')?.value || '2025-07-31',
-            timeGranularity: document.getElementById('empTimeGranularity')?.value || 'Месяц',
+            timeGranularity: 'Месяц',
             callCenter: 'Все КЦ',
             departments: ['all'],
             employees: ['all']
