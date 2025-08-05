@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Простой тест диаграмм</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h2>Простой тест диаграмм</h2>
+        
+        <div class="chart-card" style="max-width: 800px; margin: 20px 0;">
+            <div class="chart-header">
+                <h5 id="departmentsBarChartTitle">Количество отклонений</h5>
+                <div class="chart-toggle">
+                    <button class="toggle-btn active" data-mode="count" data-target="departments">шт</button>
+                    <button class="toggle-btn" data-mode="percent" data-target="departments">%</button>
+                </div>
+            </div>
+            <div class="chart-wrapper" style="height: 400px;">
+                <canvas id="departmentsBarChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="chart-card" style="max-width: 800px; margin: 20px 0;">
+            <div class="chart-header">
+                <h5 id="employeesBarChartTitle">Количество отклонений</h5>
+                <div class="chart-toggle">
+                    <button class="toggle-btn active" data-mode="count" data-target="employees">шт</button>
+                    <button class="toggle-btn" data-mode="percent" data-target="employees">%</button>
+                </div>
+            </div>
+            <div class="chart-wrapper" style="height: 400px;">
+                <canvas id="employeesBarChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/modules/charts.js"></script>
+    <script>
+        console.log('=== Простой тест диаграмм ===');
+        
+        // Проверяем загрузку Chart.js
+        console.log('Chart.js:', typeof Chart);
+        
+        // Ждем загрузки
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM загружен');
+            
+            // Проверяем функции
+            console.log('createDepartmentsBarChart:', typeof createDepartmentsBarChart);
+            console.log('createEmployeesBarChart:', typeof createEmployeesBarChart);
+            console.log('initChartToggle:', typeof initChartToggle);
+            
+            // Тестовые данные
+            const testDepartmentsData = {
+                departments: ['Группа А', 'Группа Б', 'Группа В', 'Группа Г'],
+                deviations: [150, 120, 90, 75],
+                percentages: [12.5, 10.2, 8.7, 6.3]
+            };
+            
+            const testEmployeesData = {
+                employees: ['Иванов И.И.', 'Петров П.П.', 'Сидоров С.С.', 'Козлов К.К.'],
+                deviations: [45, 38, 32, 28],
+                percentages: [15.2, 12.8, 10.5, 9.1]
+            };
+            
+            // Сохраняем данные глобально
+            window.departmentsChartData = testDepartmentsData;
+            window.employeesChartData = testEmployeesData;
+            
+            // Создаем диаграммы
+            setTimeout(() => {
+                console.log('Создаем диаграммы...');
+                
+                try {
+                    createDepartmentsBarChart(testDepartmentsData, 'count');
+                    console.log('✓ Диаграмма подразделений создана');
+                } catch (error) {
+                    console.error('✗ Ошибка диаграммы подразделений:', error);
+                }
+                
+                try {
+                    createEmployeesBarChart(testEmployeesData, 'count');
+                    console.log('✓ Диаграмма сотрудников создана');
+                } catch (error) {
+                    console.error('✗ Ошибка диаграммы сотрудников:', error);
+                }
+                
+                // Инициализируем переключатели
+                try {
+                    initChartToggle('departments');
+                    initChartToggle('employees');
+                    console.log('✓ Переключатели инициализированы');
+                } catch (error) {
+                    console.error('✗ Ошибка переключателей:', error);
+                }
+            }, 500);
+        });
+    </script>
+</body>
+</html>

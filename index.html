@@ -17,6 +17,7 @@
             <button class="tab-button" data-tab="departments">Подразделения</button>
             <button class="tab-button" data-tab="employees">Команда</button>
             <button class="tab-button" data-tab="dynamics">Динамика</button>
+            <button class="tab-button" data-tab="checklist">Детализация по чек-листам</button>
         </div>
 
         <!-- Company Tab Content -->
@@ -213,16 +214,16 @@
                             </div>
                             <div id="pieChartLegend" class="custom-legend"></div>
                         </div>
-                        <div class="chart-card">
-                            <h5>Количество отклонений</h5>
-                            <div class="chart-wrapper">
-                                <canvas id="deviationsBarChart"></canvas>
-                            </div>
-                        </div>
                         <div class="chart-card" style="grid-column: 1 / -1;">
-                            <h5>Процент отклонений</h5>
+                            <div class="chart-header">
+                                <h5 id="departmentsBarChartTitle">Количество отклонений</h5>
+                                <div class="chart-toggle">
+                                    <button class="toggle-btn active" data-mode="count" data-target="departments">шт</button>
+                                    <button class="toggle-btn" data-mode="percent" data-target="departments">%</button>
+                                </div>
+                            </div>
                             <div class="chart-wrapper">
-                                <canvas id="percentageBarChart"></canvas>
+                                <canvas id="departmentsBarChart"></canvas>
                             </div>
                         </div>
                     </div>
@@ -437,16 +438,16 @@
                                 </div>
                                 <div id="employeesPieChartLegend" class="custom-legend"></div>
                             </div>
-                            <div class="chart-card">
-                                <h5>Количество отклонений</h5>
-                                <div class="chart-wrapper">
-                                    <canvas id="employeesDeviationsBarChart"></canvas>
-                                </div>
-                            </div>
                             <div class="chart-card" style="grid-column: 1 / -1;">
-                                <h5>Процент отклонений</h5>
+                                <div class="chart-header">
+                                    <h5 id="employeesBarChartTitle">Количество отклонений</h5>
+                                    <div class="chart-toggle">
+                                        <button class="toggle-btn active" data-mode="count" data-target="employees">шт</button>
+                                        <button class="toggle-btn" data-mode="percent" data-target="employees">%</button>
+                                    </div>
+                                </div>
                                 <div class="chart-wrapper">
-                                    <canvas id="employeesPercentageBarChart"></canvas>
+                                    <canvas id="employeesBarChart"></canvas>
                                 </div>
                             </div>
                         </div>
@@ -670,6 +671,198 @@
                 </div>
             </div>
         </div>
+
+        <!-- Checklist Tab Content -->
+        <div id="checklistTab" class="tab-content">
+            <div class="checklist-dashboard">
+                <!-- Заголовок -->
+                <div class="dashboard-header">
+                    <h2>📊 Детализация по чек-листам</h2>
+                    <p>Анализ проблем операторов по категориям блоков 0 и 1 уровня</p>
+                    <div id="checklistDebugInfo" class="debug-info" style="display: none;"></div>
+                </div>
+
+                <!-- Фильтры -->
+                <div class="filters-container">
+                    <div class="filter-group">
+                        <div class="filter-item">
+                            <span class="filter-label">Период с:</span>
+                            <input type="date" id="checklistDateFrom" value="2025-05-01" class="date-input">
+                        </div>
+                        <div class="filter-item">
+                            <span class="filter-label">по:</span>
+                            <input type="date" id="checklistDateTo" value="2025-07-30" class="date-input">
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <div class="filter-item">
+                            <span class="filter-label">Колл-центр:</span>
+                            <select id="checklistKcFilter">
+                                <option value="">Все КЦ</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <span class="filter-label">Группа:</span>
+                            <select id="checklistGroupFilter">
+                                <option value="">Все группы</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <div class="filter-item">
+                            <span class="filter-label">Оператор:</span>
+                            <select id="checklistOperatorFilter">
+                                <option value="">Все операторы</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <span class="filter-label">Блок 0 уровня:</span>
+                            <select id="checklistBlock0Filter">
+                                <option value="">Все блоки 0</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <div class="filter-item">
+                            <span class="filter-label">Блок 1 уровня:</span>
+                            <select id="checklistBlock1Filter">
+                                <option value="">Все блоки 1</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <span class="filter-label">Дашборд:</span>
+                            <select id="checklistDashboard">
+                                <option value="Автооценка" selected>Автооценка</option>
+                                <option value="Автооценка УАВ/ПреХард">Автооценка УАВ/ПреХард</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <button id="checklistUpdateButton" class="btn btn-primary">Обновить</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Статистические карточки -->
+                <div class="checklist-stats-grid">
+                    <div class="checklist-stat-card">
+                        <div class="checklist-stat-number" id="checklistTotalRecords">0</div>
+                        <div class="checklist-stat-label">Всего</div>
+                    </div>
+                    <div class="checklist-stat-card">
+                        <div class="checklist-stat-number" id="checklistTotalIssues">0</div>
+                        <div class="checklist-stat-label">Проблем (score=1)</div>
+                    </div>
+                    <div class="checklist-stat-card">
+                        <div class="checklist-stat-number" id="checklistUniqueOperators">0</div>
+                        <div class="checklist-stat-label">Операторов</div>
+                    </div>
+                    <div class="checklist-stat-card">
+                        <div class="checklist-stat-number" id="checklistUniqueGroups">0</div>
+                        <div class="checklist-stat-label">Групп</div>
+                    </div>
+                    <div class="checklist-stat-card">
+                        <div class="checklist-stat-number" id="checklistIssueRate">0%</div>
+                        <div class="checklist-stat-label">Доля проблем</div>
+                    </div>
+                    <div class="checklist-stat-card">
+                        <div class="checklist-stat-number" id="checklistDateRange">0</div>
+                        <div class="checklist-stat-label">Дней в периоде</div>
+                    </div>
+                </div>
+
+                <!-- Сводная информация -->
+                <div class="checklist-summary-section">
+                    <h3 style="margin-bottom: 15px; color: #2c3e50;">📈 Сводная информация</h3>
+                    <div class="checklist-summary-grid">
+                        <div class="checklist-summary-item">
+                            <div class="checklist-summary-title">Топ блок 0 по проблемам</div>
+                            <div class="checklist-summary-value" id="checklistTopBlock0">-</div>
+                        </div>
+                        <div class="checklist-summary-item">
+                            <div class="checklist-summary-title">Топ блок 1 по проблемам</div>
+                            <div class="checklist-summary-value" id="checklistTopBlock1">-</div>
+                        </div>
+                        <div class="checklist-summary-item">
+                            <div class="checklist-summary-title">Оператор с наибольшими проблемами</div>
+                            <div class="checklist-summary-value" id="checklistTopOperator">-</div>
+                        </div>
+                        <div class="checklist-summary-item">
+                            <div class="checklist-summary-title">Группа с наибольшими проблемами</div>
+                            <div class="checklist-summary-value" id="checklistTopGroup">-</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Аналитические графики -->
+                <div class="checklist-analytics-section">
+                    <div class="checklist-chart-container">
+                        <div class="checklist-chart-title">📊 Статистика по блокам 0 уровня</div>
+                        <div id="checklistBlock0Chart" class="checklist-bar-chart"></div>
+                    </div>
+                    <div class="checklist-chart-container">
+                        <div class="checklist-chart-title">📊 Статистика по блокам 1 уровня</div>
+                        <div id="checklistBlock1Chart" class="checklist-bar-chart"></div>
+                    </div>
+                </div>
+
+                <!-- Таблица операторов -->
+                <div class="checklist-results-section">
+                    <div class="checklist-results-header">
+                        📋 Детальные данные по операторам
+                    </div>
+                    <div class="checklist-table-container">
+                        <div id="checklistLoading" class="loading">Загрузка данных...</div>
+                        <table id="checklistOperatorTable" style="display: none;">
+                            <thead>
+                                <tr>
+                                    <th>Оператор</th>
+                                    <th>Группа</th>
+                                    <th>КЦ</th>
+                                    <th>Всего</th>
+                                    <th>Проблем</th>
+                                    <th>Доля проблем</th>
+                                    <th>Топ блок 0</th>
+                                    <th>Топ блок 1</th>
+                                </tr>
+                            </thead>
+                            <tbody id="checklistOperatorBody">
+                            </tbody>
+                        </table>
+                        <div id="checklistNoData" class="no-data" style="display: none;">
+                            Нет данных для отображения
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Подробные записи -->
+                <div class="checklist-results-section">
+                    <div class="checklist-results-header">
+                        📋 Подробные записи (только проблемы)
+                    </div>
+                    <div class="checklist-table-container">
+                        <table id="checklistResultsTable" style="display: none;">
+                            <thead>
+                                <tr>
+                                    <th>Дата</th>
+                                    <th>Оператор</th>
+                                    <th>Группа</th>
+                                    <th>КЦ</th>
+                                    <th>Блок 0</th>
+                                    <th>Блок 1</th>
+                                    <th>Блок 2</th>
+                                    <th>Балл</th>
+                                </tr>
+                            </thead>
+                            <tbody id="checklistResultsBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Подключение модулей -->
@@ -693,6 +886,12 @@
     <!-- Скрипт для отладки -->
     <script src="debug-collapsible.js"></script>
     
+    <!-- Скрипт для проверки реализации переключателя -->
+    <script src="check-implementation.js"></script>
+    
+    <!-- Отладочный скрипт для диаграмм -->
+    <script src="debug-charts.js"></script>
+    
     <!-- Подключение Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
     
@@ -710,6 +909,7 @@
     <script src="js/modules/dynamics.js"></script>
     <script src="js/modules/company-dynamics.js"></script>
     <script src="js/modules/charts.js"></script>
+    <script src="js/checklist-dashboard.js"></script>
     <script src="js/modules/app.js"></script>
     
     <script>

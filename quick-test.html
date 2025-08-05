@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Быстрая проверка</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h2>Быстрая проверка диаграмм</h2>
+        <p>Откройте консоль браузера (F12) для просмотра отладочной информации.</p>
+        
+        <!-- Подразделения -->
+        <div class="chart-card" style="margin: 20px 0; max-width: 800px;">
+            <div class="chart-header">
+                <h5 id="departmentsBarChartTitle">Количество отклонений</h5>
+                <div class="chart-toggle">
+                    <button class="toggle-btn active" data-mode="count" data-target="departments">шт</button>
+                    <button class="toggle-btn" data-mode="percent" data-target="departments">%</button>
+                </div>
+            </div>
+            <div class="chart-wrapper" style="height: 300px;">
+                <canvas id="departmentsBarChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Сотрудники -->
+        <div class="chart-card" style="margin: 20px 0; max-width: 800px;">
+            <div class="chart-header">
+                <h5 id="employeesBarChartTitle">Количество отклонений</h5>
+                <div class="chart-toggle">
+                    <button class="toggle-btn active" data-mode="count" data-target="employees">шт</button>
+                    <button class="toggle-btn" data-mode="percent" data-target="employees">%</button>
+                </div>
+            </div>
+            <div class="chart-wrapper" style="height: 300px;">
+                <canvas id="employeesBarChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/modules/charts.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('=== Быстрая проверка диаграмм ===');
+            
+            // Тестовые данные
+            const testDepartmentsData = {
+                departments: ['Группа 1', 'Группа 2', 'Группа 3', 'Группа 4'],
+                deviations: [150, 120, 90, 75],
+                percentages: [12.5, 10.2, 8.7, 6.3]
+            };
+            
+            const testEmployeesData = {
+                employees: ['Иванов И.И.', 'Петров П.П.', 'Сидоров С.С.', 'Козлов К.К.'],
+                deviations: [45, 38, 32, 28],
+                percentages: [15.2, 12.8, 10.5, 9.1]
+            };
+            
+            // Сохраняем данные глобально
+            window.departmentsChartData = testDepartmentsData;
+            window.employeesChartData = testEmployeesData;
+            
+            setTimeout(() => {
+                console.log('Запускаем тест...');
+                
+                // Проверяем функции
+                console.log('Функции доступны:');
+                console.log('- createDepartmentsBarChart:', typeof createDepartmentsBarChart);
+                console.log('- createEmployeesBarChart:', typeof createEmployeesBarChart);
+                console.log('- initChartToggle:', typeof initChartToggle);
+                
+                // Создаем диаграммы
+                if (typeof createDepartmentsBarChart === 'function') {
+                    createDepartmentsBarChart(testDepartmentsData, 'count');
+                }
+                
+                if (typeof createEmployeesBarChart === 'function') {
+                    createEmployeesBarChart(testEmployeesData, 'count');
+                }
+                
+                // Инициализируем переключатели
+                if (typeof initChartToggle === 'function') {
+                    initChartToggle('departments');
+                    initChartToggle('employees');
+                }
+            }, 500);
+        });
+    </script>
+</body>
+</html>

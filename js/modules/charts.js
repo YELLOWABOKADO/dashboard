@@ -31,10 +31,15 @@ function initDepartmentCharts(departmentsData) {
     // Подготавливаем данные для графиков
     const chartData = prepareDepartmentChartData(departmentsData);
     
+    // Сохраняем данные для переключения
+    window.departmentsChartData = chartData;
+    
     // Создаем графики
     createPieChart(chartData);
-    createDeviationsBarChart(chartData);
-    createPercentageBarChart(chartData);
+    createDepartmentsBarChart(chartData, 'count'); // По умолчанию показываем количество
+    
+    // Инициализируем обработчики переключателя
+    initChartToggle('departments');
 }
 
 // Подготовка данных для графиков
@@ -196,226 +201,7 @@ function createCustomLegend(chartData) {
     legendContainer.innerHTML = legendHTML;
 }
 
-// Создание столбчатой диаграммы "Количество отклонений по КЦ"
-function createDeviationsBarChart(chartData) {
-    const ctx = document.getElementById('deviationsBarChart');
-    if (!ctx) return;
 
-    // Сортируем данные по убыванию для столбчатой диаграммы
-    const sortedData = chartData.departments.map((dept, index) => ({
-        department: dept,
-        deviations: chartData.deviations[index]
-    })).sort((a, b) => b.deviations - a.deviations);
-
-    const sortedDepartments = sortedData.map(item => item.department);
-    const sortedDeviations = sortedData.map(item => item.deviations);
-
-    // Вычисляем диапазон для обрезки диаграммы
-    const minValue = Math.min(...sortedDeviations);
-    const maxValue = Math.max(...sortedDeviations);
-    // Обрезаем от 70% минимального значения, но не меньше 0
-    const cutoffValue = Math.max(0, Math.floor(minValue * 0.7));
-
-    // Уничтожаем предыдущий график если есть
-    if (window.deviationsBarChartInstance) {
-        window.deviationsBarChartInstance.destroy();
-    }
-
-    window.deviationsBarChartInstance = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: sortedDepartments,
-            datasets: [{
-                data: sortedDeviations,
-                backgroundColor: '#FFA726',
-                borderColor: '#FF9800',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            indexAxis: 'y', // Делаем диаграмму горизонтальной
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return 'Отклонений: ' + context.parsed.x.toLocaleString();
-                        }
-                    }
-                }
-            },
-            scales: {
-                x: {
-                    min: cutoffValue, // Начинаем от 70% минимального значения
-                    max: maxValue * 1.1, // Увеличиваем отступ для размещения текста
-                    ticks: {
-                        callback: function(value) {
-                            return value.toLocaleString();
-                        }
-                    }
-                },
-                y: {
-                    ticks: {
-                        font: {
-                            size: 12
-                        }
-                    }
-                }
-            }
-        },
-        plugins: [{
-            id: 'datalabels',
-            afterDatasetsDraw: function(chart) {
-                const ctx = chart.ctx;
-                const cutoff = cutoffValue;
-                
-                chart.data.datasets.forEach((dataset, i) => {
-                    const meta = chart.getDatasetMeta(i);
-                    meta.data.forEach((element, index) => {
-                        const value = dataset.data[index];
-                        if (value > 0) {
-                            // Вычисляем позицию для размещения текста в центре видимой части столбца
-                            const cutoffPixel = chart.scales.x.getPixelForValue(cutoff);
-                            const valuePixel = chart.scales.x.getPixelForValue(value);
-                            const textX = cutoffPixel + (valuePixel - cutoffPixel) / 2;
-                            
-                            ctx.fillStyle = '#fff';
-                            ctx.font = 'bold 12px Arial';
-                            ctx.textAlign = 'center';
-                            ctx.textBaseline = 'middle';
-                            
-                            // Добавляем тень для лучшей читаемости
-                            ctx.shadowColor = '#000';
-                            ctx.shadowBlur = 2;
-                            ctx.shadowOffsetX = 1;
-                            ctx.shadowOffsetY = 1;
-                            
-                            // Размещаем текст в центре видимой части столбца
-                            ctx.fillText(value.toLocaleString(), textX, element.y);
-                            
-                            // Сбрасываем тень
-                            ctx.shadowColor = 'transparent';
-                            ctx.shadowBlur = 0;
-                            ctx.shadowOffsetX = 0;
-                            ctx.shadowOffsetY = 0;
-                        }
-                    });
-                });
-            }
-        }]
-    });
-}
-
-// Создание столбчатой диаграммы "Процент отклонений по КЦ"
-function createPercentageBarChart(chartData) {
-    const ctx = document.getElementById('percentageBarChart');
-    if (!ctx) return;
-
-    // Данные уже отсортированы в prepareDepartmentChartData по убыванию процентов
-
-    // Вычисляем диапазон для обрезки диаграммы
-    const minValue = Math.min(...chartData.percentages);
-    const maxValue = Math.max(...chartData.percentages);
-    // Обрезаем от 70% минимального значения, но не меньше 0
-    const cutoffValue = Math.max(0, minValue * 0.7);
-
-    // Уничтожаем предыдущий график если есть
-    if (window.percentageBarChartInstance) {
-        window.percentageBarChartInstance.destroy();
-    }
-
-    window.percentageBarChartInstance = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: chartData.departments,
-            datasets: [{
-                data: chartData.percentages,
-                backgroundColor: '#FFA726',
-                borderColor: '#FF9800',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            indexAxis: 'y', // Делаем диаграмму горизонтальной
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return 'Процент: ' + context.parsed.x.toFixed(2) + '%';
-                        }
-                    }
-                }
-            },
-            scales: {
-                x: {
-                    min: cutoffValue, // 70% от минимального значения
-                    max: maxValue * 1.1, // Увеличиваем отступ для размещения текста
-                    ticks: {
-                        callback: function(value) {
-                            return value.toFixed(1) + '%';
-                        }
-                    }
-                },
-                y: {
-                    ticks: {
-                        font: {
-                            size: 12
-                        }
-                    }
-                }
-            }
-        },
-        plugins: [{
-            id: 'datalabels',
-            afterDatasetsDraw: function(chart) {
-                const ctx = chart.ctx;
-                const cutoff = cutoffValue;
-                
-                chart.data.datasets.forEach((dataset, i) => {
-                    const meta = chart.getDatasetMeta(i);
-                    meta.data.forEach((element, index) => {
-                        const value = dataset.data[index];
-                        if (value > 0) {
-                            // Вычисляем позицию для размещения текста в центре видимой части столбца
-                            const cutoffPixel = chart.scales.x.getPixelForValue(cutoff);
-                            const valuePixel = chart.scales.x.getPixelForValue(value);
-                            const textX = cutoffPixel + (valuePixel - cutoffPixel) / 2;
-                            
-                            ctx.fillStyle = '#fff';
-                            ctx.font = 'bold 12px Arial';
-                            ctx.textAlign = 'center';
-                            ctx.textBaseline = 'middle';
-                            
-                            // Добавляем тень для лучшей читаемости
-                            ctx.shadowColor = '#000';
-                            ctx.shadowBlur = 2;
-                            ctx.shadowOffsetX = 1;
-                            ctx.shadowOffsetY = 1;
-                            
-                            // Размещаем текст в центре видимой части столбца
-                            ctx.fillText(value.toFixed(2) + '%', textX, element.y);
-                            
-                            // Сбрасываем тень
-                            ctx.shadowColor = 'transparent';
-                            ctx.shadowBlur = 0;
-                            ctx.shadowOffsetX = 0;
-                            ctx.shadowOffsetY = 0;
-                        }
-                    });
-                });
-            }
-        }]
-    });
-}
 
 // Инициализация графиков для сотрудников
 function initEmployeeCharts(employeesData) {
@@ -429,10 +215,15 @@ function initEmployeeCharts(employeesData) {
     // Подготавливаем данные для графиков
     const chartData = prepareEmployeeChartData(employeesData);
     
+    // Сохраняем данные для переключения
+    window.employeesChartData = chartData;
+    
     // Создаем графики
     createEmployeePieChart(chartData);
-    createEmployeeDeviationsBarChart(chartData);
-    createEmployeePercentageBarChart(chartData);
+    createEmployeesBarChart(chartData, 'count'); // По умолчанию показываем количество
+    
+    // Инициализируем обработчики переключателя
+    initChartToggle('employees');
 }
 
 // Подготовка данных для графиков сотрудников
@@ -571,44 +362,86 @@ function createEmployeeCustomLegend(chartData) {
     legendContainer.innerHTML = legendHTML;
 }
 
-// Создание столбчатой диаграммы "Количество отклонений" для сотрудников
-function createEmployeeDeviationsBarChart(chartData) {
-    const ctx = document.getElementById('employeesDeviationsBarChart');
-    if (!ctx) return;
 
-    // Сортируем данные по убыванию для столбчатой диаграммы
-    const sortedData = chartData.employees.map((emp, index) => ({
-        employee: emp,
-        deviations: chartData.deviations[index]
-    })).sort((a, b) => b.deviations - a.deviations);
 
-    const sortedEmployees = sortedData.map(item => item.employee);
-    const sortedDeviations = sortedData.map(item => item.deviations);
+// Инициализация обработчиков переключателя
+function initChartToggle(target) {
+    console.log('initChartToggle вызвана для:', target);
+    
+    const toggleButtons = document.querySelectorAll(`.toggle-btn[data-target="${target}"]`);
+    console.log('Найдено кнопок переключателя:', toggleButtons.length);
+    
+    toggleButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const mode = this.dataset.mode;
+            const target = this.dataset.target;
+            
+            // Обновляем активную кнопку
+            toggleButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Обновляем заголовок
+            const title = mode === 'count' ? 'Количество отклонений' : 'Процент отклонений';
+            document.getElementById(`${target}BarChartTitle`).textContent = title;
+            
+            // Перерисовываем диаграмму
+            if (target === 'departments' && window.departmentsChartData) {
+                createDepartmentsBarChart(window.departmentsChartData, mode);
+            } else if (target === 'employees' && window.employeesChartData) {
+                createEmployeesBarChart(window.employeesChartData, mode);
+            }
+        });
+    });
+}
 
-    // Вычисляем диапазон для обрезки диаграммы
-    const minValue = Math.min(...sortedDeviations);
-    const maxValue = Math.max(...sortedDeviations);
-    // Обрезаем от 70% минимального значения, но не меньше 0
-    const cutoffValue = Math.max(0, Math.floor(minValue * 0.7));
+// Объединенная функция для создания столбчатой диаграммы подразделений
+function createDepartmentsBarChart(chartData, mode) {
+    console.log('createDepartmentsBarChart вызвана:', { chartData, mode });
+    
+    const ctx = document.getElementById('departmentsBarChart');
+    if (!ctx) {
+        console.error('Canvas departmentsBarChart не найден!');
+        return;
+    }
+    
+    console.log('Canvas найден, создаем диаграмму...');
 
     // Уничтожаем предыдущий график если есть
-    if (window.employeesDeviationsBarChartInstance) {
-        window.employeesDeviationsBarChartInstance.destroy();
+    if (window.departmentsBarChartInstance) {
+        window.departmentsBarChartInstance.destroy();
     }
 
-    window.employeesDeviationsBarChartInstance = new Chart(ctx, {
+    const isCountMode = mode === 'count';
+    const data = isCountMode ? chartData.deviations : chartData.percentages;
+    const labels = chartData.departments;
+
+    // Сортируем данные по убыванию
+    const sortedData = labels.map((dept, index) => ({
+        department: dept,
+        value: data[index]
+    })).sort((a, b) => b.value - a.value);
+
+    const sortedLabels = sortedData.map(item => item.department);
+    const sortedValues = sortedData.map(item => item.value);
+
+    // Вычисляем диапазон для обрезки диаграммы
+    const minValue = Math.min(...sortedValues);
+    const maxValue = Math.max(...sortedValues);
+    const cutoffValue = Math.max(0, isCountMode ? Math.floor(minValue * 0.7) : minValue * 0.7);
+
+    window.departmentsBarChartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: sortedEmployees,
+            labels: sortedLabels,
             datasets: [{
-                data: sortedDeviations,
+                data: sortedValues,
                 backgroundColor: '#FFA726',
                 borderColor: '#FF9800',
                 borderWidth: 1
             }]
         },
         options: {
-            indexAxis: 'y', // Делаем диаграмму горизонтальной
+            indexAxis: 'y',
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
@@ -618,25 +451,27 @@ function createEmployeeDeviationsBarChart(chartData) {
                 tooltip: {
                     callbacks: {
                         label: function(context) {
-                            return 'Отклонений: ' + context.parsed.x.toLocaleString();
+                            const suffix = isCountMode ? '' : '%';
+                            const value = isCountMode ? context.parsed.x.toLocaleString() : context.parsed.x.toFixed(2);
+                            return (isCountMode ? 'Отклонений: ' : 'Процент: ') + value + suffix;
                         }
                     }
                 }
             },
             scales: {
                 x: {
-                    min: cutoffValue, // Начинаем от 70% минимального значения
-                    max: maxValue * 1.1, // Увеличиваем отступ для размещения текста
+                    min: cutoffValue,
+                    max: maxValue * 1.1,
                     ticks: {
                         callback: function(value) {
-                            return value.toLocaleString();
+                            return isCountMode ? value.toLocaleString() : value.toFixed(1) + '%';
                         }
                     }
                 },
                 y: {
                     ticks: {
                         font: {
-                            size: 10
+                            size: 12
                         }
                     }
                 }
@@ -653,26 +488,23 @@ function createEmployeeDeviationsBarChart(chartData) {
                     meta.data.forEach((element, index) => {
                         const value = dataset.data[index];
                         if (value > 0) {
-                            // Вычисляем позицию для размещения текста в центре видимой части столбца
                             const cutoffPixel = chart.scales.x.getPixelForValue(cutoff);
                             const valuePixel = chart.scales.x.getPixelForValue(value);
                             const textX = cutoffPixel + (valuePixel - cutoffPixel) / 2;
                             
                             ctx.fillStyle = '#fff';
-                            ctx.font = 'bold 10px Arial';
+                            ctx.font = 'bold 12px Arial';
                             ctx.textAlign = 'center';
                             ctx.textBaseline = 'middle';
                             
-                            // Добавляем тень для лучшей читаемости
                             ctx.shadowColor = '#000';
                             ctx.shadowBlur = 2;
                             ctx.shadowOffsetX = 1;
                             ctx.shadowOffsetY = 1;
                             
-                            // Размещаем текст в центре видимой части столбца
-                            ctx.fillText(value.toLocaleString(), textX, element.y);
+                            const displayValue = isCountMode ? value.toLocaleString() : value.toFixed(2) + '%';
+                            ctx.fillText(displayValue, textX, element.y);
                             
-                            // Сбрасываем тень
                             ctx.shadowColor = 'transparent';
                             ctx.shadowBlur = 0;
                             ctx.shadowOffsetX = 0;
@@ -685,37 +517,54 @@ function createEmployeeDeviationsBarChart(chartData) {
     });
 }
 
-// Создание столбчатой диаграммы "Процент отклонений" для сотрудников
-function createEmployeePercentageBarChart(chartData) {
-    const ctx = document.getElementById('employeesPercentageBarChart');
-    if (!ctx) return;
-
-    // Данные уже отсортированы в prepareEmployeeChartData по убыванию процентов
-
-    // Вычисляем диапазон для обрезки диаграммы
-    const minValue = Math.min(...chartData.percentages);
-    const maxValue = Math.max(...chartData.percentages);
-    // Обрезаем от 70% минимального значения, но не меньше 0
-    const cutoffValue = Math.max(0, minValue * 0.7);
+// Объединенная функция для создания столбчатой диаграммы сотрудников
+function createEmployeesBarChart(chartData, mode) {
+    console.log('createEmployeesBarChart вызвана:', { chartData, mode });
+    
+    const ctx = document.getElementById('employeesBarChart');
+    if (!ctx) {
+        console.error('Canvas employeesBarChart не найден!');
+        return;
+    }
+    
+    console.log('Canvas найден, создаем диаграмму...');
 
     // Уничтожаем предыдущий график если есть
-    if (window.employeesPercentageBarChartInstance) {
-        window.employeesPercentageBarChartInstance.destroy();
+    if (window.employeesBarChartInstance) {
+        window.employeesBarChartInstance.destroy();
     }
 
-    window.employeesPercentageBarChartInstance = new Chart(ctx, {
+    const isCountMode = mode === 'count';
+    const data = isCountMode ? chartData.deviations : chartData.percentages;
+    const labels = chartData.employees;
+
+    // Сортируем данные по убыванию
+    const sortedData = labels.map((emp, index) => ({
+        employee: emp,
+        value: data[index]
+    })).sort((a, b) => b.value - a.value);
+
+    const sortedLabels = sortedData.map(item => item.employee);
+    const sortedValues = sortedData.map(item => item.value);
+
+    // Вычисляем диапазон для обрезки диаграммы
+    const minValue = Math.min(...sortedValues);
+    const maxValue = Math.max(...sortedValues);
+    const cutoffValue = Math.max(0, isCountMode ? Math.floor(minValue * 0.7) : minValue * 0.7);
+
+    window.employeesBarChartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: chartData.employees,
+            labels: sortedLabels,
             datasets: [{
-                data: chartData.percentages,
+                data: sortedValues,
                 backgroundColor: '#FFA726',
                 borderColor: '#FF9800',
                 borderWidth: 1
             }]
         },
         options: {
-            indexAxis: 'y', // Делаем диаграмму горизонтальной
+            indexAxis: 'y',
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
@@ -725,18 +574,20 @@ function createEmployeePercentageBarChart(chartData) {
                 tooltip: {
                     callbacks: {
                         label: function(context) {
-                            return 'Процент: ' + context.parsed.x.toFixed(2) + '%';
+                            const suffix = isCountMode ? '' : '%';
+                            const value = isCountMode ? context.parsed.x.toLocaleString() : context.parsed.x.toFixed(2);
+                            return (isCountMode ? 'Отклонений: ' : 'Процент: ') + value + suffix;
                         }
                     }
                 }
             },
             scales: {
                 x: {
-                    min: cutoffValue, // Начинаем от 70% минимального значения
-                    max: maxValue * 1.1, // Увеличиваем отступ для размещения текста
+                    min: cutoffValue,
+                    max: maxValue * 1.1,
                     ticks: {
                         callback: function(value) {
-                            return value.toFixed(1) + '%';
+                            return isCountMode ? value.toLocaleString() : value.toFixed(1) + '%';
                         }
                     }
                 },
@@ -760,7 +611,6 @@ function createEmployeePercentageBarChart(chartData) {
                     meta.data.forEach((element, index) => {
                         const value = dataset.data[index];
                         if (value > 0) {
-                            // Вычисляем позицию для размещения текста в центре видимой части столбца
                             const cutoffPixel = chart.scales.x.getPixelForValue(cutoff);
                             const valuePixel = chart.scales.x.getPixelForValue(value);
                             const textX = cutoffPixel + (valuePixel - cutoffPixel) / 2;
@@ -770,16 +620,14 @@ function createEmployeePercentageBarChart(chartData) {
                             ctx.textAlign = 'center';
                             ctx.textBaseline = 'middle';
                             
-                            // Добавляем тень для лучшей читаемости
                             ctx.shadowColor = '#000';
                             ctx.shadowBlur = 2;
                             ctx.shadowOffsetX = 1;
                             ctx.shadowOffsetY = 1;
                             
-                            // Размещаем текст в центре видимой части столбца
-                            ctx.fillText(value.toFixed(2) + '%', textX, element.y);
+                            const displayValue = isCountMode ? value.toLocaleString() : value.toFixed(2) + '%';
+                            ctx.fillText(displayValue, textX, element.y);
                             
-                            // Сбрасываем тень
                             ctx.shadowColor = 'transparent';
                             ctx.shadowBlur = 0;
                             ctx.shadowOffsetX = 0;
@@ -799,13 +647,13 @@ if (typeof window !== 'undefined') {
     window.prepareDepartmentChartData = prepareDepartmentChartData;
     window.createPieChart = createPieChart;
     window.createCustomLegend = createCustomLegend;
-    window.createDeviationsBarChart = createDeviationsBarChart;
-    window.createPercentageBarChart = createPercentageBarChart;
     window.initEmployeeCharts = initEmployeeCharts;
     window.prepareEmployeeChartData = prepareEmployeeChartData;
     window.createEmployeePieChart = createEmployeePieChart;
     window.createEmployeeCustomLegend = createEmployeeCustomLegend;
-    window.createEmployeeDeviationsBarChart = createEmployeeDeviationsBarChart;
-    window.createEmployeePercentageBarChart = createEmployeePercentageBarChart;
+    window.initChartToggle = initChartToggle;
+    window.createDepartmentsBarChart = createDepartmentsBarChart;
+    window.createEmployeesBarChart = createEmployeesBarChart;
+    
     console.log('=== charts.js загружен ===');
 }

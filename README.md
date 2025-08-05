@@ -30,12 +30,15 @@ open http://localhost:8000
 
 ## 📚 Документация
 
-**📖 [PROJECT_DOCUMENTATION.md](PROJECT_DOCUMENTATION.md)** - полная документация проекта
+### Основные файлы:
+- **[project_structure.md](project_structure.md)** - структура и архитектура проекта
+- **[docs/](docs/)** - папка с технической документацией
+- **[tests/](tests/)** - папка с тестовыми файлами
 
-### Дополнительные файлы:
-- [MODULAR_ARCHITECTURE.md](MODULAR_ARCHITECTURE.md) - детали модульной архитектуры
-- [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md) - детали архивной монолитной версии
-- [START_SERVER.md](START_SERVER.md) - инструкции по запуску сервера
+### Техническая документация (docs/):
+- Отчеты по изменениям и реализации функций
+- Инструкции по тестированию
+- Детали исправлений и обновлений
 
 ## 🛠️ Технологии
 

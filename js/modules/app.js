@@ -36,6 +36,12 @@ async function updateActiveTab() {
             console.log('Обновляем данные динамики...');
             await updateDynamicsData();
             break;
+        case 'checklist':
+            console.log('Обновляем дашборд чек-листов...');
+            if (typeof window.checklistDashboard === 'object' && typeof window.checklistDashboard.applyFilters === 'function') {
+                window.checklistDashboard.applyFilters();
+            }
+            break;
     }
 }
 
@@ -107,6 +113,15 @@ function initApp() {
             initCompanyDynamics();
         } else {
             console.error('Функция initCompanyDynamics не найдена!');
+        }
+        
+        // Инициализируем дашборд чек-листов
+        console.log('Проверяем наличие дашборда чек-листов:', typeof window.checklistDashboard);
+        if (typeof window.checklistDashboard === 'object' && typeof window.checklistDashboard.init === 'function') {
+            console.log('Вызываем инициализацию дашборда чек-листов...');
+            window.checklistDashboard.init();
+        } else {
+            console.error('Дашборд чек-листов не найден!');
         }
         
         // Повторно инициализируем сворачивающиеся блоки после загрузки всех модулей
