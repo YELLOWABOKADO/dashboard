@@ -201,6 +201,110 @@ function createCustomLegend(chartData) {
     legendContainer.innerHTML = legendHTML;
 }
 
+// Создание второй круговой диаграммы "Топ отклонений" для подразделений
+function createDepartmentsTopChart(chartData) {
+    const ctx = document.getElementById('departmentsTopChart');
+    if (!ctx) return;
+
+    // Уничтожаем предыдущий график если есть
+    if (window.departmentsTopChartInstance) {
+        window.departmentsTopChartInstance.destroy();
+    }
+
+    // Берем топ-5 подразделений по количеству отклонений
+    const topData = chartData.departments.map((dept, index) => ({
+        name: dept,
+        deviations: chartData.deviations[index],
+        percentage: chartData.percentages[index],
+        color: chartData.colors[index]
+    })).sort((a, b) => b.deviations - a.deviations).slice(0, 5);
+
+    window.departmentsTopChartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: topData.map(item => item.name),
+            datasets: [{
+                data: topData.map(item => item.deviations),
+                backgroundColor: topData.map(item => item.color),
+                borderWidth: 2,
+                borderColor: '#ffffff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.label + ': ' + context.parsed.toLocaleString() + ' отклонений';
+                        }
+                    }
+                }
+            }
+        },
+        plugins: [{
+            id: 'datalabels',
+            afterDatasetsDraw: function(chart) {
+                const ctx = chart.ctx;
+                chart.data.datasets.forEach((dataset, i) => {
+                    const meta = chart.getDatasetMeta(i);
+                    meta.data.forEach((element, index) => {
+                        const value = dataset.data[index];
+                        if (value > 0) {
+                            const position = element.tooltipPosition();
+                            const backgroundColor = dataset.backgroundColor[index];
+                            
+                            const textColor = getContrastColor(backgroundColor);
+                            
+                            ctx.font = 'bold 12px Arial';
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'middle';
+                            
+                            ctx.shadowColor = textColor === '#ffffff' ? '#000000' : '#ffffff';
+                            ctx.shadowBlur = 3;
+                            ctx.shadowOffsetX = 1;
+                            ctx.shadowOffsetY = 1;
+                            
+                            ctx.fillStyle = textColor;
+                            ctx.fillText(value.toLocaleString(), position.x, position.y);
+                            
+                            ctx.shadowColor = 'transparent';
+                            ctx.shadowBlur = 0;
+                            ctx.shadowOffsetX = 0;
+                            ctx.shadowOffsetY = 0;
+                        }
+                    });
+                });
+            }
+        }]
+    });
+    
+    // Создаем кастомную легенду
+    createDepartmentsTopLegend(topData);
+}
+
+// Создание кастомной легенды для топ диаграммы подразделений
+function createDepartmentsTopLegend(topData) {
+    const legendContainer = document.getElementById('departmentsTopChartLegend');
+    if (!legendContainer) return;
+    
+    let legendHTML = '';
+    topData.forEach((item, index) => {
+        legendHTML += `
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: ${item.color};"></div>
+                <span>${item.name}: ${item.deviations.toLocaleString()}</span>
+            </div>
+        `;
+    });
+    
+    legendContainer.innerHTML = legendHTML;
+}
+
 
 
 // Инициализация графиков для сотрудников
@@ -355,6 +459,110 @@ function createEmployeeCustomLegend(chartData) {
             <div class="legend-item">
                 <div class="legend-color" style="background-color: ${color};"></div>
                 <span>${employee}: ${percentage.toFixed(2)}%</span>
+            </div>
+        `;
+    });
+    
+    legendContainer.innerHTML = legendHTML;
+}
+
+// Создание второй круговой диаграммы "Топ отклонений" для сотрудников
+function createEmployeesTopChart(chartData) {
+    const ctx = document.getElementById('employeesTopChart');
+    if (!ctx) return;
+
+    // Уничтожаем предыдущий график если есть
+    if (window.employeesTopChartInstance) {
+        window.employeesTopChartInstance.destroy();
+    }
+
+    // Берем топ-5 сотрудников по количеству отклонений
+    const topData = chartData.employees.map((emp, index) => ({
+        name: emp,
+        deviations: chartData.deviations[index],
+        percentage: chartData.percentages[index],
+        color: chartData.colors[index]
+    })).sort((a, b) => b.deviations - a.deviations).slice(0, 5);
+
+    window.employeesTopChartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: topData.map(item => item.name),
+            datasets: [{
+                data: topData.map(item => item.deviations),
+                backgroundColor: topData.map(item => item.color),
+                borderWidth: 2,
+                borderColor: '#ffffff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.label + ': ' + context.parsed.toLocaleString() + ' отклонений';
+                        }
+                    }
+                }
+            }
+        },
+        plugins: [{
+            id: 'datalabels',
+            afterDatasetsDraw: function(chart) {
+                const ctx = chart.ctx;
+                chart.data.datasets.forEach((dataset, i) => {
+                    const meta = chart.getDatasetMeta(i);
+                    meta.data.forEach((element, index) => {
+                        const value = dataset.data[index];
+                        if (value > 0) {
+                            const position = element.tooltipPosition();
+                            const backgroundColor = dataset.backgroundColor[index];
+                            
+                            const textColor = getContrastColor(backgroundColor);
+                            
+                            ctx.font = 'bold 10px Arial';
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'middle';
+                            
+                            ctx.shadowColor = textColor === '#ffffff' ? '#000000' : '#ffffff';
+                            ctx.shadowBlur = 2;
+                            ctx.shadowOffsetX = 1;
+                            ctx.shadowOffsetY = 1;
+                            
+                            ctx.fillStyle = textColor;
+                            ctx.fillText(value.toLocaleString(), position.x, position.y);
+                            
+                            ctx.shadowColor = 'transparent';
+                            ctx.shadowBlur = 0;
+                            ctx.shadowOffsetX = 0;
+                            ctx.shadowOffsetY = 0;
+                        }
+                    });
+                });
+            }
+        }]
+    });
+    
+    // Создаем кастомную легенду
+    createEmployeesTopLegend(topData);
+}
+
+// Создание кастомной легенды для топ диаграммы сотрудников
+function createEmployeesTopLegend(topData) {
+    const legendContainer = document.getElementById('employeesTopChartLegend');
+    if (!legendContainer) return;
+    
+    let legendHTML = '';
+    topData.forEach((item, index) => {
+        legendHTML += `
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: ${item.color};"></div>
+                <span>${item.name}: ${item.deviations.toLocaleString()}</span>
             </div>
         `;
     });
@@ -647,10 +855,14 @@ if (typeof window !== 'undefined') {
     window.prepareDepartmentChartData = prepareDepartmentChartData;
     window.createPieChart = createPieChart;
     window.createCustomLegend = createCustomLegend;
+    window.createDepartmentsTopChart = createDepartmentsTopChart;
+    window.createDepartmentsTopLegend = createDepartmentsTopLegend;
     window.initEmployeeCharts = initEmployeeCharts;
     window.prepareEmployeeChartData = prepareEmployeeChartData;
     window.createEmployeePieChart = createEmployeePieChart;
     window.createEmployeeCustomLegend = createEmployeeCustomLegend;
+    window.createEmployeesTopChart = createEmployeesTopChart;
+    window.createEmployeesTopLegend = createEmployeesTopLegend;
     window.initChartToggle = initChartToggle;
     window.createDepartmentsBarChart = createDepartmentsBarChart;
     window.createEmployeesBarChart = createEmployeesBarChart;

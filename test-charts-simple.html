@@ -11,29 +11,49 @@
     <div class="container">
         <h2>Простой тест диаграмм</h2>
         
-        <div class="chart-card" style="max-width: 800px; margin: 20px 0;">
-            <div class="chart-header">
-                <h5 id="departmentsBarChartTitle">Количество отклонений</h5>
-                <div class="chart-toggle">
-                    <button class="toggle-btn active" data-mode="count" data-target="departments">шт</button>
-                    <button class="toggle-btn" data-mode="percent" data-target="departments">%</button>
+        <!-- Тест диаграмм подразделений -->
+        <div class="charts-container" style="max-width: 1200px; margin: 20px 0;">
+            <div class="chart-card">
+                <h5>Доля отклонений</h5>
+                <div class="pie-chart-wrapper">
+                    <canvas id="pieChart"></canvas>
                 </div>
+                <div id="pieChartLegend" class="custom-legend"></div>
             </div>
-            <div class="chart-wrapper" style="height: 400px;">
-                <canvas id="departmentsBarChart"></canvas>
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h5 id="departmentsBarChartTitle">Количество отклонений</h5>
+                    <div class="chart-toggle">
+                        <button class="toggle-btn active" data-mode="count" data-target="departments">шт</button>
+                        <button class="toggle-btn" data-mode="percent" data-target="departments">%</button>
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="departmentsBarChart"></canvas>
+                </div>
             </div>
         </div>
         
-        <div class="chart-card" style="max-width: 800px; margin: 20px 0;">
-            <div class="chart-header">
-                <h5 id="employeesBarChartTitle">Количество отклонений</h5>
-                <div class="chart-toggle">
-                    <button class="toggle-btn active" data-mode="count" data-target="employees">шт</button>
-                    <button class="toggle-btn" data-mode="percent" data-target="employees">%</button>
+        <!-- Тест диаграмм сотрудников -->
+        <div class="charts-container" style="max-width: 1200px; margin: 20px 0;">
+            <div class="chart-card">
+                <h5>Доля отклонений</h5>
+                <div class="pie-chart-wrapper">
+                    <canvas id="employeesPieChart"></canvas>
                 </div>
+                <div id="employeesPieChartLegend" class="custom-legend"></div>
             </div>
-            <div class="chart-wrapper" style="height: 400px;">
-                <canvas id="employeesBarChart"></canvas>
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h5 id="employeesBarChartTitle">Количество отклонений</h5>
+                    <div class="chart-toggle">
+                        <button class="toggle-btn active" data-mode="count" data-target="employees">шт</button>
+                        <button class="toggle-btn" data-mode="percent" data-target="employees">%</button>
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="employeesBarChart"></canvas>
+                </div>
             </div>
         </div>
     </div>
@@ -50,21 +70,27 @@
             console.log('DOM загружен');
             
             // Проверяем функции
+            console.log('createPieChart:', typeof createPieChart);
+            console.log('createDepartmentsTopChart:', typeof createDepartmentsTopChart);
+            console.log('createEmployeePieChart:', typeof createEmployeePieChart);
+            console.log('createEmployeesTopChart:', typeof createEmployeesTopChart);
             console.log('createDepartmentsBarChart:', typeof createDepartmentsBarChart);
             console.log('createEmployeesBarChart:', typeof createEmployeesBarChart);
             console.log('initChartToggle:', typeof initChartToggle);
             
             // Тестовые данные
             const testDepartmentsData = {
-                departments: ['Группа А', 'Группа Б', 'Группа В', 'Группа Г'],
-                deviations: [150, 120, 90, 75],
-                percentages: [12.5, 10.2, 8.7, 6.3]
+                departments: ['Гридчина', 'Мельникова', 'Коровина', 'группа 3', 'группа 2', 'Сычева', 'группа 1'],
+                deviations: [877, 824, 762, 745, 722, 696, 544],
+                percentages: [18.1, 18.0, 16.7, 16.7, 16.0, 15.5, 14.0],
+                colors: ['#E74C3C', '#3498DB', '#2ECC71', '#F39C12', '#9B59B6', '#1ABC9C', '#34495E']
             };
             
             const testEmployeesData = {
-                employees: ['Иванов И.И.', 'Петров П.П.', 'Сидоров С.С.', 'Козлов К.К.'],
-                deviations: [45, 38, 32, 28],
-                percentages: [15.2, 12.8, 10.5, 9.1]
+                employees: ['Маркина И. М.', 'Ермошина С. В.', 'Кузнецова В. Ю.', 'Анпилогов Е. А.', 'Тарасова К. И.', 'Борисова В. А.'],
+                deviations: [145, 138, 132, 128, 125, 121],
+                percentages: [15.2, 12.8, 10.5, 9.1, 8.7, 8.2],
+                colors: ['#E74C3C', '#3498DB', '#2ECC71', '#F39C12', '#9B59B6', '#1ABC9C']
             };
             
             // Сохраняем данные глобально
@@ -76,17 +102,31 @@
                 console.log('Создаем диаграммы...');
                 
                 try {
-                    createDepartmentsBarChart(testDepartmentsData, 'count');
-                    console.log('✓ Диаграмма подразделений создана');
+                    createPieChart(testDepartmentsData);
+                    console.log('✓ Круговая диаграмма подразделений создана');
                 } catch (error) {
-                    console.error('✗ Ошибка диаграммы подразделений:', error);
+                    console.error('✗ Ошибка круговой диаграммы подразделений:', error);
+                }
+                
+                try {
+                    createDepartmentsBarChart(testDepartmentsData, 'count');
+                    console.log('✓ Столбчатая диаграмма подразделений создана');
+                } catch (error) {
+                    console.error('✗ Ошибка столбчатой диаграммы подразделений:', error);
+                }
+                
+                try {
+                    createEmployeePieChart(testEmployeesData);
+                    console.log('✓ Круговая диаграмма сотрудников создана');
+                } catch (error) {
+                    console.error('✗ Ошибка круговой диаграммы сотрудников:', error);
                 }
                 
                 try {
                     createEmployeesBarChart(testEmployeesData, 'count');
-                    console.log('✓ Диаграмма сотрудников создана');
+                    console.log('✓ Столбчатая диаграмма сотрудников создана');
                 } catch (error) {
-                    console.error('✗ Ошибка диаграммы сотрудников:', error);
+                    console.error('✗ Ошибка столбчатой диаграммы сотрудников:', error);
                 }
                 
                 // Инициализируем переключатели
