@@ -170,37 +170,116 @@ function updateChecklistStats() {
 function updateChecklistSummary() {
     const issues = checklistFilteredData.filter(item => item.score === 1);
     
+    // Функция для скрытия/показа блока
+    function toggleSummaryItem(elementId, hasData) {
+        const element = document.getElementById(elementId);
+        const parentItem = element ? element.closest('.checklist-summary-item') : null;
+        if (parentItem) {
+            parentItem.style.display = hasData ? 'block' : 'none';
+        }
+    }
+    
+    // Если нет проблем, скрываем весь блок сводной информации
+    const summarySection = document.querySelector('.checklist-summary-section');
+    if (issues.length === 0) {
+        if (summarySection) {
+            summarySection.style.display = 'none';
+        }
+        return;
+    } else {
+        if (summarySection) {
+            summarySection.style.display = 'block';
+        }
+    }
+    
+    let visibleItemsCount = 0;
+    
     // Топ блок 0
     const block0Stats = {};
     issues.forEach(item => {
-        block0Stats[item.Block_0_lvl] = (block0Stats[item.Block_0_lvl] || 0) + 1;
+        if (item.Block_0_lvl && item.Block_0_lvl.trim()) {
+            block0Stats[item.Block_0_lvl] = (block0Stats[item.Block_0_lvl] || 0) + 1;
+        }
     });
     const topBlock0 = Object.keys(block0Stats).sort((a, b) => block0Stats[b] - block0Stats[a])[0];
-    document.getElementById('checklistTopBlock0').textContent = topBlock0 ? `${topBlock0} (${block0Stats[topBlock0]})` : '-';
+    const topBlock0Element = document.getElementById('checklistTopBlock0');
+    if (topBlock0Element) {
+        if (topBlock0) {
+            topBlock0Element.textContent = `${topBlock0} (${block0Stats[topBlock0]})`;
+            toggleSummaryItem('checklistTopBlock0', true);
+            visibleItemsCount++;
+        } else {
+            toggleSummaryItem('checklistTopBlock0', false);
+        }
+    }
 
     // Топ блок 1
     const block1Stats = {};
     issues.forEach(item => {
-        block1Stats[item.Block_1_lvl] = (block1Stats[item.Block_1_lvl] || 0) + 1;
+        if (item.Block_1_lvl && item.Block_1_lvl.trim()) {
+            block1Stats[item.Block_1_lvl] = (block1Stats[item.Block_1_lvl] || 0) + 1;
+        }
     });
     const topBlock1 = Object.keys(block1Stats).sort((a, b) => block1Stats[b] - block1Stats[a])[0];
-    document.getElementById('checklistTopBlock1').textContent = topBlock1 ? `${topBlock1} (${block1Stats[topBlock1]})` : '-';
+    const topBlock1Element = document.getElementById('checklistTopBlock1');
+    if (topBlock1Element) {
+        if (topBlock1) {
+            topBlock1Element.textContent = `${topBlock1} (${block1Stats[topBlock1]})`;
+            toggleSummaryItem('checklistTopBlock1', true);
+            visibleItemsCount++;
+        } else {
+            toggleSummaryItem('checklistTopBlock1', false);
+        }
+    }
 
     // Топ оператор
     const operatorStats = {};
     issues.forEach(item => {
-        operatorStats[item.operator] = (operatorStats[item.operator] || 0) + 1;
+        if (item.operator && item.operator.trim()) {
+            operatorStats[item.operator] = (operatorStats[item.operator] || 0) + 1;
+        }
     });
     const topOperator = Object.keys(operatorStats).sort((a, b) => operatorStats[b] - operatorStats[a])[0];
-    document.getElementById('checklistTopOperator').textContent = topOperator ? `${topOperator} (${operatorStats[topOperator]})` : '-';
+    const topOperatorElement = document.getElementById('checklistTopOperator');
+    if (topOperatorElement) {
+        if (topOperator) {
+            topOperatorElement.textContent = `${topOperator} (${operatorStats[topOperator]})`;
+            toggleSummaryItem('checklistTopOperator', true);
+            visibleItemsCount++;
+        } else {
+            toggleSummaryItem('checklistTopOperator', false);
+        }
+    }
 
     // Топ группа
     const groupStats = {};
     issues.forEach(item => {
-        groupStats[item.group] = (groupStats[item.group] || 0) + 1;
+        if (item.group && item.group.trim()) {
+            groupStats[item.group] = (groupStats[item.group] || 0) + 1;
+        }
     });
     const topGroup = Object.keys(groupStats).sort((a, b) => groupStats[b] - groupStats[a])[0];
-    document.getElementById('checklistTopGroup').textContent = topGroup ? `${topGroup} (${groupStats[topGroup]})` : '-';
+    const topGroupElement = document.getElementById('checklistTopGroup');
+    if (topGroupElement) {
+        if (topGroup) {
+            topGroupElement.textContent = `${topGroup} (${groupStats[topGroup]})`;
+            toggleSummaryItem('checklistTopGroup', true);
+            visibleItemsCount++;
+        } else {
+            toggleSummaryItem('checklistTopGroup', false);
+        }
+    }
+    
+    // Обновляем CSS класс сетки в зависимости от количества видимых элементов
+    const summaryGrid = document.querySelector('.checklist-summary-grid');
+    if (summaryGrid) {
+        // Удаляем старые классы
+        summaryGrid.classList.remove('items-1', 'items-2', 'items-3', 'items-4');
+        // Добавляем новый класс
+        if (visibleItemsCount > 0) {
+            summaryGrid.classList.add(`items-${visibleItemsCount}`);
+        }
+    }
 }
 
 // Обновление графиков

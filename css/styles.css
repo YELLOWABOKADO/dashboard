@@ -923,11 +923,50 @@ tr:hover {
     gap: 20px;
 }
 
+/* Адаптивная сетка для разного количества элементов */
+@supports selector(:has(*)) {
+    .checklist-summary-grid:has(.checklist-summary-item:nth-child(1):last-child) {
+        grid-template-columns: 1fr;
+        max-width: 400px;
+    }
+
+    .checklist-summary-grid:has(.checklist-summary-item:nth-child(2):last-child) {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .checklist-summary-grid:has(.checklist-summary-item:nth-child(3):last-child) {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* Альтернативный подход для браузеров без поддержки :has() */
+.checklist-summary-grid.items-1 {
+    grid-template-columns: 1fr;
+    max-width: 400px;
+}
+
+.checklist-summary-grid.items-2 {
+    grid-template-columns: 1fr 1fr;
+}
+
+.checklist-summary-grid.items-3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.checklist-summary-grid.items-4 {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
 .checklist-summary-item {
     padding: 15px;
     border-left: 4px solid #3498db;
     background: #f8f9fa;
     border-radius: 0 8px 8px 0;
+}
+
+.checklist-summary-item:empty,
+.checklist-summary-item .checklist-summary-value:empty {
+    display: none;
 }
 
 .checklist-summary-title {

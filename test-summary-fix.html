@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест исправления блоков сводной информации</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Тест исправления блоков сводной информации</h1>
+        
+        <!-- Сводная информация -->
+        <div class="checklist-summary-section">
+            <h3 style="margin-bottom: 15px; color: #2c3e50;">📈 Сводная информация</h3>
+            <div class="checklist-summary-grid">
+                <div class="checklist-summary-item">
+                    <div class="checklist-summary-title">Топ блок 0 по проблемам</div>
+                    <div class="checklist-summary-value" id="checklistTopBlock0">Влияние на бизнес (25)</div>
+                </div>
+                <div class="checklist-summary-item">
+                    <div class="checklist-summary-title">Топ блок 1 по проблемам</div>
+                    <div class="checklist-summary-value" id="checklistTopBlock1">ФРОД-мониторинг (14)</div>
+                </div>
+                <div class="checklist-summary-item" style="display: none;">
+                    <div class="checklist-summary-title">Оператор с наибольшими проблемами</div>
+                    <div class="checklist-summary-value" id="checklistTopOperator">-</div>
+                </div>
+                <div class="checklist-summary-item">
+                    <div class="checklist-summary-title">Группа с наибольшими проблемами</div>
+                    <div class="checklist-summary-value" id="checklistTopGroup">Сычева - группа (15)</div>
+                </div>
+            </div>
+        </div>
+
+        <p>В этом тесте третий блок (Оператор с наибольшими проблемами) скрыт, что должно привести к правильному отображению только 3 блоков в сетке.</p>
+    </div>
+</body>
+</html>

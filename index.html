@@ -469,6 +469,7 @@
             <div class="sticky-header">
                 <!-- Фильтры для динамики -->
                 <div class="filters-container">
+                <!-- Первая строка фильтров -->
                 <div class="filter-group">
                     <div class="filter-item">
                         <span class="filter-label">Период с:</span>
@@ -478,9 +479,6 @@
                         <span class="filter-label">по:</span>
                         <input type="date" id="dynEndDate" value="2025-07-31" class="date-input">
                     </div>
-                </div>
-
-                <div class="filter-group">
                     <div class="filter-item">
                         <span class="filter-label">Режим отображения:</span>
                         <select id="dynTimeGranularity">
@@ -489,7 +487,6 @@
                             <option value="Месяц" selected>Месяц</option>
                         </select>
                     </div>
-
                     <div class="filter-item">
                         <span class="filter-label">КЦ:</span>
                         <select id="dynCallCenter">
@@ -498,7 +495,10 @@
                             <option value="КЦ 2">КЦ 2</option>
                         </select>
                     </div>
+                </div>
 
+                <!-- Вторая строка фильтров -->
+                <div class="filter-group">
                     <div class="filter-item">
                         <span class="filter-label">Группы:</span>
                         <div class="multi-select-container">
@@ -680,11 +680,7 @@
         <!-- Checklist Tab Content -->
         <div id="checklistTab" class="tab-content">
             <div class="checklist-dashboard">
-                <!-- Заголовок -->
-                <div class="dashboard-header">
-                    <h2>📊 Детализация по чек-листам</h2>
-                    <div id="checklistDebugInfo" class="debug-info" style="display: none;"></div>
-                </div>
+                <div id="checklistDebugInfo" class="debug-info" style="display: none;"></div>
 
                 <!-- Фильтры -->
                 <div class="filters-container">
