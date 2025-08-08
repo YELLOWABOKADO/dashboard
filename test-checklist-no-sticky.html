@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест чек-листов без sticky фильтров</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Закрепленные вкладки (только они должны быть sticky) -->
+        <div class="tabs">
+            <button class="tab-button" data-tab="other">Другая вкладка</button>
+            <button class="tab-button active" data-tab="checklist">Детализация по чек-листам</button>
+        </div>
+
+        <!-- Другая вкладка для сравнения -->
+        <div id="otherTab" class="tab-content">
+            <div class="sticky-header">
+                <div class="filters-container">
+                    <div class="filter-group">
+                        <div class="filter-item">
+                            <span class="filter-label">Эта шапка закреплена</span>
+                            <button class="btn btn-primary">Кнопка</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="scrollable-content">
+                <div style="height: 150vh; background: #f0f0f0; padding: 20px;">
+                    <p>Контент с закрепленной шапкой</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Вкладка чек-листов (без sticky фильтров) -->
+        <div id="checklistTab" class="tab-content active">
+            <div class="checklist-dashboard">
+                <!-- Заголовок -->
+                <div class="dashboard-header">
+                    <h2>📊 Детализация по чек-листам</h2>
+                </div>
+
+                <!-- Фильтры (НЕ закреплены) -->
+                <div class="filters-container">
+                    <div class="filter-group">
+                        <div class="filter-item">
+                            <span class="filter-label">Дашборд:</span>
+                            <select>
+                                <option>Автооценка</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <span class="filter-label">Период с:</span>
+                            <input type="date" class="date-input">
+                        </div>
+                        <div class="filter-item">
+                            <button class="btn btn-primary">Обновить</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Статистические карточки (НЕ закреплены) -->
+                <div class="checklist-stats-grid">
+                    <div class="checklist-stat-card">
+                        <div class="checklist-stat-number">651</div>
+                        <div class="checklist-stat-label">Всего</div>
+                    </div>
+                    <div class="checklist-stat-card">
+                        <div class="checklist-stat-number">73</div>
+                        <div class="checklist-stat-label">Проблем</div>
+                    </div>
+                </div>
+
+                <!-- Сводная информация (НЕ закреплена) -->
+                <div class="checklist-summary-section">
+                    <h3>📈 Сводная информация</h3>
+                    <div class="checklist-summary-grid">
+                        <div class="checklist-summary-item">
+                            <div class="checklist-summary-title">Топ блок 0</div>
+                            <div class="checklist-summary-value">Влияние на бизнес</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Длинный контент для проверки скролла -->
+                <div style="height: 200vh; background: linear-gradient(to bottom, #fff, #f8f9fa); padding: 20px;">
+                    <h3>Прокручиваемый контент</h3>
+                    <p>Фильтры и статистика должны прокручиваться вместе с этим контентом.</p>
+                    <p>Только вкладки вверху должны оставаться закрепленными.</p>
+                    
+                    <div style="margin-top: 100px;">
+                        <p>Скролльте вверх и вниз, чтобы убедиться, что фильтры НЕ закреплены.</p>
+                    </div>
+                    
+                    <div style="margin-top: 200px;">
+                        <p>Но вкладки должны всегда оставаться видимыми.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Простая логика переключения вкладок
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const tabId = this.dataset.tab;
+                
+                document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                this.classList.add('active');
+                document.getElementById(tabId + 'Tab').classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

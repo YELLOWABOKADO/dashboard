@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест закрепленных шапок</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Закрепленные вкладки -->
+        <div class="tabs">
+            <button class="tab-button active" data-tab="test1">Тест 1</button>
+            <button class="tab-button" data-tab="test2">Тест 2</button>
+        </div>
+
+        <!-- Тестовая вкладка 1 -->
+        <div id="test1Tab" class="tab-content active">
+            <!-- Закрепленная панель фильтров -->
+            <div class="sticky-header">
+                <div class="filters-container">
+                    <div class="filter-group">
+                        <div class="filter-item">
+                            <span class="filter-label">Фильтр 1:</span>
+                            <select>
+                                <option>Опция 1</option>
+                                <option>Опция 2</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <button class="btn btn-primary">Обновить</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Прокручиваемый контент -->
+            <div class="scrollable-content">
+                <div style="height: 200vh; background: linear-gradient(to bottom, #f8f9fa, #e9ecef); padding: 20px;">
+                    <h3>Прокручиваемый контент</h3>
+                    <p>Этот контент должен прокручиваться, а фильтры и вкладки должны оставаться закрепленными.</p>
+                    <div style="margin-top: 50px;">
+                        <p>Скролльте вниз, чтобы проверить, что шапка остается на месте.</p>
+                    </div>
+                    <div style="margin-top: 100px;">
+                        <p>Еще больше контента для проверки скролла...</p>
+                    </div>
+                    <div style="margin-top: 200px;">
+                        <p>И еще больше контента...</p>
+                    </div>
+                    <div style="margin-top: 300px;">
+                        <p>Последний блок контента для проверки.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Тестовая вкладка 2 -->
+        <div id="test2Tab" class="tab-content">
+            <!-- Закрепленная панель фильтров -->
+            <div class="sticky-header">
+                <div class="dashboard-header">
+                    <h2>📊 Заголовок вкладки</h2>
+                </div>
+                <div class="filters-container">
+                    <div class="filter-group">
+                        <div class="filter-item">
+                            <span class="filter-label">Другой фильтр:</span>
+                            <input type="date" class="date-input">
+                        </div>
+                        <div class="filter-item">
+                            <button class="btn btn-primary">Применить</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Прокручиваемый контент -->
+            <div class="scrollable-content">
+                <div style="height: 150vh; background: linear-gradient(to bottom, #fff3e0, #ffcc02); padding: 20px;">
+                    <h3>Другой прокручиваемый контент</h3>
+                    <p>Этот контент также должен прокручиваться независимо от закрепленной шапки.</p>
+                    <div style="margin-top: 100px;">
+                        <p>Проверяем работу на второй вкладке...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Простая логика переключения вкладок для теста
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const tabId = this.dataset.tab;
+                
+                // Убираем активные классы
+                document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                // Добавляем активные классы
+                this.classList.add('active');
+                document.getElementById(tabId + 'Tab').classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

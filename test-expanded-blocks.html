@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест раскрытых блоков</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Тест: Все блоки раскрыты по умолчанию</h1>
+        
+        <!-- Тестовые сворачиваемые блоки -->
+        <div class="collapsible-section">
+            <div class="collapsible-header" id="testTableHeader">
+                <h4 style="margin: 0; display: flex; align-items: center;">
+                    <span class="collapse-arrow">▼</span>
+                    <span style="margin-left: 10px;">📋 Таблица данных</span>
+                </h4>
+            </div>
+            <div class="collapsible-content" id="testTableContent">
+                <div style="padding: 20px; background: #f8f9fa; border-radius: 4px;">
+                    <p>Это содержимое таблицы. Должно быть видно сразу.</p>
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr>
+                                <th style="border: 1px solid #ddd; padding: 8px;">Колонка 1</th>
+                                <th style="border: 1px solid #ddd; padding: 8px;">Колонка 2</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="border: 1px solid #ddd; padding: 8px;">Данные 1</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">Данные 2</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="collapsible-section">
+            <div class="collapsible-header" id="testChartsHeader">
+                <h4 style="margin: 0; display: flex; align-items: center;">
+                    <span class="collapse-arrow">▼</span>
+                    <span style="margin-left: 10px;">📊 Графики</span>
+                </h4>
+            </div>
+            <div class="collapsible-content" id="testChartsContent">
+                <div style="padding: 20px; background: #e3f2fd; border-radius: 4px;">
+                    <p>Это содержимое графиков. Теперь должно быть видно сразу.</p>
+                    <div style="height: 200px; background: #bbdefb; border-radius: 4px; display: flex; align-items: center; justify-content: center;">
+                        <span>Место для графика</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="collapsible-section">
+            <div class="collapsible-header" id="testDetailsHeader">
+                <h4 style="margin: 0; display: flex; align-items: center;">
+                    <span class="collapse-arrow">▼</span>
+                    <span style="margin-left: 10px;">📋 Детальная информация</span>
+                </h4>
+            </div>
+            <div class="collapsible-content" id="testDetailsContent">
+                <div style="padding: 20px; background: #fff3e0; border-radius: 4px;">
+                    <p>Это содержимое детальной информации. Теперь должно быть видно сразу.</p>
+                    <ul>
+                        <li>Пункт 1</li>
+                        <li>Пункт 2</li>
+                        <li>Пункт 3</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Подключение модулей -->
+    <script src="js/modules/ui-helpers.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Инициализируем тестовые сворачиваемые блоки...');
+            if (typeof initCollapsibleSections === 'function') {
+                initCollapsibleSections();
+                console.log('✅ Все блоки инициализированы');
+            } else {
+                console.error('❌ Функция initCollapsibleSections не найдена!');
+            }
+        });
+    </script>
+</body>
+</html>

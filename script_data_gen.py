@@ -75,10 +75,10 @@ def get_random_block_path():
     block_3_lvl = f"{block_2_lvl}, балл"
     return block_0_lvl, block_1_lvl, block_2_lvl, block_3_lvl
 
-# Функция для генерации оценки с вероятностью 0.5-1.5%
+# Функция для генерации оценки с вероятностью 1.5-5.5%
 def generate_score():
-    # Вероятность получения 1: от 0.5% до 1.5%
-    probability = random.uniform(0.005, 0.015)
+    # Вероятность получения 1: от 1.5% до 5.5%
+    probability = random.uniform(0.15, 0.055)
     return 1 if random.random() < probability else 0
 
 # Генерация дат
@@ -106,7 +106,7 @@ for date in dates:
         data.append(entry)
 
 # Сохранение в файл
-with open("operator_data_days.json", "w", encoding="utf-8") as f:
+with open("operator_data_days_02.json", "w", encoding="utf-8") as f:
     json.dump(data, f, ensure_ascii=False, indent=4)
 
 print(f"JSON файл успешно создан. Всего записей: {len(data)}")

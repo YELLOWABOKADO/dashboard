@@ -22,8 +22,10 @@
 
         <!-- Company Tab Content -->
         <div id="companyTab" class="tab-content active">
-            <!-- Фильтры -->
-            <div class="filters-container">
+            <!-- Закрепленная панель фильтров -->
+            <div class="sticky-header">
+                <!-- Фильтры -->
+                <div class="filters-container">
                 <div class="filter-group">
                     <div class="filter-item">
                         <span class="filter-label">Период с:</span>
@@ -69,9 +71,11 @@
                 </div>
             </div>
 
+            </div>
 
-
-            <!-- Таблица с данными сводной информации -->
+            <!-- Прокручиваемый контент -->
+            <div class="scrollable-content">
+                <!-- Таблица с данными сводной информации -->
             <div id="companySummaryTable" class="mt-4">
                 <div class="loading">Загрузка данных...</div>
             </div>
@@ -89,6 +93,7 @@
                         <div class="loading">Загрузка динамики компании...</div>
                     </div>
                 </div>
+            </div>
             </div>
         </div>
 
@@ -678,13 +683,19 @@
                 <!-- Заголовок -->
                 <div class="dashboard-header">
                     <h2>📊 Детализация по чек-листам</h2>
-                    <p>Анализ проблем операторов по категориям блоков 0 и 1 уровня</p>
                     <div id="checklistDebugInfo" class="debug-info" style="display: none;"></div>
                 </div>
 
                 <!-- Фильтры -->
                 <div class="filters-container">
                     <div class="filter-group">
+                        <div class="filter-item">
+                            <span class="filter-label">Дашборд:</span>
+                            <select id="checklistDashboard">
+                                <option value="Автооценка" selected>Автооценка</option>
+                                <option value="Автооценка УАВ/ПреХард">Автооценка УАВ/ПреХард</option>
+                            </select>
+                        </div>
                         <div class="filter-item">
                             <span class="filter-label">Период с:</span>
                             <input type="date" id="checklistDateFrom" value="2025-05-01" class="date-input">
@@ -693,9 +704,6 @@
                             <span class="filter-label">по:</span>
                             <input type="date" id="checklistDateTo" value="2025-07-30" class="date-input">
                         </div>
-                    </div>
-
-                    <div class="filter-group">
                         <div class="filter-item">
                             <span class="filter-label">Колл-центр:</span>
                             <select id="checklistKcFilter">
@@ -723,20 +731,10 @@
                                 <option value="">Все блоки 0</option>
                             </select>
                         </div>
-                    </div>
-
-                    <div class="filter-group">
                         <div class="filter-item">
                             <span class="filter-label">Блок 1 уровня:</span>
                             <select id="checklistBlock1Filter">
                                 <option value="">Все блоки 1</option>
-                            </select>
-                        </div>
-                        <div class="filter-item">
-                            <span class="filter-label">Дашборд:</span>
-                            <select id="checklistDashboard">
-                                <option value="Автооценка" selected>Автооценка</option>
-                                <option value="Автооценка УАВ/ПреХард">Автооценка УАВ/ПреХард</option>
                             </select>
                         </div>
                         <div class="filter-item">
@@ -796,74 +794,136 @@
                     </div>
                 </div>
 
-                <!-- Аналитические графики -->
-                <div class="checklist-analytics-section">
-                    <div class="checklist-chart-container">
-                        <div class="checklist-chart-title">📊 Статистика по блокам 0 уровня</div>
-                        <div id="checklistBlock0Chart" class="checklist-bar-chart"></div>
+                <!-- Сворачиваемый блок: Аналитические графики -->
+                <div class="collapsible-section">
+                    <div class="collapsible-header" id="checklistAnalyticsHeader">
+                        <h4 style="margin: 0; display: flex; align-items: center;">
+                            <span class="collapse-arrow">▼</span>
+                            <span style="margin-left: 10px;">📊 Аналитические графики</span>
+                        </h4>
                     </div>
-                    <div class="checklist-chart-container">
-                        <div class="checklist-chart-title">📊 Статистика по блокам 1 уровня</div>
-                        <div id="checklistBlock1Chart" class="checklist-bar-chart"></div>
-                    </div>
-                </div>
-
-                <!-- Таблица операторов -->
-                <div class="checklist-results-section">
-                    <div class="checklist-results-header">
-                        📋 Детальные данные по операторам
-                    </div>
-                    <div class="checklist-table-container">
-                        <div id="checklistLoading" class="loading">Загрузка данных...</div>
-                        <table id="checklistOperatorTable" style="display: none;">
-                            <thead>
-                                <tr>
-                                    <th>Оператор</th>
-                                    <th>Группа</th>
-                                    <th>КЦ</th>
-                                    <th>Всего</th>
-                                    <th>Проблем</th>
-                                    <th>Доля проблем</th>
-                                    <th>Топ блок 0</th>
-                                    <th>Топ блок 1</th>
-                                </tr>
-                            </thead>
-                            <tbody id="checklistOperatorBody">
-                            </tbody>
-                        </table>
-                        <div id="checklistNoData" class="no-data" style="display: none;">
-                            Нет данных для отображения
+                    <div class="collapsible-content" id="checklistAnalyticsContent">
+                        <div class="checklist-analytics-section">
+                            <div class="checklist-chart-container">
+                                <div class="checklist-chart-title">📊 Статистика по блокам 0 уровня</div>
+                                <div id="checklistBlock0Chart" class="checklist-bar-chart"></div>
+                            </div>
+                            <div class="checklist-chart-container">
+                                <div class="checklist-chart-title">📊 Статистика по блокам 1 уровня</div>
+                                <div id="checklistBlock1Chart" class="checklist-bar-chart"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Подробные записи -->
-                <div class="checklist-results-section">
-                    <div class="checklist-results-header">
-                        📋 Подробные записи (только проблемы)
+                <!-- Сворачиваемый блок: Таблица операторов -->
+                <div class="collapsible-section">
+                    <div class="collapsible-header" id="checklistOperatorTableHeader">
+                        <h4 style="margin: 0; display: flex; align-items: center;">
+                            <span class="collapse-arrow">▼</span>
+                            <span style="margin-left: 10px;">📋 Детальные данные по операторам</span>
+                        </h4>
                     </div>
-                    <div class="checklist-table-container">
-                        <table id="checklistResultsTable" style="display: none;">
-                            <thead>
-                                <tr>
-                                    <th>Дата</th>
-                                    <th>Оператор</th>
-                                    <th>Группа</th>
-                                    <th>КЦ</th>
-                                    <th>Блок 0</th>
-                                    <th>Блок 1</th>
-                                    <th>Блок 2</th>
-                                    <th>Балл</th>
-                                </tr>
-                            </thead>
-                            <tbody id="checklistResultsBody">
-                            </tbody>
-                        </table>
+                    <div class="collapsible-content" id="checklistOperatorTableContent">
+                        <div class="checklist-table-container">
+                            <div id="checklistLoading" class="loading">Загрузка данных...</div>
+                            <table id="checklistOperatorTable" style="display: none;">
+                                <thead>
+                                    <tr>
+                                        <th>Оператор</th>
+                                        <th>Группа</th>
+                                        <th>КЦ</th>
+                                        <th>Всего</th>
+                                        <th>Проблем</th>
+                                        <th>Доля проблем</th>
+                                        <th>Топ блок 0</th>
+                                        <th>Топ блок 1</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="checklistOperatorBody">
+                                </tbody>
+                            </table>
+                            <div id="checklistNoData" class="no-data" style="display: none;">
+                                Нет данных для отображения
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Сворачиваемый блок: Подробные записи -->
+                <div class="collapsible-section">
+                    <div class="collapsible-header" id="checklistResultsTableHeader">
+                        <h4 style="margin: 0; display: flex; align-items: center;">
+                            <span class="collapse-arrow">▼</span>
+                            <span style="margin-left: 10px;">📋 Подробные записи (только проблемы)</span>
+                        </h4>
+                    </div>
+                    <div class="collapsible-content" id="checklistResultsTableContent">
+                        <div class="checklist-table-container">
+                            <table id="checklistResultsTable" style="display: none;">
+                                <thead>
+                                    <tr>
+                                        <th>Дата</th>
+                                        <th>Оператор</th>
+                                        <th>Группа</th>
+                                        <th>КЦ</th>
+                                        <th>Блок 0</th>
+                                        <th>Блок 1</th>
+                                        <th>Блок 2</th>
+                                        <th>Балл</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="checklistResultsBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Сворачиваемый блок: Графики динамики блоков -->
+                <div class="collapsible-section">
+                    <div class="collapsible-header" id="checklistChartsHeader">
+                        <h4 style="margin: 0; display: flex; align-items: center;">
+                            <span class="collapse-arrow">▼</span>
+                            <span style="margin-left: 10px;">📊 Динамика блоков по месяцам</span>
+                        </h4>
+                    </div>
+                    <div class="collapsible-content" id="checklistChartsContent">
+                        <div class="checklist-dynamics-charts">
+                            <!-- График 1: Влияние на бизнес -->
+                            <div class="checklist-chart-card">
+                                <div class="checklist-chart-header">
+                                    <h5>Динамика блока: Влияние на бизнес</h5>
+                                </div>
+                                <div class="checklist-chart-wrapper">
+                                    <canvas id="checklistResultChart"></canvas>
+                                </div>
+                            </div>
+
+                            <!-- График 2: Влияние на мотивацию сотрудника -->
+                            <div class="checklist-chart-card">
+                                <div class="checklist-chart-header">
+                                    <h5>Динамика блока: Влияние на мотивацию сотрудника</h5>
+                                </div>
+                                <div class="checklist-chart-wrapper">
+                                    <canvas id="checklistMotivationChart"></canvas>
+                                </div>
+                            </div>
+
+                            <!-- График 3: Клиентоцентричность -->
+                            <div class="checklist-chart-card">
+                                <div class="checklist-chart-header">
+                                    <h5>Динамика блока: Клиентоцентричность</h5>
+                                </div>
+                                <div class="checklist-chart-wrapper">
+                                    <canvas id="checklistObjectionsChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
     <!-- Подключение модулей -->
     <script>
@@ -909,6 +969,7 @@
     <script src="js/modules/dynamics.js"></script>
     <script src="js/modules/company-dynamics.js"></script>
     <script src="js/modules/charts.js"></script>
+    <script src="js/modules/checklist-charts.js"></script>
     <script src="js/checklist-dashboard.js"></script>
     <script src="js/modules/app.js"></script>
     

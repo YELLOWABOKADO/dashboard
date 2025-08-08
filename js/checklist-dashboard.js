@@ -207,6 +207,13 @@ function updateChecklistSummary() {
 function updateChecklistCharts() {
     updateChecklistBlockChart('checklistBlock0Chart', 'Block_0_lvl');
     updateChecklistBlockChart('checklistBlock1Chart', 'Block_1_lvl');
+    
+    // Инициализируем новые графики динамики
+    if (typeof window.updateChecklistDynamicsCharts === 'function') {
+        window.updateChecklistDynamicsCharts();
+    } else if (typeof initChecklistCharts === 'function') {
+        initChecklistCharts();
+    }
 }
 
 function updateChecklistBlockChart(containerId, blockField) {

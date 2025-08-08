@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест графиков чек-листов</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h2>Тест графиков чек-листов</h2>
+        
+        <!-- Графики динамики блоков -->
+        <div class="checklist-charts-section">
+            <h3 style="margin-bottom: 20px; color: #2c3e50;">📈 Динамика блоков: влияние на бизнес</h3>
+            
+            <div class="checklist-dynamics-charts">
+                <!-- График 1: Нацеленность на результат -->
+                <div class="checklist-chart-card">
+                    <div class="checklist-chart-header">
+                        <h5>Динамика блока: влияние на бизнес: нацеленность на результат</h5>
+                        <div class="checklist-chart-controls">
+                            <button class="checklist-chart-btn" data-chart="result" data-view="table">📊</button>
+                            <button class="checklist-chart-btn" data-chart="result" data-view="chart">📈</button>
+                        </div>
+                    </div>
+                    <div class="checklist-chart-wrapper">
+                        <canvas id="checklistResultChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- График 2: Мотивация -->
+                <div class="checklist-chart-card">
+                    <div class="checklist-chart-header">
+                        <h5>Динамика блока: влияние на бизнес: мотивация</h5>
+                        <div class="checklist-chart-controls">
+                            <button class="checklist-chart-btn" data-chart="motivation" data-view="table">📊</button>
+                            <button class="checklist-chart-btn" data-chart="motivation" data-view="chart">📈</button>
+                        </div>
+                    </div>
+                    <div class="checklist-chart-wrapper">
+                        <canvas id="checklistMotivationChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- График 3: Работа с возражениями -->
+                <div class="checklist-chart-card">
+                    <div class="checklist-chart-header">
+                        <h5>Динамика блока: влияние на бизнес: работа с возражениями</h5>
+                        <div class="checklist-chart-controls">
+                            <button class="checklist-chart-btn" data-chart="objections" data-view="table">📊</button>
+                            <button class="checklist-chart-btn" data-chart="objections" data-view="chart">📈</button>
+                        </div>
+                    </div>
+                    <div class="checklist-chart-wrapper">
+                        <canvas id="checklistObjectionsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/modules/checklist-charts.js"></script>
+    <script>
+        console.log('=== Тест графиков чек-листов ===');
+        
+        // Проверяем загрузку Chart.js
+        console.log('Chart.js:', typeof Chart);
+        
+        // Ждем загрузки
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM загружен');
+            
+            // Проверяем функции
+            console.log('initChecklistCharts:', typeof initChecklistCharts);
+            
+            // Инициализируем графики
+            setTimeout(() => {
+                console.log('Инициализируем графики чек-листов...');
+                
+                try {
+                    initChecklistCharts();
+                    console.log('✅ Графики чек-листов созданы');
+                } catch (error) {
+                    console.error('❌ Ошибка создания графиков чек-листов:', error);
+                }
+            }, 500);
+        });
+    </script>
+</body>
+</html>

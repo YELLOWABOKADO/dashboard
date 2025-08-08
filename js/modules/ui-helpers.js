@@ -270,26 +270,13 @@ function initCollapsibleSections() {
             
             // Устанавливаем правильное начальное состояние
             setTimeout(() => {
-                // Определяем, должен ли блок быть изначально развернут
-                const shouldBeExpanded = !contentId.includes('Charts') && !contentId.includes('Details') && !contentId.includes('Dynamics');
-                
-                if (shouldBeExpanded) {
-                    // Блок должен быть развернут
-                    content.classList.remove('collapsed');
-                    if (arrow) {
-                        arrow.classList.remove('collapsed');
-                    }
-                    content.style.maxHeight = content.scrollHeight + 'px';
-                    console.log(`Блок ${contentId} развернут по умолчанию, высота: ${content.scrollHeight}px`);
-                } else {
-                    // Блок должен быть свернут
-                    content.classList.add('collapsed');
-                    if (arrow) {
-                        arrow.classList.add('collapsed');
-                    }
-                    content.style.maxHeight = '0px';
-                    console.log(`Блок ${contentId} свернут по умолчанию`);
+                // Все блоки по умолчанию раскрыты
+                content.classList.remove('collapsed');
+                if (arrow) {
+                    arrow.classList.remove('collapsed');
                 }
+                content.style.maxHeight = content.scrollHeight + 'px';
+                console.log(`Блок ${contentId} развернут по умолчанию, высота: ${content.scrollHeight}px`);
             }, 100);
         }
     });

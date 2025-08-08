@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест месячных столбчатых графиков</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h2 style="text-align: center; color: #2c3e50; margin-bottom: 30px;">
+            📊 Тест месячных столбчатых графиков по блокам 0 уровня
+        </h2>
+        
+        <!-- Графики динамики блоков -->
+        <div class="checklist-charts-section">
+            <h3 style="margin-bottom: 20px; color: #2c3e50;">📊 Динамика блоков по месяцам</h3>
+            
+            <div class="checklist-dynamics-charts">
+                <!-- График 1: Влияние на бизнес -->
+                <div class="checklist-chart-card">
+                    <div class="checklist-chart-header">
+                        <h5>Динамика блока: Влияние на бизнес</h5>
+                        <div class="checklist-chart-controls">
+                            <button class="checklist-chart-btn" data-chart="result" data-view="table">📊</button>
+                            <button class="checklist-chart-btn active" data-chart="result" data-view="chart">📈</button>
+                        </div>
+                    </div>
+                    <div class="checklist-chart-wrapper">
+                        <canvas id="checklistResultChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- График 2: Влияние на мотивацию сотрудника -->
+                <div class="checklist-chart-card">
+                    <div class="checklist-chart-header">
+                        <h5>Динамика блока: Влияние на мотивацию сотрудника</h5>
+                        <div class="checklist-chart-controls">
+                            <button class="checklist-chart-btn" data-chart="motivation" data-view="table">📊</button>
+                            <button class="checklist-chart-btn active" data-chart="motivation" data-view="chart">📈</button>
+                        </div>
+                    </div>
+                    <div class="checklist-chart-wrapper">
+                        <canvas id="checklistMotivationChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- График 3: Клиентоцентричность -->
+                <div class="checklist-chart-card">
+                    <div class="checklist-chart-header">
+                        <h5>Динамика блока: Клиентоцентричность</h5>
+                        <div class="checklist-chart-controls">
+                            <button class="checklist-chart-btn" data-chart="objections" data-view="table">📊</button>
+                            <button class="checklist-chart-btn active" data-chart="objections" data-view="chart">📈</button>
+                        </div>
+                    </div>
+                    <div class="checklist-chart-wrapper">
+                        <canvas id="checklistObjectionsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Информация о данных -->
+        <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+            <h4>📋 Информация о тестовых данных:</h4>
+            <ul>
+                <li><strong>Влияние на бизнес:</strong> Проблемы, влияющие на финансовые результаты (ФРОД, нацеленность на результат)</li>
+                <li><strong>Влияние на мотивацию сотрудника:</strong> Проблемы, влияющие на мотивацию персонала (ФЗ 230, конфликты)</li>
+                <li><strong>Клиентоцентричность:</strong> Проблемы в работе с клиентами (процедуры, мотивация клиентов)</li>
+            </ul>
+            <p><strong>Данные:</strong> Месячная агрегация проблем (score = 1) по группам из реального JSON файла</p>
+        </div>
+    </div>
+
+    <script src="js/modules/checklist-charts.js"></script>
+    <script>
+        console.log('=== Тест месячных столбчатых графиков ===');
+        
+        // Имитируем данные из основного дашборда
+        let checklistFilteredData = [];
+        
+        // Загружаем данные
+        async function loadTestData() {
+            try {
+                console.log('Загружаем тестовые данные...');
+                const response = await fetch('operator_data_days.json');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const allData = await response.json();
+                console.log('Загружено записей:', allData.length);
+                
+                // Фильтруем данные (можно добавить дополнительные фильтры)
+                checklistFilteredData = allData.filter(item => {
+                    // Берем данные за май 2025
+                    return item.date >= '2025-05-01' && item.date <= '2025-05-31';
+                });
+                
+                console.log('Отфильтровано записей:', checklistFilteredData.length);
+                
+                // Показываем статистику
+                const issues = checklistFilteredData.filter(item => item.score === 1);
+                console.log('Проблем найдено:', issues.length);
+                
+                const block0Stats = {};
+                issues.forEach(item => {
+                    block0Stats[item.Block_0_lvl] = (block0Stats[item.Block_0_lvl] || 0) + 1;
+                });
+                console.log('Статистика по блокам 0 уровня:', block0Stats);
+                
+                // Инициализируем графики
+                if (typeof initChecklistCharts === 'function') {
+                    initChecklistCharts();
+                } else {
+                    console.error('Функция initChecklistCharts не найдена');
+                }
+                
+            } catch (error) {
+                console.error('Ошибка загрузки данных:', error);
+                
+                // Создаем тестовые данные если не удалось загрузить реальные
+                console.log('Создаем тестовые данные...');
+                createTestData();
+            }
+        }
+        
+        // Создание тестовых данных с месячной структурой
+        function createTestData() {
+            const groups = ['Гридчина', 'Мельникова', 'Коровина', 'Сычева'];
+            const months = [
+                { key: '2025-03', dates: ['2025-03-15', '2025-03-20', '2025-03-25'] },
+                { key: '2025-04', dates: ['2025-04-10', '2025-04-15', '2025-04-20'] },
+                { key: '2025-05', dates: ['2025-05-05', '2025-05-10', '2025-05-15'] }
+            ];
+            const blocks = ['Влияние на бизнес', 'Влияние на мотивацию сотрудника', 'Клиентоцентричность'];
+            
+            checklistFilteredData = [];
+            
+            // Генерируем тестовые данные по месяцам
+            groups.forEach((group, groupIndex) => {
+                months.forEach((month, monthIndex) => {
+                    blocks.forEach((block, blockIndex) => {
+                        month.dates.forEach(date => {
+                            // Создаем разное количество проблем для каждого блока и группы
+                            const baseProblems = (blockIndex + 1) * 2; // Разная интенсивность по блокам
+                            const groupFactor = (groupIndex + 1) * 0.5; // Разная интенсивность по группам
+                            const monthFactor = (monthIndex + 1) * 0.3; // Рост по месяцам
+                            
+                            const problemsCount = Math.floor(baseProblems * groupFactor * monthFactor) + Math.floor(Math.random() * 3);
+                            
+                            for (let i = 0; i < problemsCount; i++) {
+                                checklistFilteredData.push({
+                                    operator: `Оператор ${group} ${i + 1}`,
+                                    group: `${group} - группа`,
+                                    kc: 'КЦ 1',
+                                    date: date,
+                                    Block_0_lvl: block,
+                                    Block_1_lvl: `Подблок ${block}`,
+                                    Block_2_lvl: `Детальный блок ${i + 1}`,
+                                    Block_3_lvl: `Метрика ${i + 1}`,
+                                    score: 1 // Все записи - проблемы
+                                });
+                            }
+                            
+                            // Добавляем также нормальные записи (без проблем)
+                            const normalCount = Math.floor(Math.random() * 10) + 5;
+                            for (let i = 0; i < normalCount; i++) {
+                                checklistFilteredData.push({
+                                    operator: `Оператор ${group} ${i + 1}`,
+                                    group: `${group} - группа`,
+                                    kc: 'КЦ 1',
+                                    date: date,
+                                    Block_0_lvl: block,
+                                    Block_1_lvl: `Подблок ${block}`,
+                                    Block_2_lvl: `Детальный блок ${i + 1}`,
+                                    Block_3_lvl: `Метрика ${i + 1}`,
+                                    score: 0 // Нормальные записи
+                                });
+                            }
+                        });
+                    });
+                });
+            });
+            
+            console.log('Создано тестовых записей:', checklistFilteredData.length);
+            
+            const issues = checklistFilteredData.filter(item => item.score === 1);
+            console.log('Тестовых проблем:', issues.length);
+            
+            // Показываем статистику по блокам и месяцам
+            const monthlyStats = {};
+            issues.forEach(item => {
+                const date = new Date(item.date);
+                const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                
+                if (!monthlyStats[monthKey]) {
+                    monthlyStats[monthKey] = {};
+                }
+                
+                const block = item.Block_0_lvl;
+                monthlyStats[monthKey][block] = (monthlyStats[monthKey][block] || 0) + 1;
+            });
+            
+            console.log('Статистика по месяцам и блокам:', monthlyStats);
+            
+            // Инициализируем графики
+            if (typeof initChecklistCharts === 'function') {
+                initChecklistCharts();
+            }
+        }
+        
+        // Проверяем загрузку Chart.js
+        console.log('Chart.js:', typeof Chart);
+        
+        // Ждем загрузки DOM
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM загружен');
+            
+            // Проверяем функции
+            console.log('initChecklistCharts:', typeof initChecklistCharts);
+            
+            // Загружаем данные
+            setTimeout(() => {
+                loadTestData();
+            }, 500);
+        });
+    </script>
+</body>
+</html>
