@@ -759,7 +759,7 @@
                     </div>
                     <div class="checklist-stat-card">
                         <div class="checklist-stat-number" id="checklistIssueRate">0%</div>
-                        <div class="checklist-stat-label">Доля проблем</div>
+                        <div class="checklist-stat-label">% отклонений</div>
                     </div>
                     <div class="checklist-stat-card">
                         <div class="checklist-stat-number" id="checklistDateRange">0</div>
@@ -826,14 +826,14 @@
                             <table id="checklistOperatorTable" style="display: none;">
                                 <thead>
                                     <tr>
-                                        <th>Оператор</th>
-                                        <th>Группа</th>
-                                        <th>КЦ</th>
-                                        <th>Всего</th>
-                                        <th>Проблем</th>
-                                        <th>Доля проблем</th>
-                                        <th>Топ блок 0</th>
-                                        <th>Топ блок 1</th>
+                                        <th title="Нажмите для сортировки">Оператор</th>
+                                        <th title="Нажмите для сортировки">Группа</th>
+                                        <th title="Нажмите для сортировки">КЦ</th>
+                                        <th title="Нажмите для сортировки">Всего</th>
+                                        <th title="Нажмите для сортировки">Проблем</th>
+                                        <th title="Нажмите для сортировки">% отклонений</th>
+                                        <th title="Нажмите для сортировки">Топ блок 0</th>
+                                        <th title="Нажмите для сортировки">Топ блок 1</th>
                                     </tr>
                                 </thead>
                                 <tbody id="checklistOperatorBody">
@@ -859,14 +859,14 @@
                             <table id="checklistResultsTable" style="display: none;">
                                 <thead>
                                     <tr>
-                                        <th>Дата</th>
-                                        <th>Оператор</th>
-                                        <th>Группа</th>
-                                        <th>КЦ</th>
-                                        <th>Блок 0</th>
-                                        <th>Блок 1</th>
-                                        <th>Блок 2</th>
-                                        <th>Балл</th>
+                                        <th title="Нажмите для сортировки">Дата</th>
+                                        <th title="Нажмите для сортировки">Оператор</th>
+                                        <th title="Нажмите для сортировки">Группа</th>
+                                        <th title="Нажмите для сортировки">КЦ</th>
+                                        <th title="Нажмите для сортировки">Блок 0</th>
+                                        <th title="Нажмите для сортировки">Блок 1</th>
+                                        <th title="Нажмите для сортировки">Блок 2</th>
+                                        <th title="Нажмите для сортировки">Балл</th>
                                     </tr>
                                 </thead>
                                 <tbody id="checklistResultsBody">
@@ -885,6 +885,15 @@
                         </h4>
                     </div>
                     <div class="collapsible-content" id="checklistChartsContent">
+                        <!-- Переключатель режима отображения -->
+                        <div class="charts-mode-toggle-container">
+                            <span class="toggle-label">Режим отображения:</span>
+                            <div class="toggle-switch" id="checklistChartsToggle">
+                                <div class="toggle-option active" data-mode="count">ШТ</div>
+                                <div class="toggle-option" data-mode="percent">%</div>
+                                <div class="toggle-slider"></div>
+                            </div>
+                        </div>
                         <div class="checklist-dynamics-charts">
                             <!-- График 1: Влияние на бизнес -->
                             <div class="checklist-chart-card">

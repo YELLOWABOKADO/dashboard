@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест переключения графиков шт/% - Динамика блоков</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Тест переключения графиков шт/% - Динамика блоков по месяцам</h1>
+
+        <!-- Блок с графиками -->
+        <div class="collapsible-section">
+            <div class="collapsible-header" id="checklistChartsHeader">
+                <h4 style="margin: 0; display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                    <span style="display: flex; align-items: center;">
+                        <span class="collapse-arrow">▼</span>
+                        <span style="margin-left: 10px;">📊 Динамика блоков по месяцам</span>
+                    </span>
+                    <button id="checklistChartsToggle" class="btn btn-secondary"
+                        style="font-size: 12px; padding: 4px 8px;" title="Переключить на отображение в процентах">
+                        Показать %
+                    </button>
+                </h4>
+            </div>
+            <div class="collapsible-content" id="checklistChartsContent">
+                <div class="checklist-dynamics-charts">
+                    <!-- График 1: Влияние на бизнес -->
+                    <div class="checklist-chart-card">
+                        <div class="checklist-chart-header">
+                            <h5>Динамика блока: Влияние на бизнес</h5>
+                        </div>
+                        <div class="checklist-chart-wrapper">
+                            <canvas id="checklistResultChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- График 2: Влияние на мотивацию сотрудника -->
+                    <div class="checklist-chart-card">
+                        <div class="checklist-chart-header">
+                            <h5>Динамика блока: Влияние на мотивацию сотрудника</h5>
+                        </div>
+                        <div class="checklist-chart-wrapper">
+                            <canvas id="checklistMotivationChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- График 3: Клиентоцентричность -->
+                    <div class="checklist-chart-card">
+                        <div class="checklist-chart-header">
+                            <h5>Динамика блока: Клиентоцентричность</h5>
+                        </div>
+                        <div class="checklist-chart-wrapper">
+                            <canvas id="checklistObjectionsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top: 20px; padding: 15px; background-color: #f8f9fa; border-radius: 5px;">
+            <h3>Инструкции по тестированию:</h3>
+            <ol>
+                <li>Нажмите кнопку "Показать %" - графики должны переключиться на отображение процентов</li>
+                <li>Кнопка должна изменить текст на "Показать шт"</li>
+                <li>Нажмите кнопку "Показать шт" - графики должны вернуться к отображению количества</li>
+                <li>Проверьте, что подписи осей Y изменяются соответственно</li>
+                <li>Проверьте, что тултипы показывают правильные единицы измерения</li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- Подключение модулей -->
+    <script src="js/modules/ui-helpers.js"></script>
+    <script src="js/modules/checklist-charts.js"></script>
+    <script src="js/checklist-dashboard.js"></script>
+
+    <script>
+        // Тестовые данные
+        window.checklistFilteredData = [
+            // Май 2025 - Влияние на бизнес
+            { operator: "Иванов И.И.", group: "Гридчина - группа", date: "2025-05-15", Block_0_lvl: "Влияние на бизнес", score: 1 },
+            { operator: "Петров П.П.", group: "Гридчина - группа", date: "2025-05-16", Block_0_lvl: "Влияние на бизнес", score: 1 },
+            { operator: "Сидоров С.С.", group: "Мельникова - группа", date: "2025-05-17", Block_0_lvl: "Влияние на бизнес", score: 1 },
+            { operator: "Иванов И.И.", group: "Гридчина - группа", date: "2025-05-18", Block_0_lvl: "Влияние на бизнес", score: 0 },
+            { operator: "Петров П.П.", group: "Гридчина - группа", date: "2025-05-19", Block_0_lvl: "Влияние на бизнес", score: 0 },
+
+            // Июнь 2025 - Влияние на бизнес
+            { operator: "Иванов И.И.", group: "Гридчина - группа", date: "2025-06-15", Block_0_lvl: "Влияние на бизнес", score: 1 },
+            { operator: "Петров П.П.", group: "Гридчина - группа", date: "2025-06-16", Block_0_lvl: "Влияние на бизнес", score: 0 },
+            { operator: "Сидоров С.С.", group: "Мельникова - группа", date: "2025-06-17", Block_0_lvl: "Влияние на бизнес", score: 1 },
+            { operator: "Козлов К.К.", group: "Коровина - группа", date: "2025-06-18", Block_0_lvl: "Влияние на бизнес", score: 1 },
+
+            // Май 2025 - Влияние на мотивацию сотрудника
+            { operator: "Иванов И.И.", group: "Гридчина - группа", date: "2025-05-20", Block_0_lvl: "Влияние на мотивацию сотрудника", score: 1 },
+            { operator: "Петров П.П.", group: "Гридчина - группа", date: "2025-05-21", Block_0_lvl: "Влияние на мотивацию сотрудника", score: 0 },
+            { operator: "Сидоров С.С.", group: "Мельникова - группа", date: "2025-05-22", Block_0_lvl: "Влияние на мотивацию сотрудника", score: 1 },
+
+            // Июнь 2025 - Клиентоцентричность
+            { operator: "Иванов И.И.", group: "Гридчина - группа", date: "2025-06-20", Block_0_lvl: "Клиентоцентричность", score: 1 },
+            { operator: "Петров П.П.", group: "Гридчина - группа", date: "2025-06-21", Block_0_lvl: "Клиентоцентричность", score: 0 },
+            { operator: "Сидоров С.С.", group: "Мельникова - группа", date: "2025-06-22", Block_0_lvl: "Клиентоцентричность", score: 0 },
+            { operator: "Козлов К.К.", group: "Коровина - группа", date: "2025-06-23", Block_0_lvl: "Клиентоцентричность", score: 1 }
+        ];
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('=== Инициализация тестовой страницы ===');
+            console.log('Данные checklistFilteredData:', window.checklistFilteredData);
+            console.log('Количество записей:', window.checklistFilteredData.length);
+
+            // Проверяем доступность функций
+            console.log('initCollapsibleSections доступна:', typeof initCollapsibleSections);
+            console.log('initChecklistCharts доступна:', typeof window.initChecklistCharts);
+            console.log('toggleChecklistChartsMode доступна:', typeof window.toggleChecklistChartsMode);
+
+            // Инициализируем UI helpers
+            if (typeof initCollapsibleSections === 'function') {
+                console.log('Инициализируем сворачивающиеся блоки...');
+                initCollapsibleSections();
+            } else {
+                console.error('initCollapsibleSections не найдена!');
+            }
+
+            // Добавляем обработчик для кнопки переключения
+            const chartsToggleButton = document.getElementById('checklistChartsToggle');
+            if (chartsToggleButton) {
+                console.log('Добавляем обработчик для кнопки переключения...');
+                chartsToggleButton.addEventListener('click', function (e) {
+                    console.log('Кнопка переключения нажата!');
+                    e.stopPropagation();
+                    if (typeof window.toggleChecklistChartsMode === 'function') {
+                        window.toggleChecklistChartsMode();
+                    } else {
+                        console.error('toggleChecklistChartsMode не найдена!');
+                    }
+                });
+            } else {
+                console.error('Кнопка переключения не найдена!');
+            }
+
+            // Проверяем Chart.js
+            console.log('Chart.js доступен:', typeof Chart);
+
+            // Инициализируем графики
+            setTimeout(() => {
+                console.log('Инициализируем графики...');
+                if (typeof Chart === 'undefined') {
+                    console.error('Chart.js не загружен!');
+                    return;
+                }
+                if (typeof window.initChecklistCharts === 'function') {
+                    window.initChecklistCharts();
+                } else {
+                    console.error('initChecklistCharts не найдена!');
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+
+</html>

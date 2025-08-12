@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Отладка подсчета ошибок по группам</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Отладка подсчета ошибок по группам</h1>
+        
+        <!-- Переключатель режима отображения -->
+        <div class="charts-mode-toggle-container">
+            <span class="toggle-label">Режим отображения:</span>
+            <div class="toggle-switch" id="checklistChartsToggle">
+                <div class="toggle-option active" data-mode="count">ШТ</div>
+                <div class="toggle-option" data-mode="percent">%</div>
+                <div class="toggle-slider"></div>
+            </div>
+        </div>
+        
+        <!-- Детальная информация о данных -->
+        <div id="data-analysis" style="margin-bottom: 20px; padding: 15px; background-color: #f8f9fa; border-radius: 8px;">
+            <h3>📊 Анализ исходных данных:</h3>
+            <div id="data-breakdown"></div>
+        </div>
+        
+        <!-- Блок с графиками -->
+        <div class="checklist-dynamics-charts">
+            <!-- График 1: Влияние на бизнес -->
+            <div class="checklist-chart-card">
+                <div class="checklist-chart-header">
+                    <h5>Динамика блока: Влияние на бизнес</h5>
+                </div>
+                <div class="checklist-chart-wrapper">
+                    <canvas id="checklistResultChart"></canvas>
+                </div>
+            </div>
+
+            <!-- График 2: Влияние на мотивацию сотрудника -->
+            <div class="checklist-chart-card">
+                <div class="checklist-chart-header">
+                    <h5>Динамика блока: Влияние на мотивацию сотрудника</h5>
+                </div>
+                <div class="checklist-chart-wrapper">
+                    <canvas id="checklistMotivationChart"></canvas>
+                </div>
+            </div>
+
+            <!-- График 3: Клиентоцентричность -->
+            <div class="checklist-chart-card">
+                <div class="checklist-chart-header">
+                    <h5>Динамика блока: Клиентоцентричность</h5>
+                </div>
+                <div class="checklist-chart-wrapper">
+                    <canvas id="checklistObjectionsChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Подробная таблица расчетов -->
+        <div id="calculation-details" style="margin-top: 20px; padding: 15px; background-color: #fff; border: 1px solid #dee2e6; border-radius: 8px;">
+            <h3>🧮 Подробные расчеты:</h3>
+            <div id="calculation-table"></div>
+        </div>
+    </div>
+
+    <!-- Подключение модулей -->
+    <script src="js/modules/checklist-charts.js"></script>
+
+    <script>
+        // Расширенные тестовые данные для проверки подсчетов
+        window.checklistFilteredData = [
+            // Май 2025 - Влияние на бизнес
+            // Гридчина: 3 проблемы из 6 записей = 50%
+            {operator: "Иванов И.И.", group: "Гридчина - группа", date: "2025-05-01", Block_0_lvl: "Влияние на бизнес", score: 1},
+            {operator: "Петров П.П.", group: "Гридчина - группа", date: "2025-05-02", Block_0_lvl: "Влияние на бизнес", score: 1},
+            {operator: "Сидоров С.С.", group: "Гридчина - группа", date: "2025-05-03", Block_0_lvl: "Влияние на бизнес", score: 1},
+            {operator: "Иванов И.И.", group: "Гридчина - группа", date: "2025-05-04", Block_0_lvl: "Влияние на бизнес", score: 0},
+            {operator: "Петров П.П.", group: "Гридчина - группа", date: "2025-05-05", Block_0_lvl: "Влияние на бизнес", score: 0},
+            {operator: "Сидоров С.С.", group: "Гридчина - группа", date: "2025-05-06", Block_0_lvl: "Влияние на бизнес", score: 0},
+            
+            // Мельникова: 2 проблемы из 3 записей = 66.7%
+            {operator: "Козлов К.К.", group: "Мельникова - группа", date: "2025-05-07", Block_0_lvl: "Влияние на бизнес", score: 1},
+            {operator: "Орлов О.О.", group: "Мельникова - группа", date: "2025-05-08", Block_0_lvl: "Влияние на бизнес", score: 1},
+            {operator: "Волков В.В.", group: "Мельникова - группа", date: "2025-05-09", Block_0_lvl: "Влияние на бизнес", score: 0},
+            
+            // Коровина: 1 проблема из 2 записей = 50%
+            {operator: "Лисов Л.Л.", group: "Коровина - группа", date: "2025-05-10", Block_0_lvl: "Влияние на бизнес", score: 1},
+            {operator: "Медведев М.М.", group: "Коровина - группа", date: "2025-05-11", Block_0_lvl: "Влияние на бизнес", score: 0},
+            
+            // Июнь 2025 - Влияние на бизнес
+            // Гридчина: 1 проблема из 4 записей = 25%
+            {operator: "Иванов И.И.", group: "Гридчина - группа", date: "2025-06-01", Block_0_lvl: "Влияние на бизнес", score: 1},
+            {operator: "Петров П.П.", group: "Гридчина - группа", date: "2025-06-02", Block_0_lvl: "Влияние на бизнес", score: 0},
+            {operator: "Сидоров С.С.", group: "Гридчина - группа", date: "2025-06-03", Block_0_lvl: "Влияние на бизнес", score: 0},
+            {operator: "Иванов И.И.", group: "Гридчина - группа", date: "2025-06-04", Block_0_lvl: "Влияние на бизнес", score: 0},
+            
+            // Мельникова: 3 проблемы из 3 записей = 100%
+            {operator: "Козлов К.К.", group: "Мельникова - группа", date: "2025-06-05", Block_0_lvl: "Влияние на бизнес", score: 1},
+            {operator: "Орлов О.О.", group: "Мельникова - группа", date: "2025-06-06", Block_0_lvl: "Влияние на бизнес", score: 1},
+            {operator: "Волков В.В.", group: "Мельникова - группа", date: "2025-06-07", Block_0_lvl: "Влияние на бизнес", score: 1},
+            
+            // Май 2025 - Влияние на мотивацию сотрудника
+            // Гридчина: 2 проблемы из 4 записей = 50%
+            {operator: "Иванов И.И.", group: "Гридчина - группа", date: "2025-05-15", Block_0_lvl: "Влияние на мотивацию сотрудника", score: 1},
+            {operator: "Петров П.П.", group: "Гридчина - группа", date: "2025-05-16", Block_0_lvl: "Влияние на мотивацию сотрудника", score: 1},
+            {operator: "Сидоров С.С.", group: "Гридчина - группа", date: "2025-05-17", Block_0_lvl: "Влияние на мотивацию сотрудника", score: 0},
+            {operator: "Иванов И.И.", group: "Гридчина - группа", date: "2025-05-18", Block_0_lvl: "Влияние на мотивацию сотрудника", score: 0},
+            
+            // Мельникова: 1 проблема из 2 записей = 50%
+            {operator: "Козлов К.К.", group: "Мельникова - группа", date: "2025-05-19", Block_0_lvl: "Влияние на мотивацию сотрудника", score: 1},
+            {operator: "Орлов О.О.", group: "Мельникова - группа", date: "2025-05-20", Block_0_lvl: "Влияние на мотивацию сотрудника", score: 0},
+            
+            // Июнь 2025 - Клиентоцентричность
+            // Гридчина: 1 проблема из 3 записей = 33.3%
+            {operator: "Иванов И.И.", group: "Гридчина - группа", date: "2025-06-20", Block_0_lvl: "Клиентоцентричность", score: 1},
+            {operator: "Петров П.П.", group: "Гридчина - группа", date: "2025-06-21", Block_0_lvl: "Клиентоцентричность", score: 0},
+            {operator: "Сидоров С.С.", group: "Гридчина - группа", date: "2025-06-22", Block_0_lvl: "Клиентоцентричность", score: 0},
+            
+            // Коровина: 2 проблемы из 2 записей = 100%
+            {operator: "Лисов Л.Л.", group: "Коровина - группа", date: "2025-06-23", Block_0_lvl: "Клиентоцентричность", score: 1},
+            {operator: "Медведев М.М.", group: "Коровина - группа", date: "2025-06-24", Block_0_lvl: "Клиентоцентричность", score: 1}
+        ];
+
+        // Функция для анализа исходных данных
+        function analyzeSourceData() {
+            const data = window.checklistFilteredData;
+            const analysis = {};
+            
+            data.forEach(item => {
+                const monthKey = new Date(item.date).toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' });
+                const groupName = item.group.replace(' - группа', '');
+                const block = item.Block_0_lvl;
+                
+                if (!analysis[block]) analysis[block] = {};
+                if (!analysis[block][monthKey]) analysis[block][monthKey] = {};
+                if (!analysis[block][monthKey][groupName]) {
+                    analysis[block][monthKey][groupName] = { total: 0, issues: 0 };
+                }
+                
+                analysis[block][monthKey][groupName].total++;
+                if (item.score === 1) {
+                    analysis[block][monthKey][groupName].issues++;
+                }
+            });
+            
+            return analysis;
+        }
+
+        // Функция для отображения анализа данных
+        function displayDataAnalysis() {
+            const analysis = analyzeSourceData();
+            const breakdown = document.getElementById('data-breakdown');
+            
+            let html = '<div style="font-family: monospace; font-size: 12px;">';
+            
+            Object.keys(analysis).forEach(block => {
+                html += `<h4>${block}:</h4>`;
+                Object.keys(analysis[block]).forEach(month => {
+                    html += `<div style="margin-left: 20px;"><strong>${month}:</strong></div>`;
+                    Object.keys(analysis[block][month]).forEach(group => {
+                        const data = analysis[block][month][group];
+                        const percent = ((data.issues / data.total) * 100).toFixed(1);
+                        html += `<div style="margin-left: 40px;">${group}: ${data.issues} из ${data.total} (${percent}%)</div>`;
+                    });
+                });
+                html += '<br>';
+            });
+            
+            html += '</div>';
+            breakdown.innerHTML = html;
+        }
+
+        // Функция для отображения подробных расчетов
+        function displayCalculationDetails() {
+            const analysis = analyzeSourceData();
+            const table = document.getElementById('calculation-table');
+            
+            let html = '<table style="width: 100%; border-collapse: collapse; font-size: 12px;">';
+            html += '<thead><tr style="background-color: #f8f9fa;"><th style="border: 1px solid #dee2e6; padding: 8px;">Блок</th><th style="border: 1px solid #dee2e6; padding: 8px;">Месяц</th><th style="border: 1px solid #dee2e6; padding: 8px;">Группа</th><th style="border: 1px solid #dee2e6; padding: 8px;">Проблемы</th><th style="border: 1px solid #dee2e6; padding: 8px;">Всего</th><th style="border: 1px solid #dee2e6; padding: 8px;">Процент</th></tr></thead>';
+            html += '<tbody>';
+            
+            Object.keys(analysis).forEach(block => {
+                Object.keys(analysis[block]).forEach(month => {
+                    Object.keys(analysis[block][month]).forEach(group => {
+                        const data = analysis[block][month][group];
+                        const percent = ((data.issues / data.total) * 100).toFixed(1);
+                        html += `<tr>
+                            <td style="border: 1px solid #dee2e6; padding: 8px;">${block}</td>
+                            <td style="border: 1px solid #dee2e6; padding: 8px;">${month}</td>
+                            <td style="border: 1px solid #dee2e6; padding: 8px;">${group}</td>
+                            <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center;">${data.issues}</td>
+                            <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center;">${data.total}</td>
+                            <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center;">${percent}%</td>
+                        </tr>`;
+                    });
+                });
+            });
+            
+            html += '</tbody></table>';
+            table.innerHTML = html;
+        }
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('=== Отладка подсчета ошибок ===');
+            console.log('Всего записей:', window.checklistFilteredData.length);
+            
+            // Отображаем анализ данных
+            displayDataAnalysis();
+            displayCalculationDetails();
+            
+            // Инициализируем графики
+            setTimeout(() => {
+                if (typeof window.initChecklistCharts === 'function') {
+                    window.initChecklistCharts();
+                }
+            }, 500);
+        });
+    </script>
+</body>
+</html>

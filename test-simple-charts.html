@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Простой тест графиков шт/%</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        .chart-container {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+        }
+        .chart-wrapper {
+            position: relative;
+            height: 400px;
+            margin-top: 15px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Тест переключения графиков шт/%</h1>
+            <button id="toggleButton" class="btn btn-secondary">Показать %</button>
+        </div>
+        
+        <div class="chart-container">
+            <h3>Влияние на бизнес</h3>
+            <div class="chart-wrapper">
+                <canvas id="businessChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="chart-container">
+            <h3>Влияние на мотивацию сотрудника</h3>
+            <div class="chart-wrapper">
+                <canvas id="motivationChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="chart-container">
+            <h3>Клиентоцентричность</h3>
+            <div class="chart-wrapper">
+                <canvas id="clientChart"></canvas>
+            </div>
+        </div>
+        
+        <div style="margin-top: 20px; padding: 15px; background-color: #f8f9fa; border-radius: 5px;">
+            <h3>Тестовые данные:</h3>
+            <ul>
+                <li>Май 2025: Гридчина - 2 проблемы из 5 записей (40%)</li>
+                <li>Июнь 2025: Гридчина - 1 проблема из 2 записей (50%)</li>
+                <li>Май 2025: Мельникова - 1 проблема из 1 записи (100%)</li>
+                <li>Июнь 2025: Мельникова - 1 проблема из 1 записи (100%)</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Глобальные переменные
+        let displayMode = 'count'; // count или percent
+        let businessChart = null;
+        let motivationChart = null;
+        let clientChart = null;
+
+        // Тестовые данные
+        const testData = [
+            // Май 2025 - Влияние на бизнес
+            {group: "Гридчина - группа", date: "2025-05-15", Block_0_lvl: "Влияние на бизнес", score: 1},
+            {group: "Гридчина - группа", date: "2025-05-16", Block_0_lvl: "Влияние на бизнес", score: 1},
+            {group: "Мельникова - группа", date: "2025-05-17", Block_0_lvl: "Влияние на бизнес", score: 1},
+            {group: "Гридчина - группа", date: "2025-05-18", Block_0_lvl: "Влияние на бизнес", score: 0},
+            {group: "Гридчина - группа", date: "2025-05-19", Block_0_lvl: "Влияние на бизнес", score: 0},
+            
+            // Июнь 2025 - Влияние на бизнес
+            {group: "Гридчина - группа", date: "2025-06-15", Block_0_lvl: "Влияние на бизнес", score: 1},
+            {group: "Мельникова - группа", date: "2025-06-17", Block_0_lvl: "Влияние на бизнес", score: 1},
+            {group: "Гридчина - группа", date: "2025-06-16", Block_0_lvl: "Влияние на бизнес", score: 0},
+            
+            // Май 2025 - Влияние на мотивацию сотрудника
+            {group: "Гридчина - группа", date: "2025-05-20", Block_0_lvl: "Влияние на мотивацию сотрудника", score: 1},
+            {group: "Мельникова - группа", date: "2025-05-22", Block_0_lvl: "Влияние на мотивацию сотрудника", score: 1},
+            {group: "Гридчина - группа", date: "2025-05-21", Block_0_lvl: "Влияние на мотивацию сотрудника", score: 0},
+            
+            // Июнь 2025 - Клиентоцентричность
+            {group: "Гридчина - группа", date: "2025-06-20", Block_0_lvl: "Клиентоцентричность", score: 1},
+            {group: "Коровина - группа", date: "2025-06-23", Block_0_lvl: "Клиентоцентричность", score: 1},
+            {group: "Гридчина - группа", date: "2025-06-21", Block_0_lvl: "Клиентоцентричность", score: 0},
+            {group: "Мельникова - группа", date: "2025-06-22", Block_0_lvl: "Клиентоцентричность", score: 0}
+        ];
+
+        // Функция для обработки данных
+        function processData(data) {
+            console.log('Обрабатываем данные:', data.length, 'записей');
+            
+            const groups = [...new Set(data.map(item => item.group.replace(' - группа', '')))].sort();
+            console.log('Группы:', groups);
+            
+            const monthlyData = {};
+            const monthlyTotals = {};
+
+            data.forEach(item => {
+                const date = new Date(item.date);
+                const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                const monthLabel = date.toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' });
+
+                if (!monthlyData[monthKey]) {
+                    monthlyData[monthKey] = {
+                        label: monthLabel,
+                        business: {},
+                        motivation: {},
+                        client: {}
+                    };
+                }
+
+                if (!monthlyTotals[monthKey]) {
+                    monthlyTotals[monthKey] = {
+                        business: {},
+                        motivation: {},
+                        client: {}
+                    };
+                }
+
+                const groupName = item.group.replace(' - группа', '');
+                const block0 = item.Block_0_lvl;
+
+                // Инициализируем счетчики
+                if (!monthlyTotals[monthKey].business[groupName]) {
+                    monthlyTotals[monthKey].business[groupName] = 0;
+                    monthlyTotals[monthKey].motivation[groupName] = 0;
+                    monthlyTotals[monthKey].client[groupName] = 0;
+                }
+
+                // Считаем данные по блокам
+                if (block0 === 'Влияние на бизнес') {
+                    monthlyTotals[monthKey].business[groupName]++;
+                    if (item.score === 1) {
+                        monthlyData[monthKey].business[groupName] = (monthlyData[monthKey].business[groupName] || 0) + 1;
+                    }
+                } else if (block0 === 'Влияние на мотивацию сотрудника') {
+                    monthlyTotals[monthKey].motivation[groupName]++;
+                    if (item.score === 1) {
+                        monthlyData[monthKey].motivation[groupName] = (monthlyData[monthKey].motivation[groupName] || 0) + 1;
+                    }
+                } else if (block0 === 'Клиентоцентричность') {
+                    monthlyTotals[monthKey].client[groupName]++;
+                    if (item.score === 1) {
+                        monthlyData[monthKey].client[groupName] = (monthlyData[monthKey].client[groupName] || 0) + 1;
+                    }
+                }
+            });
+
+            const months = Object.keys(monthlyData).sort();
+            const monthLabels = months.map(m => monthlyData[m].label);
+
+            console.log('Месяцы:', monthLabels);
+            console.log('Данные по месяцам:', monthlyData);
+            console.log('Общие данные:', monthlyTotals);
+
+            // Функция для создания данных по блоку
+            const createBlockData = (blockType) => {
+                return groups.map(group => {
+                    return months.map(month => {
+                        const issues = monthlyData[month][blockType][group] || 0;
+                        const total = monthlyTotals[month][blockType][group] || 0;
+                        
+                        if (displayMode === 'percent') {
+                            return total > 0 ? ((issues / total) * 100) : 0;
+                        } else {
+                            return issues;
+                        }
+                    });
+                });
+            };
+
+            return {
+                labels: monthLabels,
+                groups: groups,
+                business: createBlockData('business'),
+                motivation: createBlockData('motivation'),
+                client: createBlockData('client')
+            };
+        }
+
+        // Функция для получения цвета группы
+        function getGroupColor(index, alpha = 1) {
+            const colors = ['#E74C3C', '#3498DB', '#2ECC71', '#F39C12', '#9B59B6'];
+            const color = colors[index % colors.length];
+
+            if (alpha < 1) {
+                const r = parseInt(color.slice(1, 3), 16);
+                const g = parseInt(color.slice(3, 5), 16);
+                const b = parseInt(color.slice(5, 7), 16);
+                return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+            }
+
+            return color;
+        }
+
+        // Функция для создания графика
+        function createChart(canvasId, data, title) {
+            const ctx = document.getElementById(canvasId);
+            if (!ctx) return null;
+
+            const blockType = canvasId.replace('Chart', '');
+            const blockData = data[blockType];
+            
+            const datasets = data.groups.map((group, index) => ({
+                label: group,
+                data: blockData[index],
+                backgroundColor: getGroupColor(index, 0.7),
+                borderColor: getGroupColor(index),
+                borderWidth: 1
+            }));
+
+            const isPercent = displayMode === 'percent';
+
+            return new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: false
+                        },
+                        legend: {
+                            display: true,
+                            position: 'bottom'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    if (isPercent) {
+                                        return context.dataset.label + ': ' + context.parsed.y.toFixed(1) + '%';
+                                    } else {
+                                        return context.dataset.label + ': ' + context.parsed.y + ' проблем';
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: 'Месяц'
+                            }
+                        },
+                        y: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: isPercent ? 'Процент ошибок (%)' : 'Количество проблем'
+                            },
+                            beginAtZero: true,
+                            max: isPercent ? 100 : undefined,
+                            ticks: {
+                                stepSize: isPercent ? 10 : 1,
+                                callback: function(value) {
+                                    return isPercent ? value + '%' : value;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Функция для создания всех графиков
+        function createAllCharts() {
+            console.log('Создаем графики в режиме:', displayMode);
+            
+            const processedData = processData(testData);
+            
+            // Уничтожаем старые графики
+            if (businessChart) businessChart.destroy();
+            if (motivationChart) motivationChart.destroy();
+            if (clientChart) clientChart.destroy();
+
+            // Создаем новые графики
+            businessChart = createChart('businessChart', processedData, 'Влияние на бизнес');
+            motivationChart = createChart('motivationChart', processedData, 'Влияние на мотивацию сотрудника');
+            clientChart = createChart('clientChart', processedData, 'Клиентоцентричность');
+        }
+
+        // Функция переключения режима
+        function toggleMode() {
+            displayMode = displayMode === 'count' ? 'percent' : 'count';
+            console.log('Переключен режим на:', displayMode);
+            
+            const button = document.getElementById('toggleButton');
+            button.textContent = displayMode === 'count' ? 'Показать %' : 'Показать шт';
+            
+            createAllCharts();
+        }
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('=== Инициализация простого теста ===');
+            console.log('Chart.js доступен:', typeof Chart);
+            
+            // Добавляем обработчик кнопки
+            document.getElementById('toggleButton').addEventListener('click', toggleMode);
+            
+            // Создаем графики
+            setTimeout(() => {
+                createAllCharts();
+            }, 100);
+        });
+    </script>
+</body>
+</html>

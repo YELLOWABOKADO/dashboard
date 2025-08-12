@@ -3,6 +3,12 @@
 let checklistAllData = [];
 let checklistFilteredData = [];
 
+// Переменные для сортировки таблиц
+let operatorTableSortColumn = 0; // По умолчанию сортируем по операторам (колонка 0)
+let operatorTableSortDirection = 'asc';
+let detailsTableSortColumn = 1; // По умолчанию сортируем по операторам (колонка 1)
+let detailsTableSortDirection = 'asc';
+
 function showChecklistDebug(message) {
     const debugDiv = document.getElementById('checklistDebugInfo');
     if (debugDiv) {
@@ -140,6 +146,10 @@ function applyChecklistFilters() {
     updateChecklistCharts();
     updateChecklistOperatorTable();
     updateChecklistTable();
+    
+    // Обновляем заголовки таблиц с индикаторами сортировки
+    updateOperatorTableHeaders();
+    updateDetailsTableHeaders();
 }
 
 // Обновление статистики
@@ -327,6 +337,45 @@ function updateChecklistBlockChart(containerId, blockField) {
     }
 }
 
+// Функция сортировки таблицы операторов
+function sortOperatorTable(columnIndex, columnName) {
+    // Определяем направление сортировки
+    if (operatorTableSortColumn === columnIndex) {
+        operatorTableSortDirection = operatorTableSortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+        operatorTableSortColumn = columnIndex;
+        operatorTableSortDirection = 'asc';
+    }
+    
+    // Обновляем заголовки таблицы
+    updateOperatorTableHeaders();
+    
+    // Перерисовываем таблицу с новой сортировкой
+    updateChecklistOperatorTable();
+}
+
+// Обновление заголовков таблицы операторов с индикаторами сортировки
+function updateOperatorTableHeaders() {
+    const headers = document.querySelectorAll('#checklistOperatorTable th');
+    headers.forEach((header, index) => {
+        // Удаляем старые индикаторы
+        header.classList.remove('sorted-asc', 'sorted-desc');
+        const existingArrow = header.querySelector('.sort-arrow');
+        if (existingArrow) {
+            existingArrow.remove();
+        }
+        
+        // Добавляем новый индикатор для активной колонки
+        if (operatorTableSortColumn === index) {
+            header.classList.add(operatorTableSortDirection === 'asc' ? 'sorted-asc' : 'sorted-desc');
+            const arrow = document.createElement('span');
+            arrow.className = 'sort-arrow';
+            arrow.textContent = operatorTableSortDirection === 'asc' ? ' ↑' : ' ↓';
+            header.appendChild(arrow);
+        }
+    });
+}
+
 // Обновление таблицы операторов
 function updateChecklistOperatorTable() {
     const tbody = document.getElementById('checklistOperatorBody');
@@ -343,6 +392,7 @@ function updateChecklistOperatorTable() {
                 kc: item.kc,
                 total: 0,
                 issues: 0,
+                issueRate: 0,
                 block0Stats: {},
                 block1Stats: {}
             };
@@ -354,10 +404,68 @@ function updateChecklistOperatorTable() {
             operatorStats[key].block0Stats[item.Block_0_lvl] = (operatorStats[key].block0Stats[item.Block_0_lvl] || 0) + 1;
             operatorStats[key].block1Stats[item.Block_1_lvl] = (operatorStats[key].block1Stats[item.Block_1_lvl] || 0) + 1;
         }
+        // Вычисляем процент проблем
+        operatorStats[key].issueRate = operatorStats[key].total > 0 ? 
+            ((operatorStats[key].issues / operatorStats[key].total) * 100) : 0;
     });
 
-    const sortedOperators = Object.values(operatorStats)
-        .sort((a, b) => b.issues - a.issues);
+    let sortedOperators = Object.values(operatorStats);
+    
+    // Применяем сортировку если выбрана колонка
+    if (operatorTableSortColumn !== null) {
+        sortedOperators.sort((a, b) => {
+            let valueA, valueB;
+            
+            switch (operatorTableSortColumn) {
+                case 0: // Оператор
+                    valueA = a.operator;
+                    valueB = b.operator;
+                    break;
+                case 1: // Группа
+                    valueA = a.group;
+                    valueB = b.group;
+                    break;
+                case 2: // КЦ
+                    valueA = a.kc;
+                    valueB = b.kc;
+                    break;
+                case 3: // Всего
+                    valueA = a.total;
+                    valueB = b.total;
+                    break;
+                case 4: // Проблем
+                    valueA = a.issues;
+                    valueB = b.issues;
+                    break;
+                case 5: // Доля проблем
+                    valueA = a.issueRate;
+                    valueB = b.issueRate;
+                    break;
+                case 6: // Топ блок 0
+                    valueA = Object.keys(a.block0Stats).sort((x, y) => a.block0Stats[y] - a.block0Stats[x])[0] || '';
+                    valueB = Object.keys(b.block0Stats).sort((x, y) => b.block0Stats[y] - b.block0Stats[x])[0] || '';
+                    break;
+                case 7: // Топ блок 1
+                    valueA = Object.keys(a.block1Stats).sort((x, y) => a.block1Stats[y] - a.block1Stats[x])[0] || '';
+                    valueB = Object.keys(b.block1Stats).sort((x, y) => b.block1Stats[y] - b.block1Stats[x])[0] || '';
+                    break;
+                default:
+                    return 0;
+            }
+            
+            // Сравнение значений
+            if (typeof valueA === 'string' && typeof valueB === 'string') {
+                const comparison = valueA.localeCompare(valueB);
+                return operatorTableSortDirection === 'asc' ? comparison : -comparison;
+            } else {
+                const comparison = valueA - valueB;
+                return operatorTableSortDirection === 'asc' ? comparison : -comparison;
+            }
+        });
+    } else {
+        // Сортировка по умолчанию - по количеству проблем (убывание)
+        sortedOperators.sort((a, b) => b.issues - a.issues);
+    }
 
     // Отладочная информация для Коротенко П. Р.
     const korotenkoData = sortedOperators.find(op => op.operator === 'Коротенко П. Р.');
@@ -366,7 +474,7 @@ function updateChecklistOperatorTable() {
     }
 
     tbody.innerHTML = sortedOperators.map(op => {
-        const issueRate = op.total > 0 ? ((op.issues / op.total) * 100).toFixed(1) : 0;
+        const issueRate = op.issueRate.toFixed(1);
         const topBlock0 = Object.keys(op.block0Stats).sort((a, b) => op.block0Stats[b] - op.block0Stats[a])[0] || '-';
         const topBlock1 = Object.keys(op.block1Stats).sort((a, b) => op.block1Stats[b] - op.block1Stats[a])[0] || '-';
         
@@ -383,6 +491,45 @@ function updateChecklistOperatorTable() {
             </tr>
         `;
     }).join('');
+}
+
+// Функция сортировки таблицы подробных записей
+function sortDetailsTable(columnIndex, columnName) {
+    // Определяем направление сортировки
+    if (detailsTableSortColumn === columnIndex) {
+        detailsTableSortDirection = detailsTableSortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+        detailsTableSortColumn = columnIndex;
+        detailsTableSortDirection = 'asc';
+    }
+    
+    // Обновляем заголовки таблицы
+    updateDetailsTableHeaders();
+    
+    // Перерисовываем таблицу с новой сортировкой
+    updateChecklistTable();
+}
+
+// Обновление заголовков таблицы подробных записей с индикаторами сортировки
+function updateDetailsTableHeaders() {
+    const headers = document.querySelectorAll('#checklistResultsTable th');
+    headers.forEach((header, index) => {
+        // Удаляем старые индикаторы
+        header.classList.remove('sorted-asc', 'sorted-desc');
+        const existingArrow = header.querySelector('.sort-arrow');
+        if (existingArrow) {
+            existingArrow.remove();
+        }
+        
+        // Добавляем новый индикатор для активной колонки
+        if (detailsTableSortColumn === index) {
+            header.classList.add(detailsTableSortDirection === 'asc' ? 'sorted-asc' : 'sorted-desc');
+            const arrow = document.createElement('span');
+            arrow.className = 'sort-arrow';
+            arrow.textContent = detailsTableSortDirection === 'asc' ? ' ↑' : ' ↓';
+            header.appendChild(arrow);
+        }
+    });
 }
 
 // Обновление детальной таблицы
@@ -402,12 +549,71 @@ function updateChecklistTable() {
     table.style.display = 'table';
     if (noData) noData.style.display = 'none';
     
-    // Сортируем по дате и оператору, показываем только проблемы
+    // Показываем только проблемы
     const issuesOnly = checklistFilteredData.filter(item => item.score === 1);
-    const sortedData = issuesOnly.sort((a, b) => {
-        if (a.date !== b.date) return b.date.localeCompare(a.date);
-        return a.operator.localeCompare(b.operator);
-    });
+    let sortedData = [...issuesOnly];
+    
+    // Применяем сортировку если выбрана колонка
+    if (detailsTableSortColumn !== null) {
+        sortedData.sort((a, b) => {
+            let valueA, valueB;
+            
+            switch (detailsTableSortColumn) {
+                case 0: // Дата
+                    valueA = new Date(a.date);
+                    valueB = new Date(b.date);
+                    break;
+                case 1: // Оператор
+                    valueA = a.operator;
+                    valueB = b.operator;
+                    break;
+                case 2: // Группа
+                    valueA = a.group;
+                    valueB = b.group;
+                    break;
+                case 3: // КЦ
+                    valueA = a.kc;
+                    valueB = b.kc;
+                    break;
+                case 4: // Блок 0
+                    valueA = a.Block_0_lvl;
+                    valueB = b.Block_0_lvl;
+                    break;
+                case 5: // Блок 1
+                    valueA = a.Block_1_lvl;
+                    valueB = b.Block_1_lvl;
+                    break;
+                case 6: // Блок 2
+                    valueA = a.Block_2_lvl;
+                    valueB = b.Block_2_lvl;
+                    break;
+                case 7: // Балл
+                    valueA = a.score;
+                    valueB = b.score;
+                    break;
+                default:
+                    return 0;
+            }
+            
+            // Сравнение значений
+            if (valueA instanceof Date && valueB instanceof Date) {
+                const comparison = valueA.getTime() - valueB.getTime();
+                return detailsTableSortDirection === 'asc' ? comparison : -comparison;
+            } else if (typeof valueA === 'string' && typeof valueB === 'string') {
+                const comparison = valueA.localeCompare(valueB);
+                return detailsTableSortDirection === 'asc' ? comparison : -comparison;
+            } else {
+                const comparison = valueA - valueB;
+                return detailsTableSortDirection === 'asc' ? comparison : -comparison;
+            }
+        });
+    } else {
+        // Сортировка по умолчанию - по дате (убывание) и оператору (возрастание)
+        sortedData.sort((a, b) => {
+            if (a.date !== b.date) return b.date.localeCompare(a.date);
+            return a.operator.localeCompare(b.operator);
+        });
+    }
     
     tbody.innerHTML = sortedData.slice(0, 500).map(item => `
         <tr>
@@ -425,6 +631,29 @@ function updateChecklistTable() {
     if (sortedData.length > 500) {
         tbody.innerHTML += `<tr><td colspan="8" style="text-align: center; color: #666; font-style: italic;">Показано первые 500 записей из ${sortedData.length}</td></tr>`;
     }
+}
+
+// Инициализация обработчиков сортировки для таблиц
+function initTableSorting() {
+    // Инициализация сортировки для таблицы операторов
+    const operatorHeaders = document.querySelectorAll('#checklistOperatorTable th');
+    operatorHeaders.forEach((header, index) => {
+        header.style.cursor = 'pointer';
+        header.style.userSelect = 'none';
+        header.addEventListener('click', () => {
+            sortOperatorTable(index, header.textContent.trim());
+        });
+    });
+    
+    // Инициализация сортировки для таблицы подробных записей
+    const detailsHeaders = document.querySelectorAll('#checklistResultsTable th');
+    detailsHeaders.forEach((header, index) => {
+        header.style.cursor = 'pointer';
+        header.style.userSelect = 'none';
+        header.addEventListener('click', () => {
+            sortDetailsTable(index, header.textContent.trim());
+        });
+    });
 }
 
 // Инициализация дашборда чек-листов
@@ -459,6 +688,13 @@ function initChecklistDashboard() {
             // Пока не перезагружаем данные при смене дашборда
         });
     }
+    
+    // Инициализируем сортировку таблиц
+    setTimeout(() => {
+        initTableSorting();
+    }, 100);
+    
+    // Переключатель режима графиков теперь инициализируется в модуле checklist-charts.js
     
     // Загружаем данные по умолчанию
     loadChecklistData();

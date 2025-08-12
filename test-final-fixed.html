@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Финальный тест исправленного переключателя</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Финальный тест исправленного переключателя ШТ/%</h1>
+        
+        <!-- Переключатель режима отображения -->
+        <div class="charts-mode-toggle-container">
+            <span class="toggle-label">Режим отображения:</span>
+            <div class="toggle-switch" id="checklistChartsToggle">
+                <div class="toggle-option active" data-mode="count">ШТ</div>
+                <div class="toggle-option" data-mode="percent">%</div>
+                <div class="toggle-slider"></div>
+            </div>
+        </div>
+        
+        <!-- Блок с графиками -->
+        <div class="checklist-dynamics-charts">
+            <!-- График 1: Влияние на бизнес -->
+            <div class="checklist-chart-card">
+                <div class="checklist-chart-header">
+                    <h5>Динамика блока: Влияние на бизнес</h5>
+                </div>
+                <div class="checklist-chart-wrapper">
+                    <canvas id="checklistResultChart"></canvas>
+                </div>
+            </div>
+
+            <!-- График 2: Влияние на мотивацию сотрудника -->
+            <div class="checklist-chart-card">
+                <div class="checklist-chart-header">
+                    <h5>Динамика блока: Влияние на мотивацию сотрудника</h5>
+                </div>
+                <div class="checklist-chart-wrapper">
+                    <canvas id="checklistMotivationChart"></canvas>
+                </div>
+            </div>
+
+            <!-- График 3: Клиентоцентричность -->
+            <div class="checklist-chart-card">
+                <div class="checklist-chart-header">
+                    <h5>Динамика блока: Клиентоцентричность</h5>
+                </div>
+                <div class="checklist-chart-wrapper">
+                    <canvas id="checklistObjectionsChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div style="margin-top: 20px; padding: 15px; background-color: #d4edda; border-radius: 5px; border-left: 4px solid #28a745;">
+            <h3>✅ Исправления в этой версии:</h3>
+            <ul>
+                <li><strong>Переключатель:</strong> Исправлены размеры, теперь компактный 80×32px</li>
+                <li><strong>Анимация:</strong> Плавное перемещение слайдера с cubic-bezier</li>
+                <li><strong>Максимум графиков:</strong> Динамический расчет для % (среднее × 2.5, мин 50%, макс 100%)</li>
+                <li><strong>Читаемость:</strong> Столбцы теперь более заметны при малых процентах</li>
+            </ul>
+        </div>
+        
+        <div style="margin-top: 20px; padding: 15px; background-color: #f8f9fa; border-radius: 5px;">
+            <h3>Тестовые сценарии:</h3>
+            <ol>
+                <li><strong>Переключатель:</strong> Кликните "%" → слайдер должен плавно переместиться вправо</li>
+                <li><strong>Графики:</strong> Должны показать проценты с оптимальным масштабом (не 0-100%)</li>
+                <li><strong>Тултипы:</strong> При наведении должны показывать "40.0%" вместо "40.0 проблем"</li>
+                <li><strong>Обратно:</strong> Кликните "ШТ" → вернется к количеству проблем</li>
+                <li><strong>Масштаб:</strong> Для % максимум должен быть ~80-90% (не 100%)</li>
+            </ol>
+        </div>
+        
+        <div style="margin-top: 20px; padding: 15px; background-color: #fff3cd; border-radius: 5px;">
+            <h4>Ожидаемые значения:</h4>
+            <ul>
+                <li><strong>Влияние на бизнес (Май):</strong> Гридчина: 40% (2 из 5), Мельникова: 100% (1 из 1)</li>
+                <li><strong>Мотивация (Май):</strong> Гридчина: 50% (1 из 2), Мельникова: 100% (1 из 1)</li>
+                <li><strong>Клиентоцентричность (Июнь):</strong> Гридчина: 50% (1 из 2), Коровина: 100% (1 из 1)</li>
+                <li><strong>Динамический максимум:</strong> Должен быть около 80-90% (не 100%)</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Подключение модулей -->
+    <script src="js/modules/checklist-charts.js"></script>
+
+    <script>
+        // Тестовые данные с разными процентами для проверки динамического максимума
+        window.checklistFilteredData = [
+            // Май 2025 - Влияние на бизнес (40% для Гридчина, 100% для Мельникова)
+            {operator: "Иванов И.И.", group: "Гридчина - группа", date: "2025-05-15", Block_0_lvl: "Влияние на бизнес", score: 1},
+            {operator: "Петров П.П.", group: "Гридчина - группа", date: "2025-05-16", Block_0_lvl: "Влияние на бизнес", score: 1},
+            {operator: "Сидоров С.С.", group: "Мельникова - группа", date: "2025-05-17", Block_0_lvl: "Влияние на бизнес", score: 1},
+            {operator: "Иванов И.И.", group: "Гридчина - группа", date: "2025-05-18", Block_0_lvl: "Влияние на бизнес", score: 0},
+            {operator: "Петров П.П.", group: "Гридчина - группа", date: "2025-05-19", Block_0_lvl: "Влияние на бизнес", score: 0},
+            
+            // Июнь 2025 - Влияние на бизнес (50% для Гридчина, 100% для Мельникова, 100% для Коровина)
+            {operator: "Иванов И.И.", group: "Гридчина - группа", date: "2025-06-15", Block_0_lvl: "Влияние на бизнес", score: 1},
+            {operator: "Петров П.П.", group: "Гридчина - группа", date: "2025-06-16", Block_0_lvl: "Влияние на бизнес", score: 0},
+            {operator: "Сидоров С.С.", group: "Мельникова - группа", date: "2025-06-17", Block_0_lvl: "Влияние на бизнес", score: 1},
+            {operator: "Козлов К.К.", group: "Коровина - группа", date: "2025-06-18", Block_0_lvl: "Влияние на бизнес", score: 1},
+            
+            // Май 2025 - Влияние на мотивацию сотрудника (50% для Гридчина, 100% для Мельникова)
+            {operator: "Иванов И.И.", group: "Гридчина - группа", date: "2025-05-20", Block_0_lvl: "Влияние на мотивацию сотрудника", score: 1},
+            {operator: "Петров П.П.", group: "Гридчина - группа", date: "2025-05-21", Block_0_lvl: "Влияние на мотивацию сотрудника", score: 0},
+            {operator: "Сидоров С.С.", group: "Мельникова - группа", date: "2025-05-22", Block_0_lvl: "Влияние на мотивацию сотрудника", score: 1},
+            
+            // Июнь 2025 - Клиентоцентричность (50% для Гридчина, 0% для Мельникова, 100% для Коровина)
+            {operator: "Иванов И.И.", group: "Гридчина - группа", date: "2025-06-20", Block_0_lvl: "Клиентоцентричность", score: 1},
+            {operator: "Петров П.П.", group: "Гридчина - группа", date: "2025-06-21", Block_0_lvl: "Клиентоцентричность", score: 0},
+            {operator: "Сидоров С.С.", group: "Мельникова - группа", date: "2025-06-22", Block_0_lvl: "Клиентоцентричность", score: 0},
+            {operator: "Козлов К.К.", group: "Коровина - группа", date: "2025-06-23", Block_0_lvl: "Клиентоцентричность", score: 1}
+        ];
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('=== Инициализация финального теста ===');
+            console.log('Данные:', window.checklistFilteredData.length, 'записей');
+            
+            // Инициализируем графики
+            setTimeout(() => {
+                if (typeof window.initChecklistCharts === 'function') {
+                    window.initChecklistCharts();
+                    
+                    // Показываем информацию о динамическом максимуме
+                    setTimeout(() => {
+                        console.log('Текущий режим:', window.checklistChartsDisplayMode || 'count');
+                        
+                        // Добавляем информацию о расчете максимума
+                        const info = document.createElement('div');
+                        info.style.cssText = 'margin-top: 20px; padding: 15px; background-color: #e3f2fd; border-radius: 5px; font-size: 14px;';
+                        info.innerHTML = `
+                            <h4>📊 Информация о динамическом максимуме:</h4>
+                            <p>При переключении на "%" максимум рассчитывается как <strong>среднее значение × 2.5</strong></p>
+                            <p>Это делает столбцы более читаемыми при малых процентах ошибок.</p>
+                            <p>Минимум: 50%, Максимум: 100%</p>
+                        `;
+                        document.querySelector('.container').appendChild(info);
+                    }, 1000);
+                }
+            }, 500);
+        });
+    </script>
+</body>
+</html>

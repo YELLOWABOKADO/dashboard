@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест нового переключателя ШТ/%</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Тест нового переключателя ШТ/%</h1>
+        
+        <!-- Переключатель режима отображения -->
+        <div class="charts-mode-toggle-container">
+            <span class="toggle-label">Режим отображения:</span>
+            <div class="toggle-switch" id="checklistChartsToggle">
+                <div class="toggle-option active" data-mode="count">ШТ</div>
+                <div class="toggle-option" data-mode="percent">%</div>
+                <div class="toggle-slider"></div>
+            </div>
+        </div>
+        
+        <!-- Блок с графиками -->
+        <div class="checklist-dynamics-charts">
+            <!-- График 1: Влияние на бизнес -->
+            <div class="checklist-chart-card">
+                <div class="checklist-chart-header">
+                    <h5>Динамика блока: Влияние на бизнес</h5>
+                </div>
+                <div class="checklist-chart-wrapper">
+                    <canvas id="checklistResultChart"></canvas>
+                </div>
+            </div>
+
+            <!-- График 2: Влияние на мотивацию сотрудника -->
+            <div class="checklist-chart-card">
+                <div class="checklist-chart-header">
+                    <h5>Динамика блока: Влияние на мотивацию сотрудника</h5>
+                </div>
+                <div class="checklist-chart-wrapper">
+                    <canvas id="checklistMotivationChart"></canvas>
+                </div>
+            </div>
+
+            <!-- График 3: Клиентоцентричность -->
+            <div class="checklist-chart-card">
+                <div class="checklist-chart-header">
+                    <h5>Динамика блока: Клиентоцентричность</h5>
+                </div>
+                <div class="checklist-chart-wrapper">
+                    <canvas id="checklistObjectionsChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div style="margin-top: 20px; padding: 15px; background-color: #f8f9fa; border-radius: 5px;">
+            <h3>Инструкции по тестированию:</h3>
+            <ol>
+                <li>Кликните на "%" в переключателе - графики должны показать проценты</li>
+                <li>Кликните на "ШТ" в переключателе - графики должны показать количество</li>
+                <li>Проверьте анимацию переключателя</li>
+                <li>Проверьте, что подписи осей Y изменяются</li>
+                <li>Проверьте тултипы при наведении на столбцы</li>
+            </ol>
+            <h4>Ожидаемые данные:</h4>
+            <ul>
+                <li><strong>Влияние на бизнес:</strong> Май - Гридчина: 2 проблемы из 5 (40%), Мельникова: 1 из 1 (100%)</li>
+                <li><strong>Мотивация:</strong> Май - Гридчина: 1 проблема из 2 (50%), Мельникова: 1 из 1 (100%)</li>
+                <li><strong>Клиентоцентричность:</strong> Июнь - Гридчина: 1 проблема из 2 (50%), Коровина: 1 из 1 (100%)</li>
+            </ul>
+        </div>
+        
+        <div id="debug-info" style="margin-top: 20px; padding: 15px; background-color: #fff3cd; border-radius: 5px; font-family: monospace; font-size: 12px;">
+            <h4>Отладочная информация:</h4>
+            <div id="debug-content">Загрузка...</div>
+        </div>
+        
+        <div style="margin-top: 20px; padding: 15px; background-color: #e7f3ff; border-radius: 5px;">
+            <h4>Изменения в этой версии:</h4>
+            <ul>
+                <li>✅ Исправлен переключатель - теперь компактный и не расползается</li>
+                <li>✅ Добавлен динамический расчет максимума для процентов (среднее × 2.5)</li>
+                <li>✅ Улучшена анимация переключателя</li>
+                <li>✅ Оптимизированы размеры и отступы</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Подключение модулей -->
+    <script src="js/modules/checklist-charts.js"></script>
+
+    <script>
+        // Тестовые данные в глобальной области
+        window.checklistFilteredData = [
+            // Май 2025 - Влияние на бизнес
+            {operator: "Иванов И.И.", group: "Гридчина - группа", date: "2025-05-15", Block_0_lvl: "Влияние на бизнес", score: 1},
+            {operator: "Петров П.П.", group: "Гридчина - группа", date: "2025-05-16", Block_0_lvl: "Влияние на бизнес", score: 1},
+            {operator: "Сидоров С.С.", group: "Мельникова - группа", date: "2025-05-17", Block_0_lvl: "Влияние на бизнес", score: 1},
+            {operator: "Иванов И.И.", group: "Гридчина - группа", date: "2025-05-18", Block_0_lvl: "Влияние на бизнес", score: 0},
+            {operator: "Петров П.П.", group: "Гридчина - группа", date: "2025-05-19", Block_0_lvl: "Влияние на бизнес", score: 0},
+            
+            // Июнь 2025 - Влияние на бизнес
+            {operator: "Иванов И.И.", group: "Гридчина - группа", date: "2025-06-15", Block_0_lvl: "Влияние на бизнес", score: 1},
+            {operator: "Петров П.П.", group: "Гридчина - группа", date: "2025-06-16", Block_0_lvl: "Влияние на бизнес", score: 0},
+            {operator: "Сидоров С.С.", group: "Мельникова - группа", date: "2025-06-17", Block_0_lvl: "Влияние на бизнес", score: 1},
+            {operator: "Козлов К.К.", group: "Коровина - группа", date: "2025-06-18", Block_0_lvl: "Влияние на бизнес", score: 1},
+            
+            // Май 2025 - Влияние на мотивацию сотрудника
+            {operator: "Иванов И.И.", group: "Гридчина - группа", date: "2025-05-20", Block_0_lvl: "Влияние на мотивацию сотрудника", score: 1},
+            {operator: "Петров П.П.", group: "Гридчина - группа", date: "2025-05-21", Block_0_lvl: "Влияние на мотивацию сотрудника", score: 0},
+            {operator: "Сидоров С.С.", group: "Мельникова - группа", date: "2025-05-22", Block_0_lvl: "Влияние на мотивацию сотрудника", score: 1},
+            
+            // Июнь 2025 - Клиентоцентричность
+            {operator: "Иванов И.И.", group: "Гридчина - группа", date: "2025-06-20", Block_0_lvl: "Клиентоцентричность", score: 1},
+            {operator: "Петров П.П.", group: "Гридчина - группа", date: "2025-06-21", Block_0_lvl: "Клиентоцентричность", score: 0},
+            {operator: "Сидоров С.С.", group: "Мельникова - группа", date: "2025-06-22", Block_0_lvl: "Клиентоцентричность", score: 0},
+            {operator: "Козлов К.К.", group: "Коровина - группа", date: "2025-06-23", Block_0_lvl: "Клиентоцентричность", score: 1}
+        ];
+
+        // Функция для обновления отладочной информации
+        function updateDebugInfo() {
+            const debugContent = document.getElementById('debug-content');
+            const mode = window.checklistChartsDisplayMode || 'не определен';
+            const dataCount = window.checklistFilteredData ? window.checklistFilteredData.length : 0;
+            
+            debugContent.innerHTML = `
+                <div>Текущий режим: <strong>${mode}</strong></div>
+                <div>Количество записей: <strong>${dataCount}</strong></div>
+                <div>Chart.js загружен: <strong>${typeof Chart !== 'undefined' ? 'Да' : 'Нет'}</strong></div>
+                <div>initChecklistCharts доступна: <strong>${typeof window.initChecklistCharts === 'function' ? 'Да' : 'Нет'}</strong></div>
+                <div>toggleChecklistChartsMode доступна: <strong>${typeof window.toggleChecklistChartsMode === 'function' ? 'Да' : 'Нет'}</strong></div>
+                <div>Переключатель найден: <strong>${document.getElementById('checklistChartsToggle') ? 'Да' : 'Нет'}</strong></div>
+            `;
+        }
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('=== Инициализация теста нового переключателя ===');
+            
+            // Обновляем отладочную информацию
+            updateDebugInfo();
+            
+            // Инициализируем графики
+            setTimeout(() => {
+                console.log('Инициализируем графики...');
+                if (typeof window.initChecklistCharts === 'function') {
+                    window.initChecklistCharts();
+                    
+                    // Обновляем отладочную информацию после инициализации
+                    setTimeout(updateDebugInfo, 500);
+                } else {
+                    console.error('initChecklistCharts не найдена!');
+                }
+            }, 500);
+            
+            // Обновляем отладочную информацию каждые 2 секунды
+            setInterval(updateDebugInfo, 2000);
+        });
+    </script>
+</body>
+</html>
