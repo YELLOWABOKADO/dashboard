@@ -7,7 +7,7 @@ async function updateActiveTab() {
     console.log('=== updateActiveTab вызвана ===');
     const currentTab = getCurrentTab();
     console.log('currentTab:', currentTab);
-    
+
     // Проверяем, что все необходимые функции загружены
     if (typeof getDepartmentsData !== 'function' || typeof getEmployeesData !== 'function' || typeof getCompanyData !== 'function' || typeof updateCompanyData !== 'function') {
         console.error('Не все функции загружены:', {
@@ -36,6 +36,16 @@ async function updateActiveTab() {
             console.log('Обновляем данные динамики...');
             await updateDynamicsData();
             break;
+        case 'ratings':
+            console.log('Переключились на вкладку рейтингов...');
+            // Инициализируем модуль рейтингов при первом посещении
+            if (typeof initRatingsModule === 'function' && typeof window.ratingsInitialized === 'undefined') {
+                console.log('Инициализируем модуль рейтингов...');
+                initRatingsModule();
+                window.ratingsInitialized = true;
+            }
+            await updateRatingsData();
+            break;
         case 'checklist':
             console.log('Обновляем дашборд чек-листов...');
             if (typeof window.checklistDashboard === 'object' && typeof window.checklistDashboard.applyFilters === 'function') {
@@ -48,20 +58,20 @@ async function updateActiveTab() {
 // Инициализация приложения
 function initApp() {
     console.log('=== Инициализация приложения ===');
-    
+
     // Инициализируем вкладки
     initTabs();
-    
+
     // Инициализируем функциональность сворачивания таблиц
     if (typeof initTableCollapse === 'function') {
         initTableCollapse();
     }
-    
+
     // Инициализируем сворачивающиеся блоки
     if (typeof initCollapsibleSections === 'function') {
         initCollapsibleSections();
     }
-    
+
     // Обработчик кнопки "Обновить" на главной вкладке
     const updateButton = document.getElementById('updateButton');
     if (updateButton) {
@@ -81,13 +91,13 @@ function initApp() {
             await updateActiveTab();
         });
     }
-    
+
     // Настраиваем фильтры с задержкой
     setTimeout(() => {
         console.log('Инициализируем фильтры с задержкой...');
         setupDepartmentFilters();
         setupEmployeeFilters();
-        
+
         // Инициализируем модуль сотрудников (включая детализацию)
         console.log('Проверяем наличие функции initEmployeesModule:', typeof initEmployeesModule);
         if (typeof initEmployeesModule === 'function') {
@@ -96,7 +106,7 @@ function initApp() {
         } else {
             console.error('Функция initEmployeesModule не найдена!');
         }
-        
+
         // Инициализируем модуль динамики
         console.log('Проверяем наличие функции initDynamicsModule:', typeof initDynamicsModule);
         if (typeof initDynamicsModule === 'function') {
@@ -105,7 +115,9 @@ function initApp() {
         } else {
             console.error('Функция initDynamicsModule не найдена!');
         }
-        
+
+        // Модуль рейтингов инициализируется при переключении на вкладку
+
         // Инициализируем динамику компании
         console.log('Проверяем наличие функции initCompanyDynamics:', typeof initCompanyDynamics);
         if (typeof initCompanyDynamics === 'function') {
@@ -114,7 +126,7 @@ function initApp() {
         } else {
             console.error('Функция initCompanyDynamics не найдена!');
         }
-        
+
         // Инициализируем дашборд чек-листов
         console.log('Проверяем наличие дашборда чек-листов:', typeof window.checklistDashboard);
         if (typeof window.checklistDashboard === 'object' && typeof window.checklistDashboard.init === 'function') {
@@ -123,14 +135,14 @@ function initApp() {
         } else {
             console.error('Дашборд чек-листов не найден!');
         }
-        
+
         // Повторно инициализируем сворачивающиеся блоки после загрузки всех модулей
         if (typeof initCollapsibleSections === 'function') {
             console.log('Повторная инициализация сворачивающихся блоков...');
             initCollapsibleSections();
         }
     }, 300);
-    
+
     // Загружаем данные для начальной вкладки с проверкой готовности функций
     setTimeout(() => {
         console.log('Проверяем готовность функций...');
@@ -140,7 +152,7 @@ function initApp() {
             getCompanyData: typeof getCompanyData,
             updateCompanyData: typeof updateCompanyData
         });
-        
+
         if (typeof getDepartmentsData === 'function' && typeof getEmployeesData === 'function' && typeof getCompanyData === 'function' && typeof updateCompanyData === 'function') {
             console.log('Все функции загружены, вызываем updateActiveTab');
             updateActiveTab();
@@ -153,7 +165,7 @@ function initApp() {
                     getCompanyData: typeof getCompanyData,
                     updateCompanyData: typeof updateCompanyData
                 });
-                
+
                 if (typeof getDepartmentsData === 'function' && typeof getEmployeesData === 'function' && typeof getCompanyData === 'function' && typeof updateCompanyData === 'function') {
                     console.log('Все функции загружены при повторной проверке, вызываем updateActiveTab');
                     updateActiveTab();

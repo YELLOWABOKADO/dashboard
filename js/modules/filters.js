@@ -18,7 +18,25 @@ function validateDateRange(startDate, endDate, granularity) {
         return false;
     }
 
-    // Ограничения по гранулярности отключены - можно выбирать любой диапазон дат
+    // Проверяем ограничения по гранулярности (если указана)
+    if (granularity) {
+        const daysDiff = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+
+        if (granularity === 'День' && daysDiff > 31) {
+            alert('Для просмотра по дням максимальный период - 31 день');
+            return false;
+        }
+
+        if (granularity === 'Неделя' && daysDiff > 183) {
+            alert('Для просмотра по неделям максимальный период - 6 месяцев');
+            return false;
+        }
+
+        if (granularity === 'Месяц' && daysDiff > 730) {
+            alert('Для просмотра по месяцам максимальный период - 2 года');
+            return false;
+        }
+    }
 
     return true;
 }
@@ -27,12 +45,12 @@ function validateDateRange(startDate, endDate, granularity) {
 function getSelectedMultiSelectValues(dropdownId) {
     const dropdown = document.getElementById(dropdownId);
     if (!dropdown) return [];
-    
+
     const allCheckbox = dropdown.querySelector('input[value="all"]');
     if (allCheckbox && allCheckbox.checked) {
         return ['all'];
     }
-    
+
     const selectedCheckboxes = dropdown.querySelectorAll('input[type="checkbox"]:checked:not([value="all"])');
     return Array.from(selectedCheckboxes).map(cb => cb.value);
 }
@@ -49,7 +67,7 @@ function updateMultiSelectButtonText(dropdownId, buttonTextId) {
         console.error('ButtonText не найден:', buttonTextId);
         return;
     }
-    
+
     const allCheckbox = dropdown.querySelector('input[value="all"]');
     if (allCheckbox && allCheckbox.checked) {
         // Определяем тип выпадающего списка по ID
@@ -60,10 +78,10 @@ function updateMultiSelectButtonText(dropdownId, buttonTextId) {
         }
         return;
     }
-    
+
     const selectedCheckboxes = dropdown.querySelectorAll('input[type="checkbox"]:checked:not([value="all"])');
     const selectedCount = selectedCheckboxes.length;
-    
+
     if (selectedCount === 0) {
         allCheckbox.checked = true;
         if (dropdownId.includes('Employees')) {

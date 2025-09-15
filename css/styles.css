@@ -337,7 +337,8 @@ tr:hover {
     position: relative;
     display: inline-block;
     min-width: 200px;
-    z-index: 100; /* Базовый z-index для контейнера */
+    z-index: 100;
+    /* Базовый z-index для контейнера */
 }
 
 .multi-select-button {
@@ -376,9 +377,11 @@ tr:hover {
     border-radius: 0 0 4px 4px;
     max-height: 200px;
     overflow-y: auto;
-    z-index: 9999; /* Увеличиваем z-index для выпадающего списка */
+    z-index: 9999;
+    /* Увеличиваем z-index для выпадающего списка */
     display: none;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Добавляем тень для лучшей видимости */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    /* Добавляем тень для лучшей видимости */
 }
 
 .multi-select-dropdown.show {
@@ -611,7 +614,8 @@ tr:hover {
     padding: 0 20px 20px 20px;
     transition: max-height 0.3s ease;
     overflow: hidden;
-    max-height: none; /* По умолчанию блоки развернуты */
+    max-height: none;
+    /* По умолчанию блоки развернуты */
 }
 
 .collapsible-content.collapsed {
@@ -636,32 +640,34 @@ tr:hover {
         grid-template-columns: 1fr;
         gap: 15px;
     }
-    
+
     .chart-wrapper {
         height: 350px;
     }
-    
+
     .pie-chart-wrapper {
         height: 300px;
     }
-    
+
     .collapsible-header {
         padding: 12px 15px;
     }
-    
+
     .collapsible-content {
         padding: 0 15px 15px 15px;
     }
-    
+
     .sticky-header {
-        position: relative; /* На мобильных убираем sticky */
+        position: relative;
+        /* На мобильных убираем sticky */
         box-shadow: none;
     }
-    
+
     .scrollable-content {
         padding-top: 10px;
     }
 }
+
 /* Стили для детализации */
 .details-container {
     margin: 20px 0;
@@ -801,17 +807,17 @@ tr:hover {
     .details-table {
         font-size: 12px;
     }
-    
+
     .details-table th,
     .details-table td {
         padding: 8px 6px;
     }
-    
+
     .details-header-employee,
     .details-employee-name {
         min-width: 120px !important;
     }
-    
+
     .details-header-period {
         min-width: 70px;
     }
@@ -868,6 +874,7 @@ tr:hover {
 .details-container .error {
     color: #dc3545;
 }
+
 /* Стили для раскрывающихся блоков RPC */
 .collapsible-row {
     cursor: pointer;
@@ -926,6 +933,7 @@ tr:hover {
     color: #007bff;
     font-weight: bold;
 }
+
 /* ===== CHECKLIST DASHBOARD STYLES ===== */
 .checklist-dashboard {
     padding: 20px 0;
@@ -935,7 +943,7 @@ tr:hover {
     background: white;
     padding: 20px;
     border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     margin-bottom: 20px;
 }
 
@@ -971,7 +979,7 @@ tr:hover {
     background: white;
     padding: 20px;
     border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     text-align: center;
 }
 
@@ -990,7 +998,7 @@ tr:hover {
 .checklist-summary-section {
     background: white;
     border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     padding: 20px;
     margin-bottom: 20px;
 }
@@ -1069,7 +1077,7 @@ tr:hover {
 .checklist-chart-container {
     background: white;
     border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     padding: 20px;
 }
 
@@ -1131,7 +1139,7 @@ tr:hover {
 .checklist-results-section {
     background: white;
     border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     overflow: hidden;
     margin-bottom: 20px;
 }
@@ -1196,21 +1204,21 @@ tr:hover {
     .checklist-analytics-section {
         grid-template-columns: 1fr;
     }
-    
+
     .checklist-stats-grid {
         grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     }
-    
+
     .filters-container {
         justify-content: flex-start;
         gap: 10px;
     }
-    
+
     .filter-group {
         padding: 6px 12px;
         gap: 12px;
     }
-    
+
     .checklist-bar-label {
         min-width: 120px;
         max-width: 120px;
@@ -1268,7 +1276,7 @@ tr:hover {
     padding: 20px;
     background: #ffffff;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .checklist-dynamics-charts {
@@ -1283,7 +1291,7 @@ tr:hover {
     border: 1px solid #e0e0e0;
     border-radius: 8px;
     padding: 15px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .checklist-chart-header {
@@ -1343,21 +1351,22 @@ tr:hover {
         grid-template-columns: 1fr;
         gap: 15px;
     }
-    
+
     .checklist-chart-header {
         flex-direction: column;
         align-items: flex-start;
         gap: 10px;
     }
-    
+
     .checklist-chart-header h5 {
         font-size: 13px;
     }
-    
+
     .checklist-chart-wrapper {
         height: 250px;
     }
 }
+
 /* Стили
  для сортировки таблиц чек-листов */
 #checklistOperatorTable th,
@@ -1420,4 +1429,209 @@ tr:hover {
 #checklistResultsTable th.sorted-asc::after,
 #checklistResultsTable th.sorted-desc::after {
     display: none;
+}
+
+/* ===== RATINGS STYLES ===== */
+.ratings-container {
+    margin: 20px 0;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.ratings-header {
+    padding: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    text-align: center;
+}
+
+.ratings-header h3 {
+    margin: 0 0 10px 0;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.ratings-period-info {
+    font-size: 14px;
+    opacity: 0.9;
+    font-weight: 300;
+}
+
+.ratings-table-container {
+    overflow-x: auto;
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.ratings-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.ratings-table thead {
+    background-color: #f8f9fa;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.ratings-table th {
+    padding: 15px 12px;
+    text-align: center;
+    font-weight: 600;
+    color: #495057;
+    border-bottom: 2px solid #dee2e6;
+    white-space: nowrap;
+    min-width: 120px;
+}
+
+.ratings-table tbody tr {
+    border-bottom: 1px solid #e9ecef;
+    transition: background-color 0.2s ease;
+}
+
+.ratings-table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.ratings-table tbody tr.top-rating {
+    background: linear-gradient(90deg, #fff3cd 0%, #ffeaa7 100%);
+    border-left: 4px solid #ffc107;
+}
+
+.ratings-table tbody tr.top-rating:hover {
+    background: linear-gradient(90deg, #ffeaa7 0%, #ffd740 100%);
+}
+
+.ratings-table td {
+    padding: 12px;
+    text-align: center;
+    vertical-align: middle;
+    border-right: 1px solid #f1f1f1;
+}
+
+.position-cell {
+    font-weight: bold;
+    font-size: 16px;
+    color: #495057;
+    min-width: 80px;
+}
+
+.rank-icon {
+    font-size: 18px;
+    margin-right: 5px;
+}
+
+.name-cell {
+    text-align: left;
+    font-weight: 500;
+    color: #495057;
+    min-width: 200px;
+    max-width: 250px;
+    word-wrap: break-word;
+}
+
+.group-cell {
+    min-width: 150px;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.callcenter-cell {
+    min-width: 100px;
+    color: #6c757d;
+}
+
+.calls-cell {
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+    color: #28a745;
+}
+
+.deviations-cell {
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+    color: #dc3545;
+}
+
+.percentage-cell {
+    font-weight: bold;
+    font-size: 16px;
+    min-width: 120px;
+}
+
+.percentage-cell .percentage-high {
+    color: #dc3545;
+}
+
+.percentage-cell .percentage-medium {
+    color: #fd7e14;
+}
+
+.percentage-cell .percentage-low {
+    color: #28a745;
+}
+
+.days-cell {
+    font-family: 'Courier New', monospace;
+    color: #6c757d;
+    min-width: 80px;
+}
+
+/* Адаптивность для рейтингов */
+@media (max-width: 768px) {
+    .ratings-table {
+        font-size: 12px;
+    }
+
+    .ratings-table th,
+    .ratings-table td {
+        padding: 8px 6px;
+    }
+
+    .ratings-header h3 {
+        font-size: 20px;
+    }
+
+    .name-cell {
+        min-width: 150px;
+        max-width: 200px;
+    }
+
+    .group-cell {
+        min-width: 120px;
+    }
+
+    .percentage-cell {
+        font-size: 14px;
+        min-width: 100px;
+    }
+
+    .position-cell {
+        font-size: 14px;
+        min-width: 60px;
+    }
+
+    .rank-icon {
+        font-size: 16px;
+    }
+}
+
+/* Специальные стили для топ-3 мест */
+.ratings-table tbody tr:nth-child(1) .position-cell {
+    color: #ffd700;
+    text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+}
+
+.ratings-table tbody tr:nth-child(2) .position-cell {
+    color: #c0c0c0;
+    text-shadow: 0 0 5px rgba(192, 192, 192, 0.5);
+}
+
+.ratings-table tbody tr:nth-child(3) .position-cell {
+    color: #cd7f32;
+    text-shadow: 0 0 5px rgba(205, 127, 50, 0.5);
 }
