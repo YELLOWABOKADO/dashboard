@@ -21,31 +21,31 @@ function showChecklistDebug(message) {
 // Загрузка данных для дашборда чек-листов
 async function loadChecklistData(dashboardType = 'Автооценка') {
     console.log(`[Checklist Dashboard] Начинаем загрузку данных для дашборда: ${dashboardType}...`);
-    
+
     // Показываем индикатор загрузки
     const loadingElement = document.getElementById('checklistLoading');
     if (loadingElement) {
         loadingElement.style.display = 'block';
         loadingElement.innerHTML = 'Загрузка данных...';
     }
-    
+
     try {
         // Пока все дашборды используют один и тот же источник данных
         const fileName = 'operator_data_days.json';
-        
+
         const response = await fetch(fileName);
-        
+
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
+
         checklistAllData = await response.json();
-        
+
         console.log(`[Checklist Dashboard] ✅ Успешно загружено ${checklistAllData.length} записей для дашборда "${dashboardType}"`);
-        
+
         if (checklistAllData.length > 0) {
             console.log('[Checklist Dashboard] Пример записи:', checklistAllData[0]);
-            
+
             // Проверяем данные для Коротенко П. Р.
             const korotenkoRecords = checklistAllData.filter(item => item.operator === 'Коротенко П. Р.');
             console.log(`[Checklist Dashboard] Найдено записей для Коротенко П. Р.: ${korotenkoRecords.length}`);
@@ -54,10 +54,16 @@ async function loadChecklistData(dashboardType = 'Автооценка') {
                 console.log(`[Checklist Dashboard] Из них проблем (score=1): ${korotenkoIssues.length}`);
                 console.log(`[Checklist Dashboard] Процент проблем: ${((korotenkoIssues.length / korotenkoRecords.length) * 100).toFixed(1)}%`);
             }
-            
+
             populateChecklistFilters();
             applyChecklistFilters();
-            
+
+            // Инициализируем сортировку таблиц после загрузки данных
+            initTableSorting();
+            // Обновляем заголовки таблиц с индикаторами сортировки по умолчанию
+            updateOperatorTableHeaders();
+            updateDetailsTableHeaders();
+
             if (loadingElement) {
                 loadingElement.style.display = 'none';
             }
@@ -66,11 +72,11 @@ async function loadChecklistData(dashboardType = 'Автооценка') {
         } else {
             throw new Error('Файл пустой');
         }
-        
+
     } catch (error) {
         console.error('[Checklist Dashboard] Ошибка загрузки из файла:', error.message);
         showChecklistDebug('Ошибка загрузки данных: ' + error.message);
-        
+
         if (loadingElement) {
             loadingElement.innerHTML = `Ошибка загрузки данных для дашборда "${dashboardType}"`;
         }
@@ -82,7 +88,7 @@ async function loadChecklistData(dashboardType = 'Автооценка') {
 // Заполнение фильтров
 function populateChecklistFilters() {
     console.log('[Checklist Dashboard] Заполняем фильтры...');
-    
+
     const kcs = [...new Set(checklistAllData.map(item => item.kc))].sort();
     const groups = [...new Set(checklistAllData.map(item => item.group))].sort();
     const operators = [...new Set(checklistAllData.map(item => item.operator))].sort();
@@ -101,21 +107,21 @@ function populateChecklistFilters() {
 function populateChecklistSelect(selectId, options) {
     const select = document.getElementById(selectId);
     if (!select) return;
-    
+
     const currentValue = select.value;
-    
+
     // Очищаем все опции кроме первой
     while (select.children.length > 1) {
         select.removeChild(select.lastChild);
     }
-    
+
     options.forEach(option => {
         const optionElement = document.createElement('option');
         optionElement.value = option;
         optionElement.textContent = option;
         select.appendChild(optionElement);
     });
-    
+
     select.value = currentValue;
 }
 
@@ -131,14 +137,14 @@ function applyChecklistFilters() {
 
     checklistFilteredData = checklistAllData.filter(item => {
         const itemDate = item.date;
-        
+
         return (!dateFrom || itemDate >= dateFrom) &&
-               (!dateTo || itemDate <= dateTo) &&
-               (!kc || item.kc === kc) &&
-               (!group || item.group === group) &&
-               (!operator || item.operator === operator) &&
-               (!block0 || item.Block_0_lvl === block0) &&
-               (!block1 || item.Block_1_lvl === block1);
+            (!dateTo || itemDate <= dateTo) &&
+            (!kc || item.kc === kc) &&
+            (!group || item.group === group) &&
+            (!operator || item.operator === operator) &&
+            (!block0 || item.Block_0_lvl === block0) &&
+            (!block1 || item.Block_1_lvl === block1);
     });
 
     console.log(`[Checklist Dashboard] Отфильтровано записей: ${checklistFilteredData.length} из ${checklistAllData.length}`);
@@ -146,7 +152,7 @@ function applyChecklistFilters() {
     updateChecklistCharts();
     updateChecklistOperatorTable();
     updateChecklistTable();
-    
+
     // Обновляем заголовки таблиц с индикаторами сортировки
     updateOperatorTableHeaders();
     updateDetailsTableHeaders();
@@ -159,7 +165,7 @@ function updateChecklistStats() {
     const uniqueOperators = new Set(checklistFilteredData.map(item => item.operator)).size;
     const uniqueGroups = new Set(checklistFilteredData.map(item => item.group)).size;
     const issueRate = totalRecords > 0 ? ((totalIssues / totalRecords) * 100).toFixed(1) : 0;
-    
+
     const dates = checklistFilteredData.map(item => item.date);
     const minDate = dates.length > 0 ? Math.min(...dates.map(d => new Date(d))) : 0;
     const maxDate = dates.length > 0 ? Math.max(...dates.map(d => new Date(d))) : 0;
@@ -179,7 +185,7 @@ function updateChecklistStats() {
 // Обновление сводной информации
 function updateChecklistSummary() {
     const issues = checklistFilteredData.filter(item => item.score === 1);
-    
+
     // Функция для скрытия/показа блока
     function toggleSummaryItem(elementId, hasData) {
         const element = document.getElementById(elementId);
@@ -188,7 +194,7 @@ function updateChecklistSummary() {
             parentItem.style.display = hasData ? 'block' : 'none';
         }
     }
-    
+
     // Если нет проблем, скрываем весь блок сводной информации
     const summarySection = document.querySelector('.checklist-summary-section');
     if (issues.length === 0) {
@@ -201,9 +207,9 @@ function updateChecklistSummary() {
             summarySection.style.display = 'block';
         }
     }
-    
+
     let visibleItemsCount = 0;
-    
+
     // Топ блок 0
     const block0Stats = {};
     issues.forEach(item => {
@@ -279,7 +285,7 @@ function updateChecklistSummary() {
             toggleSummaryItem('checklistTopGroup', false);
         }
     }
-    
+
     // Обновляем CSS класс сетки в зависимости от количества видимых элементов
     const summaryGrid = document.querySelector('.checklist-summary-grid');
     if (summaryGrid) {
@@ -296,7 +302,7 @@ function updateChecklistSummary() {
 function updateChecklistCharts() {
     updateChecklistBlockChart('checklistBlock0Chart', 'Block_0_lvl');
     updateChecklistBlockChart('checklistBlock1Chart', 'Block_1_lvl');
-    
+
     // Инициализируем новые графики динамики
     if (typeof window.updateChecklistDynamicsCharts === 'function') {
         window.updateChecklistDynamicsCharts();
@@ -308,9 +314,9 @@ function updateChecklistCharts() {
 function updateChecklistBlockChart(containerId, blockField) {
     const container = document.getElementById(containerId);
     if (!container) return;
-    
+
     const issues = checklistFilteredData.filter(item => item.score === 1);
-    
+
     const stats = {};
     issues.forEach(item => {
         stats[item[blockField]] = (stats[item[blockField]] || 0) + 1;
@@ -346,10 +352,10 @@ function sortOperatorTable(columnIndex, columnName) {
         operatorTableSortColumn = columnIndex;
         operatorTableSortDirection = 'asc';
     }
-    
+
     // Обновляем заголовки таблицы
     updateOperatorTableHeaders();
-    
+
     // Перерисовываем таблицу с новой сортировкой
     updateChecklistOperatorTable();
 }
@@ -364,7 +370,7 @@ function updateOperatorTableHeaders() {
         if (existingArrow) {
             existingArrow.remove();
         }
-        
+
         // Добавляем новый индикатор для активной колонки
         if (operatorTableSortColumn === index) {
             header.classList.add(operatorTableSortDirection === 'asc' ? 'sorted-asc' : 'sorted-desc');
@@ -380,7 +386,7 @@ function updateOperatorTableHeaders() {
 function updateChecklistOperatorTable() {
     const tbody = document.getElementById('checklistOperatorBody');
     if (!tbody) return;
-    
+
     // Группируем данные по операторам
     const operatorStats = {};
     checklistFilteredData.forEach(item => {
@@ -397,7 +403,7 @@ function updateChecklistOperatorTable() {
                 block1Stats: {}
             };
         }
-        
+
         operatorStats[key].total++;
         if (item.score === 1) {
             operatorStats[key].issues++;
@@ -405,17 +411,17 @@ function updateChecklistOperatorTable() {
             operatorStats[key].block1Stats[item.Block_1_lvl] = (operatorStats[key].block1Stats[item.Block_1_lvl] || 0) + 1;
         }
         // Вычисляем процент проблем
-        operatorStats[key].issueRate = operatorStats[key].total > 0 ? 
+        operatorStats[key].issueRate = operatorStats[key].total > 0 ?
             ((operatorStats[key].issues / operatorStats[key].total) * 100) : 0;
     });
 
     let sortedOperators = Object.values(operatorStats);
-    
+
     // Применяем сортировку если выбрана колонка
     if (operatorTableSortColumn !== null) {
         sortedOperators.sort((a, b) => {
             let valueA, valueB;
-            
+
             switch (operatorTableSortColumn) {
                 case 0: // Оператор
                     valueA = a.operator;
@@ -452,7 +458,7 @@ function updateChecklistOperatorTable() {
                 default:
                     return 0;
             }
-            
+
             // Сравнение значений
             if (typeof valueA === 'string' && typeof valueB === 'string') {
                 const comparison = valueA.localeCompare(valueB);
@@ -463,8 +469,8 @@ function updateChecklistOperatorTable() {
             }
         });
     } else {
-        // Сортировка по умолчанию - по количеству проблем (убывание)
-        sortedOperators.sort((a, b) => b.issues - a.issues);
+        // Сортировка по умолчанию - по операторам (возрастание)
+        sortedOperators.sort((a, b) => a.operator.localeCompare(b.operator));
     }
 
     // Отладочная информация для Коротенко П. Р.
@@ -477,7 +483,7 @@ function updateChecklistOperatorTable() {
         const issueRate = op.issueRate.toFixed(1);
         const topBlock0 = Object.keys(op.block0Stats).sort((a, b) => op.block0Stats[b] - op.block0Stats[a])[0] || '-';
         const topBlock1 = Object.keys(op.block1Stats).sort((a, b) => op.block1Stats[b] - op.block1Stats[a])[0] || '-';
-        
+
         return `
             <tr>
                 <td>${op.operator}</td>
@@ -502,10 +508,10 @@ function sortDetailsTable(columnIndex, columnName) {
         detailsTableSortColumn = columnIndex;
         detailsTableSortDirection = 'asc';
     }
-    
+
     // Обновляем заголовки таблицы
     updateDetailsTableHeaders();
-    
+
     // Перерисовываем таблицу с новой сортировкой
     updateChecklistTable();
 }
@@ -520,7 +526,7 @@ function updateDetailsTableHeaders() {
         if (existingArrow) {
             existingArrow.remove();
         }
-        
+
         // Добавляем новый индикатор для активной колонки
         if (detailsTableSortColumn === index) {
             header.classList.add(detailsTableSortDirection === 'asc' ? 'sorted-asc' : 'sorted-desc');
@@ -537,27 +543,27 @@ function updateChecklistTable() {
     const tbody = document.getElementById('checklistResultsBody');
     const noData = document.getElementById('checklistNoData');
     const table = document.getElementById('checklistResultsTable');
-    
+
     if (!tbody || !table) return;
-    
+
     if (checklistFilteredData.length === 0) {
         table.style.display = 'none';
         if (noData) noData.style.display = 'block';
         return;
     }
-    
+
     table.style.display = 'table';
     if (noData) noData.style.display = 'none';
-    
+
     // Показываем только проблемы
     const issuesOnly = checklistFilteredData.filter(item => item.score === 1);
     let sortedData = [...issuesOnly];
-    
+
     // Применяем сортировку если выбрана колонка
     if (detailsTableSortColumn !== null) {
         sortedData.sort((a, b) => {
             let valueA, valueB;
-            
+
             switch (detailsTableSortColumn) {
                 case 0: // Дата
                     valueA = new Date(a.date);
@@ -594,7 +600,7 @@ function updateChecklistTable() {
                 default:
                     return 0;
             }
-            
+
             // Сравнение значений
             if (valueA instanceof Date && valueB instanceof Date) {
                 const comparison = valueA.getTime() - valueB.getTime();
@@ -608,13 +614,10 @@ function updateChecklistTable() {
             }
         });
     } else {
-        // Сортировка по умолчанию - по дате (убывание) и оператору (возрастание)
-        sortedData.sort((a, b) => {
-            if (a.date !== b.date) return b.date.localeCompare(a.date);
-            return a.operator.localeCompare(b.operator);
-        });
+        // Сортировка по умолчанию - по операторам (возрастание)
+        sortedData.sort((a, b) => a.operator.localeCompare(b.operator));
     }
-    
+
     tbody.innerHTML = sortedData.slice(0, 500).map(item => `
         <tr>
             <td>${item.date}</td>
@@ -644,7 +647,7 @@ function initTableSorting() {
             sortOperatorTable(index, header.textContent.trim());
         });
     });
-    
+
     // Инициализация сортировки для таблицы подробных записей
     const detailsHeaders = document.querySelectorAll('#checklistResultsTable th');
     detailsHeaders.forEach((header, index) => {
@@ -659,43 +662,40 @@ function initTableSorting() {
 // Инициализация дашборда чек-листов
 function initChecklistDashboard() {
     console.log('[Checklist Dashboard] Инициализация дашборда чек-листов...');
-    
+
     // Добавляем обработчики для всех фильтров
     const filterIds = ['checklistDateFrom', 'checklistDateTo', 'checklistKcFilter', 'checklistGroupFilter', 'checklistOperatorFilter', 'checklistBlock0Filter', 'checklistBlock1Filter'];
-    
+
     filterIds.forEach(id => {
         const element = document.getElementById(id);
         if (element) {
             element.addEventListener('change', applyChecklistFilters);
         }
     });
-    
+
     // Добавляем обработчик для кнопки "Обновить"
     const updateButton = document.getElementById('checklistUpdateButton');
     if (updateButton) {
-        updateButton.addEventListener('click', async function() {
+        updateButton.addEventListener('click', async function () {
             console.log('[Checklist Dashboard] Кнопка "Обновить" нажата');
             const dashboardType = document.getElementById('checklistDashboard')?.value || 'Автооценка';
             await loadChecklistData(dashboardType);
         });
     }
-    
+
     // Добавляем обработчик для изменения дашборда (пока без функциональности)
     const dashboardSelect = document.getElementById('checklistDashboard');
     if (dashboardSelect) {
-        dashboardSelect.addEventListener('change', function() {
+        dashboardSelect.addEventListener('change', function () {
             console.log('[Checklist Dashboard] Дашборд изменен на:', this.value, '(пока без функциональности)');
             // Пока не перезагружаем данные при смене дашборда
         });
     }
-    
-    // Инициализируем сортировку таблиц
-    setTimeout(() => {
-        initTableSorting();
-    }, 100);
-    
+
+    // Сортировка таблиц инициализируется в loadChecklistData() после загрузки данных
+
     // Переключатель режима графиков теперь инициализируется в модуле checklist-charts.js
-    
+
     // Загружаем данные по умолчанию
     loadChecklistData();
 }
@@ -706,7 +706,7 @@ if (typeof window !== 'undefined') {
         init: initChecklistDashboard,
         loadData: loadChecklistData,
         applyFilters: applyChecklistFilters,
-        updateDashboard: function(dashboardType) {
+        updateDashboard: function (dashboardType) {
             return loadChecklistData(dashboardType);
         }
     };

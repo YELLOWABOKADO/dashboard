@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест сортировки по операторам</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Тест сортировки по операторам по умолчанию</h1>
+        
+        <!-- Вкладка Детализация по чек-листам -->
+        <div id="checklistTab" class="tab-content active">
+            <div class="checklist-dashboard">
+                <div class="dashboard-header">
+                    <h2>📊 Детализация по чек-листам</h2>
+                </div>
+
+                <!-- Фильтры -->
+                <div class="filters-container">
+                    <div class="filter-group">
+                        <div class="filter-item">
+                            <span class="filter-label">Период с:</span>
+                            <input type="date" id="checklistDateFrom" value="2025-05-01" class="date-input">
+                        </div>
+                        <div class="filter-item">
+                            <span class="filter-label">по:</span>
+                            <input type="date" id="checklistDateTo" value="2025-06-30" class="date-input">
+                        </div>
+                        <div class="filter-item">
+                            <span class="filter-label">КЦ:</span>
+                            <select id="checklistKcFilter">
+                                <option value="">Все КЦ</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <span class="filter-label">Группа:</span>
+                            <select id="checklistGroupFilter">
+                                <option value="">Все группы</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <span class="filter-label">Оператор:</span>
+                            <select id="checklistOperatorFilter">
+                                <option value="">Все операторы</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <span class="filter-label">Блок 0:</span>
+                            <select id="checklistBlock0Filter">
+                                <option value="">Все блоки</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <span class="filter-label">Блок 1:</span>
+                            <select id="checklistBlock1Filter">
+                                <option value="">Все блоки</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <button id="checklistUpdateButton" class="btn btn-primary">Обновить</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Статистика -->
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <div class="stat-value" id="checklistTotalRecords">0</div>
+                        <div class="stat-label">Всего записей</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="checklistTotalIssues">0</div>
+                        <div class="stat-label">Проблем</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="checklistUniqueOperators">0</div>
+                        <div class="stat-label">Операторов</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="checklistUniqueGroups">0</div>
+                        <div class="stat-label">Групп</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="checklistIssueRate">0%</div>
+                        <div class="stat-label">Доля проблем</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="checklistDateRange">0</div>
+                        <div class="stat-label">Дней</div>
+                    </div>
+                </div>
+
+                <!-- Таблица операторов -->
+                <div class="collapsible-section">
+                    <div class="collapsible-header" id="checklistOperatorTableHeader">
+                        <h4 style="margin: 0; display: flex; align-items: center;">
+                            <span class="collapse-arrow">▼</span>
+                            <span style="margin-left: 10px;">📋 Детальные данные по операторам (сортировка по операторам по умолчанию)</span>
+                        </h4>
+                    </div>
+                    <div class="collapsible-content" id="checklistOperatorTableContent">
+                        <div class="checklist-table-container">
+                            <div id="checklistLoading" class="loading">Загрузка данных...</div>
+                            <table id="checklistOperatorTable" style="display: none;">
+                                <thead>
+                                    <tr>
+                                        <th title="Нажмите для сортировки">Оператор</th>
+                                        <th title="Нажмите для сортировки">Группа</th>
+                                        <th title="Нажмите для сортировки">КЦ</th>
+                                        <th title="Нажмите для сортировки">Всего</th>
+                                        <th title="Нажмите для сортировки">Проблем</th>
+                                        <th title="Нажмите для сортировки">% отклонений</th>
+                                        <th title="Нажмите для сортировки">Топ блок 0</th>
+                                        <th title="Нажмите для сортировки">Топ блок 1</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="checklistOperatorBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Таблица подробных записей -->
+                <div class="collapsible-section">
+                    <div class="collapsible-header" id="checklistResultsTableHeader">
+                        <h4 style="margin: 0; display: flex; align-items: center;">
+                            <span class="collapse-arrow">▼</span>
+                            <span style="margin-left: 10px;">📋 Подробные записи (сортировка по операторам по умолчанию)</span>
+                        </h4>
+                    </div>
+                    <div class="collapsible-content" id="checklistResultsTableContent">
+                        <div class="checklist-table-container">
+                            <table id="checklistResultsTable" style="display: none;">
+                                <thead>
+                                    <tr>
+                                        <th title="Нажмите для сортировки">Дата</th>
+                                        <th title="Нажмите для сортировки">Оператор</th>
+                                        <th title="Нажмите для сортировки">Группа</th>
+                                        <th title="Нажмите для сортировки">КЦ</th>
+                                        <th title="Нажмите для сортировки">Блок 0</th>
+                                        <th title="Нажмите для сортировки">Блок 1</th>
+                                        <th title="Нажмите для сортировки">Блок 2</th>
+                                        <th title="Нажмите для сортировки">Балл</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="checklistResultsBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Скрипты -->
+    <script src="js/checklist-dashboard.js"></script>
+    <script src="js/modules/checklist-charts.js"></script>
+    <script>
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Инициализация тестовой страницы сортировки по операторам...');
+            
+            // Инициализируем дашборд чек-листов
+            if (window.checklistDashboard && window.checklistDashboard.init) {
+                window.checklistDashboard.init();
+            }
+            
+            // Инициализируем сворачиваемые блоки
+            const headers = document.querySelectorAll('.collapsible-header');
+            headers.forEach(header => {
+                header.addEventListener('click', function() {
+                    const content = this.nextElementSibling;
+                    const arrow = this.querySelector('.collapse-arrow');
+                    
+                    if (content.style.display === 'none') {
+                        content.style.display = 'block';
+                        arrow.textContent = '▼';
+                    } else {
+                        content.style.display = 'none';
+                        arrow.textContent = '▶';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
