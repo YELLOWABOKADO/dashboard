@@ -3,6 +3,11 @@
 let checklistAllData = [];
 let checklistFilteredData = [];
 
+// Экспортируем отфильтрованные данные для использования другими модулями
+if (typeof window !== 'undefined') {
+    window.checklistFilteredData = checklistFilteredData;
+}
+
 // Переменные для сортировки таблиц
 let operatorTableSortColumn = 0; // По умолчанию сортируем по операторам (колонка 0)
 let operatorTableSortDirection = 'asc';
@@ -148,6 +153,10 @@ function applyChecklistFilters() {
     });
 
     console.log(`[Checklist Dashboard] Отфильтровано записей: ${checklistFilteredData.length} из ${checklistAllData.length}`);
+
+    // Обновляем глобальную переменную для использования другими модулями
+    window.checklistFilteredData = checklistFilteredData;
+
     updateChecklistStats();
     updateChecklistCharts();
     updateChecklistOperatorTable();
