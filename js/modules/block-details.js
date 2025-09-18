@@ -440,13 +440,16 @@ function renderBlockDetailsChart(filters) {
     filteredData.forEach(item => {
         const date = new Date(item.date);
         let periodKey;
+        let weekStart = null;
 
         if (filters.timeGranularity === 'Неделя') {
             // Получаем начало недели (понедельник)
             const dayOfWeek = date.getDay();
             const monday = new Date(date);
             monday.setDate(date.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+            monday.setHours(0, 0, 0, 0);
             periodKey = monday.toISOString().split('T')[0];
+            weekStart = monday;
         } else {
             // Месяц
             periodKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
@@ -457,7 +460,7 @@ function renderBlockDetailsChart(filters) {
                 total: 0,
                 issues: 0,
                 label: filters.timeGranularity === 'Неделя'
-                    ? `${monday.getDate().toString().padStart(2, '0')}.${(monday.getMonth() + 1).toString().padStart(2, '0')}.${monday.getFullYear()}`
+                    ? `${weekStart.getDate().toString().padStart(2, '0')}.${(weekStart.getMonth() + 1).toString().padStart(2, '0')}.${weekStart.getFullYear()}`
                     : date.toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' })
             };
         }
