@@ -196,6 +196,22 @@ select {
     cursor: pointer;
     min-width: 110px;
 }
+/* Узкий селект для длинных названий блоков с переносом */
+.block-select {
+    max-width: 320px;
+    width: 100%;
+    white-space: normal; /* для отображения переносов в некоторых браузерах */
+}
+
+/* Попытка визуально ограничить высоту строки options (в Chrome option не поддерживает многострочность полностью) */
+.block-select option {
+    white-space: normal;
+    line-height: 1.2;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
 
 select:hover {
     border-color: #adb5bd;

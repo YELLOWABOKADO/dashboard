@@ -1108,21 +1108,13 @@
 
         <!-- Block Details Tab Content -->
         <div id="blockDetailsTab" class="tab-content">
-            <div style="padding: 20px; background: #f0f0f0; margin: 10px; border-radius: 5px;">
-                <h3 style="color: #333; margin-bottom: 10px;">🔍 Детализация по блокам</h3>
-                <p style="color: #666; margin-bottom: 20px;">Вкладка загружена успешно. Если вы видите это сообщение,
-                    HTML работает правильно.</p>
-                <button onclick="console.log('Тест кнопки: вкладка работает'); alert('Тест пройден!');"
-                    style="padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer;">Тест
-                    вкладки</button>
-            </div>
             <div class="checklist-dashboard">
                 <!-- Фильтры для детализации по блокам -->
                 <div class="filters-container">
                     <div class="filter-group">
                         <div class="filter-item">
-                            <span class="filter-label">Блок/подблок:</span>
-                            <select id="blockDetailsBlockFilter">
+                            <span class="filter-label">Блоки:</span>
+                            <select id="blockDetailsBlockFilter" class="block-select" title="Выберите блок">
                                 <option value="">Выберите блок</option>
                             </select>
                         </div>
@@ -1222,51 +1214,7 @@
         <!-- Подключение Chart.js -->
         <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
 
-        <!-- Отладочный скрипт для проверки вкладки -->
-        <script>
-            // Проверяем загрузку модуля block-details
-            window.addEventListener('load', function () {
-                console.log('=== Проверка вкладки "Детализация по блокам" ===');
-
-                // Проверяем существование вкладки
-                const tabElement = document.getElementById('blockDetailsTab');
-                console.log('Вкладка blockDetailsTab:', tabElement ? 'найдена' : 'НЕ НАЙДЕНА');
-
-                // Проверяем кнопку вкладки
-                const tabButton = document.querySelector('button[data-tab="blockDetails"]');
-                console.log('Кнопка вкладки:', tabButton ? 'найдена' : 'НЕ НАЙДЕНА');
-
-                // Проверяем функцию модуля
-                console.log('Функция initBlockDetailsModule:', typeof window.initBlockDetailsModule);
-
-                // Проверяем элементы фильтров
-                const elements = [
-                    'blockDetailsBlockFilter',
-                    'blockDetailsKcFilter',
-                    'blockDetailsGroupFilter',
-                    'blockDetailsOperatorFilter',
-                    'blockDetailsChartsToggle',
-                    'blockDetailsChart'
-                ];
-
-                elements.forEach(id => {
-                    const element = document.getElementById(id);
-                    console.log(`Элемент ${id}:`, element ? 'найден' : 'НЕ НАЙДЕН');
-                });
-
-                console.log('=== Конец проверки ===');
-            });
-
-            // Функция для ручной проверки
-            window.checkBlockDetailsTab = function () {
-                console.log('=== Ручная проверка вкладки ===');
-                const tab = document.getElementById('blockDetailsTab');
-                console.log('Вкладка:', tab);
-                console.log('CSS классы:', tab ? tab.className : 'вкладка не найдена');
-                console.log('Стиль display:', tab ? getComputedStyle(tab).display : 'н/д');
-                return tab;
-            };
-        </script>
+        
 
         <!-- Подключение данных -->
         <script src="js/data/real-data-processor.js"

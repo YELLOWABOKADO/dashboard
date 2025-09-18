@@ -169,7 +169,7 @@ function populateBlockDetailsSelects(operatorData) {
 }
 
 // Заполнение селекта блоков
-function populateBlockDetailsBlocks() {
+async function populateBlockDetailsBlocks() {
     console.log('=== Заполнение селекта блоков ===');
 
     const blockSelect = document.getElementById('blockDetailsBlockFilter');
@@ -178,44 +178,95 @@ function populateBlockDetailsBlocks() {
         return;
     }
 
-    // Проверяем, загружены ли данные чек-листов
-    if (typeof window.checklistFilteredData === 'undefined' || !window.checklistFilteredData || window.checklistFilteredData.length === 0) {
-        console.log('Данные чек-листов еще не загружены, повторяем через 500мс');
-        setTimeout(() => populateBlockDetailsBlocks(), 500);
-        return;
+    // Сначала пробуем загрузить реальные данные из operator_data_days.json
+    let sourceData = await loadChecklistSourceData();
+    if (!sourceData || sourceData.length === 0) {
+        // Фолбек на уже имеющиеся данные, если они появились из других модулей
+        if (Array.isArray(window.checklistFilteredData) && window.checklistFilteredData.length > 0) {
+            sourceData = window.checklistFilteredData;
+        } else {
+            console.log('Не удалось загрузить operator_data_days.json. Показываем тестовые блоки.');
+            const testBlocks = [
+                'Влияние на бизнес',
+                'Влияние на мотивацию сотрудника',
+                'Клиентоцентричность',
+                'Влияние на бизнес > Качество обслуживания',
+                'Влияние на мотивацию сотрудника > Система мотивации'
+            ];
+            blockSelect.innerHTML = '<option value="">Выберите блок</option>';
+            testBlocks.forEach(block => {
+                blockSelect.innerHTML += `<option value="${block}">${block}</option>`;
+            });
+            return;
+        }
     }
 
-    // Получаем данные чек-листов для определения доступных блоков
-    if (window.checklistFilteredData && window.checklistFilteredData.length > 0) {
-        console.log('Найдены данные чек-листов:', window.checklistFilteredData.length, 'записей');
+    // Строим список путей блоков из загруженных данных (до 3 уровня)
+    console.log('Найдены данные чек-листов:', sourceData.length, 'записей');
+    const blockSet = new Set();
+    sourceData.forEach(item => {
+        const b0 = item.Block_0_lvl || '';
+        const b1 = item.Block_1_lvl || '';
+        const b2 = item.Block_2_lvl || '';
+        const b3 = item.Block_3_lvl || '';
+        if (!b0) return;
+        // Добавляем последовательные уровни как отдельные варианты
+        blockSet.add(`${b0}`);
+        if (b1) blockSet.add(`${b0} > ${b1}`);
+        if (b2) blockSet.add(`${b0} > ${b1} > ${b2}`);
+        if (b3) blockSet.add(`${b0} > ${b1} > ${b2} > ${b3}`);
+    });
 
-        const blocks = [...new Set(window.checklistFilteredData.map(item =>
-            `${item.Block_0_lvl}${item.Block_1_lvl ? ` > ${item.Block_1_lvl}` : ''}${item.Block_2_lvl ? ` > ${item.Block_2_lvl}` : ''}${item.Block_3_lvl ? ` > ${item.Block_3_lvl}` : ''}${item.Block_4_lvl ? ` > ${item.Block_4_lvl}` : ''}`
-        ))].sort();
+    const blocks = Array.from(blockSet).sort();
+    console.log('Найдено уникальных путей блоков:', blocks.length);
 
-        console.log('Найдено блоков:', blocks.length);
+    blockSelect.innerHTML = '<option value="">Выберите блок</option>';
+    blocks.forEach(block => {
+        const optionHtml = `<option value="${block}" title="${block}">${block}</option>`;
+        blockSelect.innerHTML += optionHtml;
+    });
+}
 
-        blockSelect.innerHTML = '<option value="">Выберите блок</option>';
-        blocks.forEach(block => {
-            blockSelect.innerHTML += `<option value="${block}">${block}</option>`;
-        });
-    } else {
-        console.log('Данные чек-листов не найдены, создаем тестовые блоки');
-
-        // Создаем тестовые блоки для демонстрации
-        const testBlocks = [
-            'Влияние на бизнес',
-            'Влияние на мотивацию сотрудника',
-            'Клиентоцентричность',
-            'Влияние на бизнес > Качество обслуживания',
-            'Влияние на мотивацию сотрудника > Система мотивации'
-        ];
-
-        blockSelect.innerHTML = '<option value="">Выберите блок</option>';
-        testBlocks.forEach(block => {
-            blockSelect.innerHTML += `<option value="${block}">${block}</option>`;
-        });
+// Загрузка исходных данных чек-листов из operator_data_days.json
+let cachedChecklistSourceData = null;
+async function loadChecklistSourceData() {
+    if (cachedChecklistSourceData && Array.isArray(cachedChecklistSourceData) && cachedChecklistSourceData.length > 0) {
+        return cachedChecklistSourceData;
     }
+
+    const possiblePaths = [
+        'operator_data_days.json',
+        './operator_data_days.json',
+        '/operator_data_days.json',
+        'tests/operator_data_days.json',
+        './tests/operator_data_days.json'
+    ];
+
+    for (const path of possiblePaths) {
+        try {
+            console.log(`Пробуем загрузить operator_data_days.json из ${path}...`);
+            const response = await fetch(path);
+            if (!response.ok) {
+                console.warn(`Статус ${response.status} при загрузке ${path}`);
+                continue;
+            }
+            const data = await response.json();
+            if (Array.isArray(data) && data.length > 0) {
+                cachedChecklistSourceData = data;
+                // Делаем доступным для других модулей
+                if (!window.checklistFilteredData || window.checklistFilteredData.length === 0) {
+                    window.checklistFilteredData = data;
+                }
+                console.log('✅ operator_data_days.json загружен. Записей:', data.length);
+                return data;
+            }
+        } catch (e) {
+            console.warn('Ошибка загрузки', path, e.message);
+        }
+    }
+
+    console.error('Не удалось загрузить operator_data_days.json ни по одному пути');
+    return [];
 }
 
 // Получение значений фильтров
@@ -326,8 +377,15 @@ function renderBlockDetailsChart(filters) {
     // Фильтруем данные по выбранным критериям
     const filteredData = checklistData.filter(item => {
         // Фильтр по блоку
-        const itemBlock = `${item.Block_0_lvl}${item.Block_1_lvl ? ` > ${item.Block_1_lvl}` : ''}${item.Block_2_lvl ? ` > ${item.Block_2_lvl}` : ''}${item.Block_3_lvl ? ` > ${item.Block_3_lvl}` : ''}${item.Block_4_lvl ? ` > ${item.Block_4_lvl}` : ''}`;
-        if (itemBlock !== filters.block) return false;
+        const compose = (it) => {
+            const p = [it.Block_0_lvl, it.Block_1_lvl, it.Block_2_lvl, it.Block_3_lvl].filter(Boolean);
+            // Создаем все префиксы для сопоставления
+            const prefixes = [];
+            for (let i = 1; i <= p.length; i++) prefixes.push(p.slice(0, i).join(' > '));
+            return prefixes;
+        };
+        const itemPrefixes = compose(item);
+        if (!itemPrefixes.includes(filters.block)) return false;
 
         // Фильтр по КЦ (проверяем разные возможные названия полей)
         if (filters.kc && filters.kc !== '') {
@@ -335,10 +393,13 @@ function renderBlockDetailsChart(filters) {
             if (itemKc !== filters.kc) return false;
         }
 
-        // Фильтр по группе
+        // Фильтр по группе (нормализуем суффикс " - группа")
         if (filters.group && filters.group !== '') {
-            const itemGroup = item.group || item['Группа'];
-            if (itemGroup !== filters.group) return false;
+            const itemGroupRaw = item.group || item['Группа'] || '';
+            const normalizeGroup = (g) => (g || '').replace(/\s*-\s*группа$/i, '').trim();
+            const itemGroupNorm = normalizeGroup(itemGroupRaw);
+            const filterGroupNorm = normalizeGroup(filters.group);
+            if (itemGroupNorm !== filterGroupNorm) return false;
         }
 
         // Фильтр по оператору
