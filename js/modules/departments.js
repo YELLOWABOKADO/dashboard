@@ -320,11 +320,10 @@ function setupDepartmentDropdowns() {
         });
     }
     
-    // Закрытие выпадающих списков при клике вне их
+    // Закрытие выпадающих списков при клике вне их (только своего)
     document.addEventListener('click', function() {
-        document.querySelectorAll('.multi-select-dropdown').forEach(dd => {
-            dd.style.display = 'none';
-        });
+        const deptDropdownEl = document.getElementById('deptDepartmentsDropdown');
+        if (deptDropdownEl) deptDropdownEl.style.display = 'none';
     });
 }
 

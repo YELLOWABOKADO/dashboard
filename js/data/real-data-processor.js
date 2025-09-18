@@ -7,6 +7,9 @@ console.log('=== real-data-processor.js загружается ===');
 let operatorData = null;
 let rpcDetailsData = null;
 
+// Флаг для принудительного использования тестовых данных (для отладки)
+const FORCE_USE_TEST_DATA = false;
+
 // Временные тестовые данные (для обхода CORS)
 const TEMP_OPERATOR_DATA = {
     "Маркина И. М.": {
@@ -100,7 +103,7 @@ const TEMP_OPERATOR_DATA = {
 // Функция для загрузки данных RPC
 async function loadRpcData() {
     if (rpcDetailsData) return rpcDetailsData;
-    
+
     try {
         console.log('Загружаем данные RPC...');
         const response = await fetch('rpc_details_data.json');
@@ -123,32 +126,70 @@ async function loadOperatorData() {
         return operatorData;
     }
 
-    try {
-        console.log('Пытаемся загрузить данные операторов из callcenter_operator_data.json...');
-        const response = await fetch('callcenter_operator_data.json');
-        console.log('Response status:', response.status, response.statusText);
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status} ${response.statusText}`);
-        }
-        
-        const text = await response.text();
-        console.log('Response text length:', text.length);
-        
-        operatorData = JSON.parse(text);
-        console.log('Данные операторов успешно загружены из JSON:', Object.keys(operatorData).length, 'операторов');
-        
-        return operatorData;
-    } catch (error) {
-        console.error('Ошибка загрузки данных из JSON файла:', error.message);
-        console.log('Используем временные тестовые данные...');
-        
-        // Используем временные данные
+    // Если принудительно используем тестовые данные
+    if (FORCE_USE_TEST_DATA) {
+        console.log('Принудительно используем тестовые данные (FORCE_USE_TEST_DATA = true)');
         operatorData = TEMP_OPERATOR_DATA;
         console.log('Загружены тестовые данные:', Object.keys(operatorData).length, 'операторов');
-        
         return operatorData;
     }
+
+    const possiblePaths = [
+        'callcenter_operator_data.json',
+        './callcenter_operator_data.json',
+        '/callcenter_operator_data.json',
+        '../callcenter_operator_data.json'
+    ];
+
+    for (const path of possiblePaths) {
+        try {
+            console.log(`Пытаемся загрузить данные операторов из ${path}...`);
+            const response = await fetch(path, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            });
+            console.log(`Response status для ${path}:`, response.status, response.statusText);
+
+            if (!response.ok) {
+                console.warn(`Путь ${path} вернул статус ${response.status}, пробуем следующий...`);
+                continue;
+            }
+
+            const text = await response.text();
+            console.log('Response text length:', text.length);
+
+            if (!text || text.length < 10) {
+                console.warn(`Путь ${path} вернул пустой или слишком маленький ответ, пробуем следующий...`);
+                continue;
+            }
+
+            operatorData = JSON.parse(text);
+            console.log('✅ Данные операторов успешно загружены из JSON:', Object.keys(operatorData).length, 'операторов');
+            console.log('📊 Примеры данных:', Object.keys(operatorData).slice(0, 3).map(name => `${name}: ${Object.keys(operatorData[name].Данные).length} дней`));
+
+            return operatorData;
+        } catch (error) {
+            console.warn(`Ошибка загрузки из ${path}:`, error.message);
+            continue;
+        }
+    }
+
+    console.error('❌ Не удалось загрузить данные из всех возможных путей, используем временные тестовые данные...');
+    console.error('Возможные причины:');
+    console.error('- CORS политика сервера');
+    console.error('- Неправильный путь к файлу');
+    console.error('- Сервер не обслуживает статические файлы');
+    console.error('- Рекомендация: поместите callcenter_operator_data.json в корневую директорию сайта');
+
+    // Используем временные данные
+    operatorData = TEMP_OPERATOR_DATA;
+    console.warn('⚠️ Загружены ВЫДУМАННЫЕ тестовые данные:', Object.keys(operatorData).length, 'операторов');
+    console.warn('📊 Примеры тестовых данных:', Object.keys(operatorData).slice(0, 3).map(name => `${name}: ${Object.keys(operatorData[name].Данные).length} дней`));
+
+    return operatorData;
 }
 
 // Загрузка данных RPC детализации
@@ -175,23 +216,23 @@ async function loadRpcDetailsData() {
     try {
         console.log('Пытаемся загрузить данные RPC из rpc_details_data.json...');
         const response = await fetch('rpc_details_data.json');
-        
+
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status} ${response.statusText}`);
         }
-        
+
         rpcDetailsData = await response.json();
         console.log('Данные RPC успешно загружены из JSON');
-        
+
         return rpcDetailsData;
     } catch (error) {
         console.error('Ошибка загрузки данных RPC из JSON файла:', error.message);
         console.log('Используем временные данные RPC...');
-        
+
         // Используем временные данные
         rpcDetailsData = TEMP_RPC_DATA;
         console.log('Загружены тестовые данные RPC');
-        
+
         return rpcDetailsData;
     }
 }
@@ -232,7 +273,7 @@ function getPreviousPeriod(startDate, endDate, granularity) {
         case 'Месяц':
             prevStart = new Date(start);
             prevStart.setMonth(prevStart.getMonth() - 1);
-            
+
             // Для конечной даты нужно учесть количество дней в предыдущем месяце
             prevEnd = new Date(prevStart);
             prevEnd.setMonth(prevEnd.getMonth() + 1, 0); // Последний день предыдущего месяца
@@ -276,15 +317,15 @@ function aggregateDataForPeriod(data, startDate, endDate) {
 function getRpcDataForPeriod(rpcData, startDate, endDate, kcKey, rpcFilter) {
     // Определяем период в формате YYYY-MM для поиска в RPC данных
     const periodKey = startDate.substring(0, 7); // "2025-07"
-    
+
     if (!rpcData[periodKey]) {
         console.log(`RPC данные для периода ${periodKey} не найдены`);
         return { calls: 0, deviations: 0 };
     }
-    
+
     const periodData = rpcData[periodKey];
     let targetData;
-    
+
     // Выбираем данные по КЦ
     if (kcKey === 'kc1') {
         targetData = periodData.kc1;
@@ -293,11 +334,11 @@ function getRpcDataForPeriod(rpcData, startDate, endDate, kcKey, rpcFilter) {
     } else {
         targetData = periodData.total;
     }
-    
+
     if (!targetData) {
         return { calls: 0, deviations: 0 };
     }
-    
+
     // Если выбран конкретный RPC фильтр, берем данные из details
     if (rpcFilter !== 'Все' && targetData.details && targetData.details[rpcFilter]) {
         const detailData = targetData.details[rpcFilter];
@@ -306,7 +347,7 @@ function getRpcDataForPeriod(rpcData, startDate, endDate, kcKey, rpcFilter) {
             deviations: detailData.deviations || 0
         };
     }
-    
+
     // Иначе возвращаем общие данные
     return {
         calls: targetData.calls || 0,
@@ -317,15 +358,15 @@ function getRpcDataForPeriod(rpcData, startDate, endDate, kcKey, rpcFilter) {
 // Функция для получения данных компании
 async function getCompanyData(startDate, endDate, granularity, selectedCallCenter = 'Все КЦ') {
     console.log(`getCompanyData вызвана с параметрами:`, { startDate, endDate, granularity, selectedCallCenter });
-    
+
     const data = await loadOperatorData();
     const rpcData = await loadRpcData();
-    
+
     if (!data) {
         console.error('Не удалось загрузить данные операторов');
         return null;
     }
-    
+
     if (!rpcData) {
         console.error('Не удалось загрузить данные RPC');
         return null;
@@ -333,7 +374,7 @@ async function getCompanyData(startDate, endDate, granularity, selectedCallCente
 
     const currentPeriod = { startDate, endDate };
     const previousPeriod = getPreviousPeriod(startDate, endDate, granularity);
-    
+
     console.log('Периоды для анализа:', { currentPeriod, previousPeriod });
 
     // Отслеживаем, какие КЦ имеют данные
@@ -667,6 +708,7 @@ if (typeof module !== 'undefined' && module.exports) {
 } else {
     // Для браузера делаем функции глобальными
     window.loadOperatorData = loadOperatorData;
+    window.TEMP_OPERATOR_DATA = TEMP_OPERATOR_DATA; // Для отладки
     window.loadRpcData = loadRpcData;
     window.getCompanyData = getCompanyData;
     window.getDepartmentsData = getDepartmentsData;
@@ -675,12 +717,20 @@ if (typeof module !== 'undefined' && module.exports) {
     window.getRpcDataForPeriod = getRpcDataForPeriod;
     window.loadRpcDetailsData = loadRpcDetailsData;
     window.getRpcDetailsData = getRpcDetailsData;
-    
+
+    // Функция для сброса кэша данных (для отладки)
+    window.resetDataCache = function () {
+        operatorData = null;
+        rpcDetailsData = null;
+        console.log('🗑️ Кэш данных сброшен. Следующая загрузка будет заново пытаться загрузить JSON.');
+    };
+
     console.log('=== real-data-processor.js функции экспортированы в window ===', {
         loadOperatorData: typeof window.loadOperatorData,
         getCompanyData: typeof window.getCompanyData,
         getDepartmentsData: typeof window.getDepartmentsData,
         getEmployeesData: typeof window.getEmployeesData,
-        getPreviousPeriod: typeof window.getPreviousPeriod
+        getPreviousPeriod: typeof window.getPreviousPeriod,
+        resetDataCache: typeof window.resetDataCache
     });
 }

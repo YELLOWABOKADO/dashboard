@@ -53,12 +53,15 @@ function setupDynamicsMultiSelect(prefix, defaultText) {
     // Обработчик клика по кнопке
     button.addEventListener('click', function(e) {
         e.stopPropagation();
-        dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+        const isVisible = window.getComputedStyle(dropdown).display !== 'none';
+        dropdown.style.display = isVisible ? 'none' : 'block';
     });
     
     // Закрытие при клике вне элемента
-    document.addEventListener('click', function() {
-        dropdown.style.display = 'none';
+    document.addEventListener('click', function(e) {
+        if (!button.contains(e.target) && !dropdown.contains(e.target)) {
+            dropdown.style.display = 'none';
+        }
     });
     
     // Обработчик изменения чекбоксов

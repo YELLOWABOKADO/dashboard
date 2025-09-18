@@ -398,11 +398,12 @@ function setupEmployeeDropdowns() {
         });
     }
 
-    // Закрытие выпадающих списков при клике вне их
+    // Закрытие выпадающих списков при клике вне их (только своих)
     document.addEventListener('click', function () {
-        document.querySelectorAll('.multi-select-dropdown').forEach(dd => {
-            dd.style.display = 'none';
-        });
+        const empDepartmentsDropdownEl = document.getElementById('empDepartmentsDropdown');
+        const empEmployeesDropdownEl = document.getElementById('empEmployeesDropdown');
+        if (empDepartmentsDropdownEl) empDepartmentsDropdownEl.style.display = 'none';
+        if (empEmployeesDropdownEl) empEmployeesDropdownEl.style.display = 'none';
     });
 }
 

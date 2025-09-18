@@ -72,23 +72,65 @@ async function populateRatingsFilters() {
             employees.add(employeeName);
         });
 
-        // Проверяем, что dropdown'ы существуют и содержат опции
+        // Заполняем dropdown групп
         const departmentsDropdown = document.getElementById('ratDepartmentsDropdown');
-        const employeesDropdown = document.getElementById('ratEmployeesDropdown');
-
         if (departmentsDropdown) {
-            console.log('Dropdown групп найден, проверяем опции...');
+            // Очищаем существующие опции кроме "Все группы"
             const existingOptions = departmentsDropdown.querySelectorAll('input[type="checkbox"]:not([value="all"])');
-            console.log('Существующие опции групп:', existingOptions.length);
+            existingOptions.forEach(option => option.parentElement.remove());
+
+            // Добавляем новые опции
+            Array.from(groups).sort().forEach(group => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'multi-select-option';
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = `rat_dept_${group.replace(/\s+/g, '_').toLowerCase()}`;
+                checkbox.value = group;
+
+                const label = document.createElement('label');
+                label.setAttribute('for', checkbox.id);
+                label.textContent = `${group} - группа`;
+
+                optionDiv.appendChild(checkbox);
+                optionDiv.appendChild(label);
+                departmentsDropdown.appendChild(optionDiv);
+            });
+
+            console.log('Dropdown групп заполнен:', Array.from(groups).length, 'групп');
         }
 
+        // Заполняем dropdown сотрудников
+        const employeesDropdown = document.getElementById('ratEmployeesDropdown');
         if (employeesDropdown) {
-            console.log('Dropdown сотрудников найден, проверяем опции...');
+            // Очищаем существующие опции кроме "Все сотрудники"
             const existingOptions = employeesDropdown.querySelectorAll('input[type="checkbox"]:not([value="all"])');
-            console.log('Существующие опции сотрудников:', existingOptions.length);
+            existingOptions.forEach(option => option.parentElement.remove());
+
+            // Добавляем новые опции
+            Array.from(employees).sort().forEach(employee => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'multi-select-option';
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = `rat_emp_${employee.replace(/\s+/g, '_').toLowerCase()}`;
+                checkbox.value = employee;
+
+                const label = document.createElement('label');
+                label.setAttribute('for', checkbox.id);
+                label.textContent = employee;
+
+                optionDiv.appendChild(checkbox);
+                optionDiv.appendChild(label);
+                employeesDropdown.appendChild(optionDiv);
+            });
+
+            console.log('Dropdown сотрудников заполнен:', Array.from(employees).length, 'сотрудников');
         }
 
-        console.log('Фильтры рейтингов проверены:', {
+        console.log('Фильтры рейтингов заполнены:', {
             groups: Array.from(groups),
             employees: Array.from(employees)
         });
@@ -149,17 +191,34 @@ function setupRatingsMultiSelect(prefix, defaultText) {
 
     // Обработчик клика по кнопке
     button.addEventListener('click', function (e) {
+        if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
         e.stopPropagation();
         e.preventDefault();
-        dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+        const isVisible = window.getComputedStyle(dropdown).display !== 'none';
+        const nextDisplay = isVisible ? 'none' : 'block';
+        dropdown.style.display = nextDisplay;
+        dropdown.classList.toggle('show', nextDisplay === 'block');
+        // Дублируем в следующий тик на случай внешних обработчиков
+        setTimeout(() => {
+            dropdown.style.display = nextDisplay;
+            dropdown.classList.toggle('show', nextDisplay === 'block');
+        }, 0);
         console.log(`Клик по кнопке ${prefix}, dropdown теперь: ${dropdown.style.display}`);
     });
 
     // Закрытие при клике вне элемента
     document.addEventListener('click', function (e) {
+        console.log(`Document click: target=${e.target.id || e.target.tagName}, button.contains=${button.contains(e.target)}, dropdown.contains=${dropdown.contains(e.target)}`);
         if (!button.contains(e.target) && !dropdown.contains(e.target)) {
+            console.log(`Закрываем dropdown ${prefix} при клике вне элемента`);
             dropdown.style.display = 'none';
+            dropdown.classList.remove('show');
         }
+    });
+
+    // Останавливаем всплытие кликов внутри дропдауна, чтобы внешние хендлеры не закрывали его
+    dropdown.addEventListener('click', function (e) {
+        e.stopPropagation();
     });
 
     // Обработчик изменения чекбоксов через event delegation
@@ -308,6 +367,13 @@ async function loadRatingsDetails() {
 
         console.log('Данные операторов загружены, количество:', Object.keys(operatorData).length);
 
+        // Проверим, реальные ли данные или тестовые
+        const isTestData = operatorData === window.TEMP_OPERATOR_DATA || (operatorData && Object.keys(operatorData).length === 6 && operatorData['Маркина И. М.']);
+        console.log('🔍 Тип данных:', isTestData ? 'ВЫДУМАННЫЕ (тестовые)' : 'РЕАЛЬНЫЕ (из JSON)');
+        if (isTestData) {
+            console.warn('⚠️ ВНИМАНИЕ: Используются выдуманные тестовые данные! Проверьте загрузку callcenter_operator_data.json');
+        }
+
         // Фильтруем сотрудников
         const filteredEmployees = filterEmployeesForRatings(operatorData, filters);
         console.log('Отфильтрованные сотрудники для рейтингов:', filteredEmployees.length, 'сотрудников');
@@ -371,11 +437,33 @@ function filterEmployeesForRatings(operatorData, filters) {
 
 // Вычисление рейтингов операторов
 function calculateRatings(operatorData, filteredEmployees, filters) {
+    console.log('🎯 calculateRatings вызвана с параметрами:', {
+        operatorDataKeys: Object.keys(operatorData || {}),
+        filteredEmployeesCount: filteredEmployees?.length || 0,
+        filteredEmployees: filteredEmployees,
+        filters
+    });
+
     const ratings = [];
 
     filteredEmployees.forEach(employeeName => {
         const employee = operatorData[employeeName];
+        console.log(`👤 Обрабатываем сотрудника: ${employeeName}`, {
+            employeeExists: !!employee,
+            employeeGroup: employee?.['Группа'],
+            employeeCallCenter: employee?.['КЦ']
+        });
+
+        if (!employee) {
+            console.error(`❌ Сотрудник ${employeeName} не найден в данных!`);
+            return;
+        }
+
         const employeeData = employee['Данные'];
+        if (!employeeData) {
+            console.error(`❌ У сотрудника ${employeeName} нет данных!`);
+            return;
+        }
 
         // Вычисляем суммарные показатели за период
         let totalCalls = 0;
@@ -384,20 +472,26 @@ function calculateRatings(operatorData, filteredEmployees, filters) {
 
         const startDate = new Date(filters.startDate);
         const endDate = new Date(filters.endDate);
+        console.log(`📅 Период анализа: ${startDate.toISOString().split('T')[0]} - ${endDate.toISOString().split('T')[0]}`);
 
         Object.keys(employeeData).forEach(dateStr => {
             const date = new Date(dateStr);
             if (date >= startDate && date <= endDate) {
                 const dayData = employeeData[dateStr];
-                totalCalls += dayData['Звонков'] || 0;
-                totalDeviations += dayData['Отклонений'] || 0;
+                const calls = dayData['Звонков'] || 0;
+                const deviations = dayData['Отклонений'] || 0;
+
+                totalCalls += calls;
+                totalDeviations += deviations;
                 daysCount++;
+
+                console.log(`📊 День ${dateStr}: звонков=${calls}, отклонений=${deviations}`);
             }
         });
 
         const percentage = totalCalls > 0 ? (totalDeviations / totalCalls) * 100 : 0;
 
-        ratings.push({
+        const rating = {
             name: employeeName,
             group: employee['Группа'] || 'Без группы',
             callCenter: employee['КЦ'] || 'Не указан',
@@ -405,11 +499,21 @@ function calculateRatings(operatorData, filteredEmployees, filters) {
             totalDeviations: totalDeviations,
             daysCount: daysCount,
             percentage: Math.round(percentage * 100) / 100
-        });
+        };
+
+        console.log(`✅ Рейтинг для ${employeeName}:`, rating);
+        ratings.push(rating);
     });
 
     // Сортируем по проценту отклонений (возрастание - лучший рейтинг)
     ratings.sort((a, b) => a.percentage - b.percentage);
+
+    console.log('🏆 Финальные рейтинги:', ratings.map(r => ({
+        name: r.name,
+        percentage: r.percentage,
+        calls: r.totalCalls,
+        deviations: r.totalDeviations
+    })));
 
     return ratings;
 }
@@ -467,7 +571,7 @@ function generateRatingsTable(ratingsData, filters) {
                 <td class="callcenter-cell">${rating.callCenter}</td>
                 <td class="calls-cell">${rating.totalCalls.toLocaleString()}</td>
                 <td class="deviations-cell">${rating.totalDeviations.toLocaleString()}</td>
-                <td class="percentage-cell">${rating.percentage.toFixed(1)}%</td>
+                <td class="percentage-cell">${rating.percentage.toFixed(2)}%</td>
                 <td class="days-cell">${rating.daysCount}</td>
             </tr>
         `;
