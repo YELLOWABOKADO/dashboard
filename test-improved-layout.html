@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Улучшенный макет переключателей и графиков</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 20px;
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        .demo-info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2196f3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>📊 Тест улучшенного макета графиков</h2>
+        
+        <div class="demo-info">
+            <strong>Что тестируем:</strong>
+            <ul>
+                <li>✅ Переключатель группировки (исправленный размер)</li>
+                <li>✅ Третий график увеличен до 70% ширины</li>
+                <li>✅ Макет 2+1 (два графика сверху, один снизу по центру)</li>
+                <li>✅ Переключение между режимами ШТ/% и По месяцам/По подразделениям</li>
+            </ul>
+        </div>
+        
+        <!-- Переключатели режимов отображения -->
+        <div class="charts-controls-container">
+            <div class="charts-mode-toggle-container">
+                <span class="toggle-label">Режим отображения:</span>
+                <div class="toggle-switch" id="checklistChartsToggle">
+                    <div class="toggle-option active" data-mode="count">ШТ</div>
+                    <div class="toggle-option" data-mode="percent">%</div>
+                    <div class="toggle-slider"></div>
+                </div>
+            </div>
+            <div class="charts-grouping-toggle-container">
+                <span class="toggle-label">Группировка:</span>
+                <div class="toggle-switch" id="checklistGroupingToggle">
+                    <div class="toggle-option active" data-mode="months">По месяцам</div>
+                    <div class="toggle-option" data-mode="departments">По подразделениям</div>
+                    <div class="toggle-slider"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Графики -->
+        <div class="checklist-dynamics-charts">
+            <!-- График 1: Влияние на бизнес -->
+            <div class="checklist-chart-card">
+                <div class="checklist-chart-header">
+                    <h5>Динамика блока: Влияние на бизнес</h5>
+                </div>
+                <div class="checklist-chart-wrapper">
+                    <canvas id="checklistResultChart"></canvas>
+                </div>
+            </div>
+
+            <!-- График 2: Влияние на мотивацию сотрудника -->
+            <div class="checklist-chart-card">
+                <div class="checklist-chart-header">
+                    <h5>Динамика блока: Влияние на мотивацию сотрудника</h5>
+                </div>
+                <div class="checklist-chart-wrapper">
+                    <canvas id="checklistMotivationChart"></canvas>
+                </div>
+            </div>
+
+            <!-- График 3: Клиентоцентричность -->
+            <div class="checklist-chart-card">
+                <div class="checklist-chart-header">
+                    <h5>Динамика блока: Клиентоцентричность</h5>
+                </div>
+                <div class="checklist-chart-wrapper">
+                    <canvas id="checklistObjectionsChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="demo-info" style="margin-top: 20px;">
+            <strong>Инструкция:</strong>
+            <ol>
+                <li>Попробуйте переключить "Режим отображения" между ШТ и %</li>
+                <li>Попробуйте переключить "Группировка" между "По месяцам" и "По подразделениям"</li>
+                <li>Обратите внимание, как меняется структура данных на графиках</li>
+                <li>Проверьте, что третий график теперь больше и лучше видно</li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- Подключаем модули -->
+    <script src="js/modules/checklist-charts.js"></script>
+    <script>
+        // Расширенные тестовые данные
+        window.checklistFilteredData = [
+            // Май 2025
+            { date: '2025-05-10', group: 'Гридчина - группа', Block_0_lvl: 'Влияние на бизнес', score: 1 },
+            { date: '2025-05-11', group: 'Гридчина - группа', Block_0_lvl: 'Влияние на бизнес', score: 0 },
+            { date: '2025-05-12', group: 'Мельникова - группа', Block_0_lvl: 'Влияние на бизнес', score: 1 },
+            { date: '2025-05-13', group: 'Коровина - группа', Block_0_lvl: 'Влияние на бизнес', score: 0 },
+            
+            { date: '2025-05-15', group: 'Гридчина - группа', Block_0_lvl: 'Влияние на мотивацию сотрудника', score: 1 },
+            { date: '2025-05-16', group: 'Мельникова - группа', Block_0_lvl: 'Влияние на мотивацию сотрудника', score: 1 },
+            { date: '2025-05-17', group: 'Коровина - группа', Block_0_lvl: 'Влияние на мотивацию сотрудника', score: 0 },
+            { date: '2025-05-18', group: 'Сычева - группа', Block_0_lvl: 'Влияние на мотивацию сотрудника', score: 1 },
+            
+            { date: '2025-05-20', group: 'Гридчина - группа', Block_0_lvl: 'Клиентоцентричность', score: 1 },
+            { date: '2025-05-21', group: 'Мельникова - группа', Block_0_lvl: 'Клиентоцентричность', score: 0 },
+            { date: '2025-05-22', group: 'Коровина - группа', Block_0_lvl: 'Клиентоцентричность', score: 1 },
+            
+            // Июнь 2025
+            { date: '2025-06-10', group: 'Гридчина - группа', Block_0_lvl: 'Влияние на бизнес', score: 0 },
+            { date: '2025-06-11', group: 'Мельникова - группа', Block_0_lvl: 'Влияние на бизнес', score: 1 },
+            { date: '2025-06-12', group: 'Коровина - группа', Block_0_lvl: 'Влияние на бизнес', score: 1 },
+            { date: '2025-06-13', group: 'Сычева - группа', Block_0_lvl: 'Влияние на бизнес', score: 0 },
+            
+            { date: '2025-06-15', group: 'Гридчина - группа', Block_0_lvl: 'Влияние на мотивацию сотрудника', score: 1 },
+            { date: '2025-06-16', group: 'Мельникова - группа', Block_0_lvl: 'Влияние на мотивацию сотрудника', score: 0 },
+            { date: '2025-06-17', group: 'Коровина - группа', Block_0_lvl: 'Влияние на мотивацию сотрудника', score: 1 },
+            
+            { date: '2025-06-20', group: 'Гридчина - группа', Block_0_lvl: 'Клиентоцентричность', score: 0 },
+            { date: '2025-06-21', group: 'Мельникова - группа', Block_0_lvl: 'Клиентоцентричность', score: 1 },
+            { date: '2025-06-22', group: 'Сычева - группа', Block_0_lvl: 'Клиентоцентричность', score: 1 },
+            
+            // Июль 2025
+            { date: '2025-07-10', group: 'Гридчина - группа', Block_0_lvl: 'Влияние на бизнес', score: 1 },
+            { date: '2025-07-11', group: 'Мельникова - группа', Block_0_lvl: 'Влияние на бизнес', score: 1 },
+            { date: '2025-07-12', group: 'Коровина - группа', Block_0_lvl: 'Влияние на бизнес', score: 0 },
+            
+            { date: '2025-07-15', group: 'Гридчина - группа', Block_0_lvl: 'Влияние на мотивацию сотрудника', score: 0 },
+            { date: '2025-07-16', group: 'Сычева - группа', Block_0_lvl: 'Влияние на мотивацию сотрудника', score: 1 },
+            { date: '2025-07-17', group: 'Коровина - группа', Block_0_lvl: 'Влияние на мотивацию сотрудника', score: 1 },
+            
+            { date: '2025-07-20', group: 'Мельникова - группа', Block_0_lvl: 'Клиентоцентричность', score: 1 },
+            { date: '2025-07-21', group: 'Сычева - группа', Block_0_lvl: 'Клиентоцентричность', score: 0 },
+            { date: '2025-07-22', group: 'Коровина - группа', Block_0_lvl: 'Клиентоцентричность', score: 1 }
+        ];
+
+        // Инициализируем графики после загрузки страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Инициализируем улучшенные графики...');
+            console.log('📊 Тестовых данных:', window.checklistFilteredData.length);
+            initChecklistCharts();
+        });
+    </script>
+</body>
+</html>

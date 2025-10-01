@@ -10,6 +10,9 @@ let checklistObjectionsChart = null;
 // Переменная для хранения режима отображения (count/percent)
 let checklistChartsDisplayMode = 'count';
 
+// Переменная для хранения режима группировки (months/departments)
+let checklistChartsGroupingMode = 'months';
+
 // Инициализация графиков чек-листов
 function initChecklistCharts() {
     console.log('=== Инициализация графиков чек-листов ===');
@@ -23,14 +26,20 @@ function initChecklistCharts() {
 
     console.log('Найдено данных для графиков:', data.length);
 
-    // Создаем данные на основе реальных данных
+    // Создаем данные на основе реальных данных с учетом режима группировки
     const chartData = generateRealChecklistChartData(data);
 
-    // Инициализируем переключатель (только один раз)
+    // Инициализируем переключатели (только один раз)
     const toggleElement = document.getElementById('checklistChartsToggle');
     if (toggleElement && !toggleElement.hasAttribute('data-initialized')) {
         initToggleSwitch();
         toggleElement.setAttribute('data-initialized', 'true');
+    }
+    
+    const groupingToggleElement = document.getElementById('checklistGroupingToggle');
+    if (groupingToggleElement && !groupingToggleElement.hasAttribute('data-initialized')) {
+        initGroupingToggleSwitch();
+        groupingToggleElement.setAttribute('data-initialized', 'true');
     }
 
     // Создаем графики
@@ -53,10 +62,11 @@ function getChecklistFilters() {
     };
 }
 
-// Генерация данных на основе реальных данных с месячной агрегацией
+// Генерация данных на основе реальных данных с поддержкой двух режимов группировки
 function generateRealChecklistChartData(data) {
-    console.log('=== Генерируем месячные данные графиков ===');
+    console.log('=== Генерируем данные графиков ===');
     console.log('Входные данные:', data.length, 'записей');
+    console.log('Режим группировки:', checklistChartsGroupingMode);
     console.log('Пример записи:', data[0]);
 
     if (data.length === 0) {
@@ -64,6 +74,17 @@ function generateRealChecklistChartData(data) {
         return generateChecklistChartData({});
     }
 
+    if (checklistChartsGroupingMode === 'months') {
+        return generateMonthlyGroupedData(data);
+    } else {
+        return generateDepartmentGroupedData(data);
+    }
+}
+
+// Генерация данных с группировкой по месяцам (текущий режим)
+function generateMonthlyGroupedData(data) {
+    console.log('=== Группировка по месяцам ===');
+    
     // Получаем уникальные группы
     const groups = [...new Set(data.map(item => item.group.replace(' - группа', '')))].sort();
     console.log('Группы:', groups);
@@ -127,23 +148,7 @@ function generateRealChecklistChartData(data) {
     const monthLabels = months.map(m => monthlyData[m].label);
 
     console.log('Месяцы:', monthLabels);
-    console.log('Данные по месяцам (проблемы):', monthlyData);
-    console.log('Общие данные по месяцам (всего записей):', monthlyTotals);
     
-    // Детальная отладка для каждого блока
-    ['business', 'motivation', 'client'].forEach(blockType => {
-        console.log(`\n=== Отладка блока: ${blockType} ===`);
-        months.forEach(month => {
-            console.log(`Месяц: ${monthlyData[month].label}`);
-            groups.forEach(group => {
-                const issues = monthlyData[month][blockType][group] || 0;
-                const total = monthlyTotals[month][blockType][group] || 0;
-                const percent = total > 0 ? ((issues / total) * 100).toFixed(1) : 0;
-                console.log(`  ${group}: ${issues} из ${total} (${percent}%)`);
-            });
-        });
-    });
-
     // Функция для создания данных по блоку
     const createBlockData = (blockType) => {
         return groups.map(group => {
@@ -186,6 +191,133 @@ function generateRealChecklistChartData(data) {
             title: 'Клиентоцентричность',
             totals: months.map(month => {
                 return groups.map(group => monthlyTotals[month].client[group] || 0);
+            })
+        }
+    };
+}
+
+// Генерация данных с группировкой по подразделениям (новый режим)
+function generateDepartmentGroupedData(data) {
+    console.log('=== Группировка по подразделениям ===');
+    
+    // Получаем уникальные месяцы
+    const monthsSet = new Set();
+    data.forEach(item => {
+        const date = new Date(item.date);
+        const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+        monthsSet.add(monthKey);
+    });
+    
+    const months = Array.from(monthsSet).sort();
+    const monthLabels = months.map(monthKey => {
+        const [year, month] = monthKey.split('-');
+        const date = new Date(year, month - 1);
+        return date.toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' });
+    });
+    
+    console.log('Месяцы:', monthLabels);
+    
+    // Получаем уникальные группы
+    const groups = [...new Set(data.map(item => item.group.replace(' - группа', '')))].sort();
+    console.log('Группы:', groups);
+
+    // Группируем данные по подразделениям
+    const departmentData = {};
+    const departmentTotals = {}; // Для расчета процентов
+
+    // Инициализируем структуру данных
+    groups.forEach(group => {
+        departmentData[group] = {
+            business: {},
+            motivation: {},
+            client: {}
+        };
+        departmentTotals[group] = {
+            business: {},
+            motivation: {},
+            client: {}
+        };
+        
+        months.forEach(monthKey => {
+            departmentData[group].business[monthKey] = 0;
+            departmentData[group].motivation[monthKey] = 0;
+            departmentData[group].client[monthKey] = 0;
+            departmentTotals[group].business[monthKey] = 0;
+            departmentTotals[group].motivation[monthKey] = 0;
+            departmentTotals[group].client[monthKey] = 0;
+        });
+    });
+
+    data.forEach(item => {
+        const date = new Date(item.date);
+        const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+        const groupName = item.group.replace(' - группа', '');
+        const block0 = item.Block_0_lvl;
+
+        // Считаем общее количество записей по блокам для каждого месяца
+        if (block0 === 'Влияние на бизнес') {
+            departmentTotals[groupName].business[monthKey]++;
+            if (item.score === 1) {
+                departmentData[groupName].business[monthKey]++;
+            }
+        } else if (block0 === 'Влияние на мотивацию сотрудника') {
+            departmentTotals[groupName].motivation[monthKey]++;
+            if (item.score === 1) {
+                departmentData[groupName].motivation[monthKey]++;
+            }
+        } else if (block0 === 'Клиентоцентричность') {
+            departmentTotals[groupName].client[monthKey]++;
+            if (item.score === 1) {
+                departmentData[groupName].client[monthKey]++;
+            }
+        }
+    });
+
+    console.log('Данные по подразделениям (проблемы):', departmentData);
+    console.log('Общие данные по подразделениям (всего записей):', departmentTotals);
+    
+    // Функция для создания данных по блоку
+    const createBlockData = (blockType) => {
+        return months.map(monthKey => {
+            return groups.map(group => {
+                const issues = departmentData[group][blockType][monthKey] || 0;
+                const total = departmentTotals[group][blockType][monthKey] || 0;
+                
+                if (checklistChartsDisplayMode === 'percent') {
+                    return total > 0 ? ((issues / total) * 100) : 0;
+                } else {
+                    return issues;
+                }
+            });
+        });
+    };
+
+    return {
+        result: {
+            labels: groups, // Теперь по оси X идут подразделения
+            groups: monthLabels, // А в легенде - месяцы
+            data: createBlockData('business'),
+            title: 'Влияние на бизнес',
+            totals: months.map(monthKey => {
+                return groups.map(group => departmentTotals[group].business[monthKey] || 0);
+            })
+        },
+        motivation: {
+            labels: groups, // Теперь по оси X идут подразделения
+            groups: monthLabels, // А в легенде - месяцы
+            data: createBlockData('motivation'),
+            title: 'Влияние на мотивацию сотрудника',
+            totals: months.map(monthKey => {
+                return groups.map(group => departmentTotals[group].motivation[monthKey] || 0);
+            })
+        },
+        objections: {
+            labels: groups, // Теперь по оси X идут подразделения
+            groups: monthLabels, // А в легенде - месяцы
+            data: createBlockData('client'),
+            title: 'Клиентоцентричность',
+            totals: months.map(monthKey => {
+                return groups.map(group => departmentTotals[group].client[monthKey] || 0);
             })
         }
     };
@@ -331,6 +463,8 @@ function createChecklistObjectionsChart(data) {
     });
 }
 
+
+
 // Получение цвета для группы
 function getGroupColor(index, alpha = 1) {
     const colors = [
@@ -418,6 +552,7 @@ function getChecklistChartOptions(title) {
 // Настройки для столбчатых графиков чек-листов
 function getChecklistBarChartOptions(title, data = null) {
     const isPercent = checklistChartsDisplayMode === 'percent';
+    const isDepartmentGrouping = checklistChartsGroupingMode === 'departments';
     
     // Рассчитываем динамический максимум для процентов
     let maxValue = undefined;
@@ -473,7 +608,7 @@ function getChecklistBarChartOptions(title, data = null) {
                 display: true,
                 title: {
                     display: true,
-                    text: 'Месяц',
+                    text: isDepartmentGrouping ? 'Подразделение' : 'Месяц',
                     font: {
                         size: 12,
                         weight: 'bold'
@@ -552,7 +687,7 @@ function updateToggleSwitch() {
     toggleSwitch.setAttribute('data-active', checklistChartsDisplayMode);
 }
 
-// Инициализация переключателя
+// Инициализация переключателя режима отображения
 function initToggleSwitch() {
     const toggleSwitch = document.getElementById('checklistChartsToggle');
     if (!toggleSwitch) return;
@@ -574,6 +709,67 @@ function initToggleSwitch() {
     updateToggleSwitch();
 }
 
+// Инициализация переключателя группировки
+function initGroupingToggleSwitch() {
+    const toggleSwitch = document.getElementById('checklistGroupingToggle');
+    if (!toggleSwitch) return;
+    
+    console.log('Инициализируем переключатель группировки графиков...');
+    
+    // Добавляем обработчики кликов на опции
+    const options = toggleSwitch.querySelectorAll('.toggle-option');
+    options.forEach(option => {
+        option.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const mode = this.getAttribute('data-mode');
+            console.log('Выбран режим группировки:', mode);
+            toggleChecklistGroupingMode(mode);
+        });
+    });
+    
+    // Устанавливаем начальное состояние
+    updateGroupingToggleSwitch();
+}
+
+// Переключение режима группировки графиков
+function toggleChecklistGroupingMode(mode) {
+    if (mode) {
+        checklistChartsGroupingMode = mode;
+    } else {
+        checklistChartsGroupingMode = checklistChartsGroupingMode === 'months' ? 'departments' : 'months';
+    }
+    
+    console.log('Переключен режим группировки графиков на:', checklistChartsGroupingMode);
+    
+    // Обновляем переключатель
+    updateGroupingToggleSwitch();
+    
+    // Перерисовываем графики
+    initChecklistCharts();
+}
+
+// Обновление внешнего вида переключателя группировки
+function updateGroupingToggleSwitch() {
+    const toggleSwitch = document.getElementById('checklistGroupingToggle');
+    if (!toggleSwitch) return;
+    
+    const options = toggleSwitch.querySelectorAll('.toggle-option');
+    
+    // Убираем активный класс со всех опций
+    options.forEach(option => option.classList.remove('active'));
+    
+    // Добавляем активный класс к текущей опции
+    const activeOption = toggleSwitch.querySelector(`[data-mode="${checklistChartsGroupingMode}"]`);
+    if (activeOption) {
+        activeOption.classList.add('active');
+    }
+    
+    // Обновляем позицию слайдера
+    toggleSwitch.setAttribute('data-active', checklistChartsGroupingMode);
+    
+    console.log('Обновлен переключатель группировки:', checklistChartsGroupingMode);
+}
+
 // Обновление графиков при изменении фильтров
 function updateChecklistDynamicsCharts() {
     console.log('Обновление динамических графиков чек-листов...');
@@ -585,6 +781,9 @@ if (typeof window !== 'undefined') {
     window.initChecklistCharts = initChecklistCharts;
     window.updateChecklistDynamicsCharts = updateChecklistDynamicsCharts;
     window.toggleChecklistChartsMode = toggleChecklistChartsMode;
+    window.toggleChecklistGroupingMode = toggleChecklistGroupingMode;
     window.initToggleSwitch = initToggleSwitch;
     window.updateToggleSwitch = updateToggleSwitch;
+    window.initGroupingToggleSwitch = initGroupingToggleSwitch;
+    window.updateGroupingToggleSwitch = updateGroupingToggleSwitch;
 }

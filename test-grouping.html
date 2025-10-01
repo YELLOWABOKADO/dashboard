@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест переключателя группировки</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Тест переключателя группировки</h1>
+        
+        <!-- Переключатели режимов отображения -->
+        <div class="charts-controls-container">
+            <div class="charts-mode-toggle-container">
+                <span class="toggle-label">Группировка:</span>
+                <div class="toggle-switch" id="checklistGroupingToggle">
+                    <div class="toggle-option active" data-mode="months">По месяцам</div>
+                    <div class="toggle-option" data-mode="departments">По подразделениям</div>
+                    <div class="toggle-slider"></div>
+                </div>
+            </div>
+            <div class="charts-mode-toggle-container">
+                <span class="toggle-label">Режим отображения:</span>
+                <div class="toggle-switch" id="checklistChartsToggle">
+                    <div class="toggle-option active" data-mode="count">ШТ</div>
+                    <div class="toggle-option" data-mode="percent">%</div>
+                    <div class="toggle-slider"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="output">
+            <p>Режим группировки: <span id="groupingMode">months</span></p>
+            <p>Режим отображения: <span id="displayMode">count</span></p>
+        </div>
+    </div>
+
+    <script>
+        // Простая логика для тестирования
+        let groupingMode = 'months';
+        let displayMode = 'count';
+        
+        function updateDisplay() {
+            document.getElementById('groupingMode').textContent = groupingMode;
+            document.getElementById('displayMode').textContent = displayMode;
+        }
+        
+        function updateGroupingToggle() {
+            const toggle = document.getElementById('checklistGroupingToggle');
+            const options = toggle.querySelectorAll('.toggle-option');
+            
+            options.forEach(option => option.classList.remove('active'));
+            const activeOption = toggle.querySelector(`[data-mode="${groupingMode}"]`);
+            if (activeOption) {
+                activeOption.classList.add('active');
+            }
+            
+            toggle.setAttribute('data-active', groupingMode);
+        }
+        
+        function updateDisplayToggle() {
+            const toggle = document.getElementById('checklistChartsToggle');
+            const options = toggle.querySelectorAll('.toggle-option');
+            
+            options.forEach(option => option.classList.remove('active'));
+            const activeOption = toggle.querySelector(`[data-mode="${displayMode}"]`);
+            if (activeOption) {
+                activeOption.classList.add('active');
+            }
+            
+            toggle.setAttribute('data-active', displayMode);
+        }
+        
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', function() {
+            // Переключатель группировки
+            const groupingToggle = document.getElementById('checklistGroupingToggle');
+            const groupingOptions = groupingToggle.querySelectorAll('.toggle-option');
+            groupingOptions.forEach(option => {
+                option.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    groupingMode = this.getAttribute('data-mode');
+                    updateGroupingToggle();
+                    updateDisplay();
+                });
+            });
+            
+            // Переключатель отображения
+            const displayToggle = document.getElementById('checklistChartsToggle');
+            const displayOptions = displayToggle.querySelectorAll('.toggle-option');
+            displayOptions.forEach(option => {
+                option.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    displayMode = this.getAttribute('data-mode');
+                    updateDisplayToggle();
+                    updateDisplay();
+                });
+            });
+            
+            // Начальное состояние
+            updateGroupingToggle();
+            updateDisplayToggle();
+            updateDisplay();
+        });
+    </script>
+</body>
+</html>

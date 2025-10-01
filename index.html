@@ -1061,13 +1061,23 @@
                         </h4>
                     </div>
                     <div class="collapsible-content" id="checklistChartsContent">
-                        <!-- Переключатель режима отображения -->
-                        <div class="charts-mode-toggle-container">
-                            <span class="toggle-label">Режим отображения:</span>
-                            <div class="toggle-switch" id="checklistChartsToggle">
-                                <div class="toggle-option active" data-mode="count">ШТ</div>
-                                <div class="toggle-option" data-mode="percent">%</div>
-                                <div class="toggle-slider"></div>
+                        <!-- Переключатели режимов отображения -->
+                        <div class="charts-controls-container">
+                            <div class="charts-mode-toggle-container">
+                                <span class="toggle-label">Режим отображения:</span>
+                                <div class="toggle-switch" id="checklistChartsToggle">
+                                    <div class="toggle-option active" data-mode="count">ШТ</div>
+                                    <div class="toggle-option" data-mode="percent">%</div>
+                                    <div class="toggle-slider"></div>
+                                </div>
+                            </div>
+                            <div class="charts-grouping-toggle-container">
+                                <span class="toggle-label">Группировка:</span>
+                                <div class="toggle-switch" id="checklistGroupingToggle">
+                                    <div class="toggle-option active" data-mode="months">По месяцам</div>
+                                    <div class="toggle-option" data-mode="departments">По подразделениям</div>
+                                    <div class="toggle-slider"></div>
+                                </div>
                             </div>
                         </div>
                         <div class="checklist-dynamics-charts">

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест переключателя группировки</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h2>Тест переключателя группировки графиков</h2>
+        
+        <!-- Переключатели режимов отображения -->
+        <div class="charts-controls-container">
+            <div class="charts-mode-toggle-container">
+                <span class="toggle-label">Режим отображения:</span>
+                <div class="toggle-switch" id="checklistChartsToggle">
+                    <div class="toggle-option active" data-mode="count">ШТ</div>
+                    <div class="toggle-option" data-mode="percent">%</div>
+                    <div class="toggle-slider"></div>
+                </div>
+            </div>
+            <div class="charts-grouping-toggle-container">
+                <span class="toggle-label">Группировка:</span>
+                <div class="toggle-switch" id="checklistGroupingToggle">
+                    <div class="toggle-option active" data-mode="months">По месяцам</div>
+                    <div class="toggle-option" data-mode="departments">По подразделениям</div>
+                    <div class="toggle-slider"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Графики -->
+        <div class="checklist-dynamics-charts">
+            <!-- График 1: Влияние на бизнес -->
+            <div class="checklist-chart-card">
+                <div class="checklist-chart-header">
+                    <h5>Динамика блока: Влияние на бизнес</h5>
+                </div>
+                <div class="checklist-chart-wrapper">
+                    <canvas id="checklistResultChart"></canvas>
+                </div>
+            </div>
+
+            <!-- График 2: Влияние на мотивацию сотрудника -->
+            <div class="checklist-chart-card">
+                <div class="checklist-chart-header">
+                    <h5>Динамика блока: Влияние на мотивацию сотрудника</h5>
+                </div>
+                <div class="checklist-chart-wrapper">
+                    <canvas id="checklistMotivationChart"></canvas>
+                </div>
+            </div>
+
+            <!-- График 3: Клиентоцентричность -->
+            <div class="checklist-chart-card">
+                <div class="checklist-chart-header">
+                    <h5>Динамика блока: Клиентоцентричность</h5>
+                </div>
+                <div class="checklist-chart-wrapper">
+                    <canvas id="checklistObjectionsChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Подключаем модули -->
+    <script src="js/modules/checklist-charts.js"></script>
+    <script>
+        // Имитируем данные для тестирования
+        window.checklistFilteredData = [
+            // Влияние на бизнес
+            {
+                date: '2025-05-15',
+                group: 'Гридчина - группа',
+                Block_0_lvl: 'Влияние на бизнес',
+                score: 1
+            },
+            {
+                date: '2025-06-15',
+                group: 'Гридчина - группа',
+                Block_0_lvl: 'Влияние на бизнес',
+                score: 0
+            },
+            {
+                date: '2025-07-15',
+                group: 'Коровина - группа',
+                Block_0_lvl: 'Влияние на бизнес',
+                score: 1
+            },
+            // Влияние на мотивацию сотрудника
+            {
+                date: '2025-05-16',
+                group: 'Мельникова - группа',
+                Block_0_lvl: 'Влияние на мотивацию сотрудника',
+                score: 1
+            },
+            {
+                date: '2025-06-16',
+                group: 'Мельникова - группа',
+                Block_0_lvl: 'Влияние на мотивацию сотрудника',
+                score: 1
+            },
+            {
+                date: '2025-07-16',
+                group: 'Сычева - группа',
+                Block_0_lvl: 'Влияние на мотивацию сотрудника',
+                score: 0
+            },
+            // Клиентоцентричность
+            {
+                date: '2025-05-17',
+                group: 'Гридчина - группа',
+                Block_0_lvl: 'Клиентоцентричность',
+                score: 1
+            },
+            {
+                date: '2025-06-17',
+                group: 'Коровина - группа',
+                Block_0_lvl: 'Клиентоцентричность',
+                score: 0
+            },
+            {
+                date: '2025-07-17',
+                group: 'Сычева - группа',
+                Block_0_lvl: 'Клиентоцентричность',
+                score: 1
+            }
+        ];
+
+        // Инициализируем графики после загрузки страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Инициализируем тестовые графики...');
+            initChecklistCharts();
+        });
+    </script>
+</body>
+</html>
