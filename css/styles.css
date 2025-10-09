@@ -1608,6 +1608,19 @@ tr:hover {
     margin-right: 5px;
 }
 
+.cc-position-cell {
+    font-weight: bold;
+    font-size: 16px;
+    color: #495057;
+    min-width: 100px;
+    background-color: #f8f9fa;
+}
+
+.cc-rank-icon {
+    font-size: 18px;
+    margin-right: 5px;
+}
+
 .name-cell {
     text-align: left;
     font-weight: 500;
@@ -1698,7 +1711,16 @@ tr:hover {
         min-width: 60px;
     }
 
+    .cc-position-cell {
+        font-size: 14px;
+        min-width: 80px;
+    }
+
     .rank-icon {
+        font-size: 16px;
+    }
+
+    .cc-rank-icon {
         font-size: 16px;
     }
 }

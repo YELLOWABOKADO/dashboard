@@ -508,12 +508,36 @@ function calculateRatings(operatorData, filteredEmployees, filters) {
     // Сортируем по проценту отклонений (возрастание - лучший рейтинг)
     ratings.sort((a, b) => a.percentage - b.percentage);
 
+    // Добавляем общее место в рейтинге
+    ratings.forEach((rating, index) => {
+        rating.overallPosition = index + 1;
+    });
+
+    // Вычисляем место в КЦ для каждого оператора
+    const callCenters = [...new Set(ratings.map(r => r.callCenter))];
+    
+    callCenters.forEach(callCenter => {
+        const ccRatings = ratings.filter(r => r.callCenter === callCenter);
+        ccRatings.forEach((rating, index) => {
+            rating.callCenterPosition = index + 1;
+        });
+    });
+
     console.log('🏆 Финальные рейтинги:', ratings.map(r => ({
         name: r.name,
         percentage: r.percentage,
         calls: r.totalCalls,
-        deviations: r.totalDeviations
+        deviations: r.totalDeviations,
+        overallPosition: r.overallPosition,
+        callCenterPosition: r.callCenterPosition,
+        callCenter: r.callCenter
     })));
+
+    console.log('📊 Места в КЦ по операторам:');
+    callCenters.forEach(cc => {
+        const ccOperators = ratings.filter(r => r.callCenter === cc);
+        console.log(`КЦ ${cc}:`, ccOperators.map(r => `${r.name} - место ${r.callCenterPosition}`));
+    });
 
     return ratings;
 }
@@ -533,6 +557,7 @@ function generateRatingsTable(ratingsData, filters) {
                     <thead>
                         <tr>
                             <th>Место</th>
+                            <th>Место в КЦ</th>
                             <th>ФИО</th>
                             <th>Группа</th>
                             <th>КЦ</th>
@@ -560,11 +585,25 @@ function generateRatingsTable(ratingsData, filters) {
 
         const rowClass = position <= 3 ? 'top-rating' : '';
 
+        // Иконки для места в КЦ
+        let ccRankIcon = '';
+        if (rating.callCenterPosition === 1) {
+            ccRankIcon = '🥇';
+        } else if (rating.callCenterPosition === 2) {
+            ccRankIcon = '🥈';
+        } else if (rating.callCenterPosition === 3) {
+            ccRankIcon = '🥉';
+        }
+
         tableHTML += `
             <tr class="${rowClass}">
                 <td class="position-cell">
                     ${rankIcon ? `<span class="rank-icon">${rankIcon}</span>` : ''}
                     ${position}
+                </td>
+                <td class="cc-position-cell">
+                    ${ccRankIcon ? `<span class="cc-rank-icon">${ccRankIcon}</span>` : ''}
+                    ${rating.callCenterPosition}
                 </td>
                 <td class="name-cell">${rating.name}</td>
                 <td class="group-cell">${rating.group}</td>
