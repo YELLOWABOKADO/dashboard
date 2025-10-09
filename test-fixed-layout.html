@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест исправленного расположения графиков</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Тест исправленного расположения графиков - Динамика блоков по месяцам</h1>
+        
+        <!-- Блок с графиками -->
+        <div class="collapsible-section">
+            <div class="collapsible-header">
+                <h4 style="margin: 0; display: flex; align-items: center;">
+                    <span class="collapse-arrow">▼</span>
+                    <span style="margin-left: 10px;">📊 Динамика блоков по месяцам</span>
+                </h4>
+            </div>
+            <div class="collapsible-content">
+                <!-- Переключатели режимов отображения -->
+                <div class="charts-controls-container">
+                    <div class="charts-mode-toggle-container">
+                        <span class="toggle-label">Режим отображения:</span>
+                        <div class="toggle-switch" id="checklistChartsToggle">
+                            <div class="toggle-option active" data-mode="count">ШТ</div>
+                            <div class="toggle-option" data-mode="percent">%</div>
+                            <div class="toggle-slider"></div>
+                        </div>
+                    </div>
+                    <div class="charts-grouping-toggle-container">
+                        <span class="toggle-label">Группировка:</span>
+                        <div class="toggle-switch" id="checklistGroupingToggle">
+                            <div class="toggle-option active" data-mode="months">По месяцам</div>
+                            <div class="toggle-option" data-mode="departments">По подразделениям</div>
+                            <div class="toggle-slider"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="checklist-dynamics-charts">
+                    <!-- График 1: Влияние на бизнес -->
+                    <div class="checklist-chart-card">
+                        <div class="checklist-chart-header">
+                            <h5>Динамика блока: Влияние на бизнес</h5>
+                        </div>
+                        <div class="checklist-chart-wrapper">
+                            <div style="height: 300px; background: #f8f9fa; border: 2px dashed #dee2e6; display: flex; align-items: center; justify-content: center; color: #6c757d;">
+                                График 1 (Влияние на бизнес)
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- График 2: Влияние на мотивацию сотрудника -->
+                    <div class="checklist-chart-card">
+                        <div class="checklist-chart-header">
+                            <h5>Динамика блока: Влияние на мотивацию сотрудника</h5>
+                        </div>
+                        <div class="checklist-chart-wrapper">
+                            <div style="height: 300px; background: #f8f9fa; border: 2px dashed #dee2e6; display: flex; align-items: center; justify-content: center; color: #6c757d;">
+                                График 2 (Мотивация сотрудника)
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- График 3: Клиентоцентричность -->
+                    <div class="checklist-chart-card">
+                        <div class="checklist-chart-header">
+                            <h5>Динамика блока: Клиентоцентричность</h5>
+                        </div>
+                        <div class="checklist-chart-wrapper">
+                            <div style="height: 300px; background: #f8f9fa; border: 2px dashed #dee2e6; display: flex; align-items: center; justify-content: center; color: #6c757d;">
+                                График 3 (Клиентоцентричность)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div style="margin-top: 30px; padding: 20px; background: #e8f5e8; border-radius: 8px;">
+            <h3>Изменения:</h3>
+            <ul>
+                <li>✅ Третий график теперь располагается под первым графиком (левая колонка)</li>
+                <li>✅ Третий график имеет такие же размеры, как первые два</li>
+                <li>✅ Убрано центрирование третьего графика</li>
+                <li>✅ Сохранена сетка 2x2 для трех графиков</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

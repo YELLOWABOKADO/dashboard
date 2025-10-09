@@ -1333,9 +1333,9 @@ tr:hover {
 }
 
 .checklist-dynamics-charts .checklist-chart-card:nth-child(3) {
-    grid-column: 1 / -1; /* Третий график занимает всю ширину */
-    max-width: 70%; /* Увеличиваем ширину третьего графика */
-    margin: 0 auto; /* Центрируем третий график */
+    /* Третий график теперь располагается под первым графиком */
+    grid-column: 1;
+    grid-row: 2;
 }
 
 .checklist-chart-card {
