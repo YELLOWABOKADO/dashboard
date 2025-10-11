@@ -20,6 +20,8 @@
             <button class="tab-button" data-tab="ratings">Рейтинги</button>
             <button class="tab-button" data-tab="checklist">Детализация по чек-листам</button>
             <button class="tab-button" data-tab="blockDetails">Детализация по блокам</button>
+            <button class="tab-button" data-tab="employeeDetails">Детализация по сотруднику</button>
+            <button class="tab-button" data-tab="employeeDynamics">Динамика сотрудника</button>
         </div>
 
         <!-- Company Tab Content -->
@@ -1194,6 +1196,466 @@
             </div>
         </div>
 
+        <!-- Employee Details Tab Content -->
+        <div id="employeeDetailsTab" class="tab-content">
+            <div class="checklist-dashboard">
+                <!-- Фильтры -->
+                <div class="filters-container">
+                    <div class="filter-group">
+                        <div class="filter-item">
+                            <span class="filter-label">Дашборд:</span>
+                            <select id="empDetailsDashboard">
+                                <option value="Автооценка" selected>Автооценка</option>
+                                <option value="Автооценка УАВ/ПреХард">Автооценка УАВ/ПреХард</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <span class="filter-label">Период с:</span>
+                            <input type="date" id="empDetailsDateFrom" value="2025-05-01" class="date-input">
+                        </div>
+                        <div class="filter-item">
+                            <span class="filter-label">по:</span>
+                            <input type="date" id="empDetailsDateTo" value="2025-07-30" class="date-input">
+                        </div>
+                        <div class="filter-item">
+                            <span class="filter-label">Колл-центр:</span>
+                            <select id="empDetailsKcFilter">
+                                <option value="">Все КЦ</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <div class="filter-item">
+                            <span class="filter-label">Группа:</span>
+                            <select id="empDetailsGroupFilter">
+                                <option value="">Все группы</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <span class="filter-label">Сотрудник:</span>
+                            <select id="empDetailsOperatorFilter">
+                                <option value="">Выберите сотрудника</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <span class="filter-label">Режим сравнения:</span>
+                            <select id="empDetailsCompareMode">
+                                <option value="single" selected>Один сотрудник</option>
+                                <option value="compare">Сравнение сотрудников</option>
+                            </select>
+                        </div>
+                        <div class="filter-item" id="empDetailsSecondOperatorContainer" style="display: none;">
+                            <span class="filter-label">Сравнить с:</span>
+                            <select id="empDetailsSecondOperator">
+                                <option value="">Выберите второго сотрудника</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <button id="empDetailsUpdateButton" class="btn btn-primary">Обновить</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Статистические карточки -->
+                <div class="checklist-stats-grid" id="empDetailsStatsGrid">
+                    <div class="checklist-stat-card">
+                        <div class="checklist-stat-number" id="empDetailsTotalRecords">0</div>
+                        <div class="checklist-stat-label">Всего записей</div>
+                    </div>
+                    <div class="checklist-stat-card">
+                        <div class="checklist-stat-number" id="empDetailsTotalIssues">0</div>
+                        <div class="checklist-stat-label">Проблем (score=1)</div>
+                    </div>
+                    <div class="checklist-stat-card">
+                        <div class="checklist-stat-number" id="empDetailsIssueRate">0%</div>
+                        <div class="checklist-stat-label">% отклонений</div>
+                    </div>
+                    <div class="checklist-stat-card">
+                        <div class="checklist-stat-number" id="empDetailsDateRange">0</div>
+                        <div class="checklist-stat-label">Дней в периоде</div>
+                    </div>
+                    <div class="checklist-stat-card">
+                        <div class="checklist-stat-number" id="empDetailsTopBlock">-</div>
+                        <div class="checklist-stat-label">Топ проблемный блок</div>
+                    </div>
+                    <div class="checklist-stat-card">
+                        <div class="checklist-stat-number" id="empDetailsAvgDaily">0</div>
+                        <div class="checklist-stat-label">Среднее в день</div>
+                    </div>
+                </div>
+
+                <!-- Сводная информация по сотруднику -->
+                <div class="checklist-summary-section" id="empDetailsSummarySection">
+                    <h3 style="margin-bottom: 15px; color: #2c3e50;">👤 Профиль сотрудника</h3>
+                    <div class="checklist-summary-grid">
+                        <div class="checklist-summary-item">
+                            <div class="checklist-summary-title">ФИО</div>
+                            <div class="checklist-summary-value" id="empDetailsName">-</div>
+                        </div>
+                        <div class="checklist-summary-item">
+                            <div class="checklist-summary-title">Группа</div>
+                            <div class="checklist-summary-value" id="empDetailsGroup">-</div>
+                        </div>
+                        <div class="checklist-summary-item">
+                            <div class="checklist-summary-title">Колл-центр</div>
+                            <div class="checklist-summary-value" id="empDetailsKc">-</div>
+                        </div>
+                        <div class="checklist-summary-item">
+                            <div class="checklist-summary-title">Рейтинг в группе</div>
+                            <div class="checklist-summary-value" id="empDetailsRankInGroup">-</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Сворачиваемый блок: Детализация по блокам -->
+                <div class="collapsible-section">
+                    <div class="collapsible-header" id="empDetailsBlocksHeader">
+                        <h4 style="margin: 0; display: flex; align-items: center;">
+                            <span class="collapse-arrow">▼</span>
+                            <span style="margin-left: 10px;">📊 Детализация по блокам</span>
+                        </h4>
+                    </div>
+                    <div class="collapsible-content" id="empDetailsBlocksContent">
+                        <div class="checklist-analytics-section">
+                            <div class="checklist-chart-container">
+                                <div class="checklist-chart-title">📊 Статистика по блокам 0 уровня</div>
+                                <div id="empDetailsBlock0Chart" class="checklist-bar-chart"></div>
+                            </div>
+                            <div class="checklist-chart-container">
+                                <div class="checklist-chart-title">📊 Статистика по блокам 1 уровня</div>
+                                <div id="empDetailsBlock1Chart" class="checklist-bar-chart"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Сворачиваемый блок: Динамика по времени -->
+                <div class="collapsible-section">
+                    <div class="collapsible-header" id="empDetailsDynamicsHeader">
+                        <h4 style="margin: 0; display: flex; align-items: center;">
+                            <span class="collapse-arrow">▼</span>
+                            <span style="margin-left: 10px;">📈 Динамика по времени</span>
+                        </h4>
+                    </div>
+                    <div class="collapsible-content" id="empDetailsDynamicsContent">
+                        <div class="checklist-dynamics-charts">
+                            <div class="checklist-chart-card">
+                                <div class="checklist-chart-header">
+                                    <h5>Динамика отклонений по дням</h5>
+                                </div>
+                                <div class="checklist-chart-wrapper">
+                                    <canvas id="empDetailsDailyChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Сворачиваемый блок: Подробные записи -->
+                <div class="collapsible-section">
+                    <div class="collapsible-header" id="empDetailsRecordsHeader">
+                        <h4 style="margin: 0; display: flex; align-items: center;">
+                            <span class="collapse-arrow">▼</span>
+                            <span style="margin-left: 10px;">📋 Подробные записи</span>
+                        </h4>
+                    </div>
+                    <div class="collapsible-content" id="empDetailsRecordsContent">
+                        <div class="checklist-table-container">
+                            <div id="empDetailsLoading" class="loading">Выберите сотрудника для просмотра данных</div>
+                            <table id="empDetailsTable" style="display: none;">
+                                <thead>
+                                    <tr>
+                                        <th title="Нажмите для сортировки">Дата</th>
+                                        <th title="Нажмите для сортировки">Блок 0</th>
+                                        <th title="Нажмите для сортировки">Блок 1</th>
+                                        <th title="Нажмите для сортировки">Блок 2</th>
+                                        <th title="Нажмите для сортировки">Балл</th>
+                                        <th title="Нажмите для сортировки">Статус</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="empDetailsTableBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Сворачиваемый блок: Сравнение сотрудников (показывается только в режиме сравнения) -->
+                <div class="collapsible-section" id="empDetailsCompareSection" style="display: none;">
+                    <div class="collapsible-header" id="empDetailsCompareHeader">
+                        <h4 style="margin: 0; display: flex; align-items: center;">
+                            <span class="collapse-arrow">▼</span>
+                            <span style="margin-left: 10px;">⚖️ Сравнение сотрудников</span>
+                        </h4>
+                    </div>
+                    <div class="collapsible-content" id="empDetailsCompareContent">
+                        <div class="employee-comparison-container">
+                            <div class="comparison-stats-grid">
+                                <div class="comparison-employee-card">
+                                    <h5 id="empDetailsFirstEmployeeName">Сотрудник 1</h5>
+                                    <div class="comparison-stats">
+                                        <div class="comparison-stat">
+                                            <span class="stat-label">Всего записей:</span>
+                                            <span class="stat-value" id="empDetailsFirstTotal">0</span>
+                                        </div>
+                                        <div class="comparison-stat">
+                                            <span class="stat-label">Проблем:</span>
+                                            <span class="stat-value" id="empDetailsFirstIssues">0</span>
+                                        </div>
+                                        <div class="comparison-stat">
+                                            <span class="stat-label">% отклонений:</span>
+                                            <span class="stat-value" id="empDetailsFirstRate">0%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="comparison-vs">VS</div>
+                                <div class="comparison-employee-card">
+                                    <h5 id="empDetailsSecondEmployeeName">Сотрудник 2</h5>
+                                    <div class="comparison-stats">
+                                        <div class="comparison-stat">
+                                            <span class="stat-label">Всего записей:</span>
+                                            <span class="stat-value" id="empDetailsSecondTotal">0</span>
+                                        </div>
+                                        <div class="comparison-stat">
+                                            <span class="stat-label">Проблем:</span>
+                                            <span class="stat-value" id="empDetailsSecondIssues">0</span>
+                                        </div>
+                                        <div class="comparison-stat">
+                                            <span class="stat-label">% отклонений:</span>
+                                            <span class="stat-value" id="empDetailsSecondRate">0%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="comparison-chart-container">
+                                <div class="checklist-chart-card">
+                                    <div class="checklist-chart-header">
+                                        <h5>Сравнение по блокам 0 уровня</h5>
+                                    </div>
+                                    <div class="checklist-chart-wrapper">
+                                        <canvas id="empDetailsComparisonChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Employee Dynamics Tab Content -->
+        <div id="employeeDynamicsTab" class="tab-content">
+            <!-- Закрепленная панель фильтров -->
+            <div class="sticky-header">
+                <div class="filters-container">
+                    <div class="filter-group">
+                        <div class="filter-item">
+                            <span class="filter-label">Сотрудник:</span>
+                            <select id="empDynOperator" class="date-input">
+                                <option value="">Выберите сотрудника</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <span class="filter-label">Период с:</span>
+                            <input type="date" id="empDynStartDate" value="2025-05-01" class="date-input">
+                        </div>
+                        <div class="filter-item">
+                            <span class="filter-label">по:</span>
+                            <input type="date" id="empDynEndDate" value="2025-07-31" class="date-input">
+                        </div>
+                        <div class="filter-item">
+                            <span class="filter-label">Группировка:</span>
+                            <select id="empDynGranularity" class="date-input">
+                                <option value="week">Неделя</option>
+                                <option value="month" selected>Месяц</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <span class="filter-label">Сравнить с:</span>
+                            <select id="empDynCompareOperator" class="date-input">
+                                <option value="">Не выбрано</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <button id="empDynUpdateButton" class="btn btn-primary">Обновить</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Прокручиваемый контент -->
+            <div class="scrollable-content">
+                <!-- Информация о сотруднике -->
+                <div id="empDynEmployeeInfo" class="employee-profile-card" style="display: none;">
+                    <h4>Информация о сотруднике</h4>
+                    <div class="employee-info-grid">
+                        <div class="info-item">
+                            <span class="info-label">ФИО:</span>
+                            <span class="info-value" id="empDynName">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Группа:</span>
+                            <span class="info-value" id="empDynGroup">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">КЦ:</span>
+                            <span class="info-value" id="empDynKc">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Статистика за период -->
+                <div id="empDynStatsCards" class="stats-cards-container" style="display: none;">
+                    <div class="stat-card">
+                        <div class="stat-label">Всего звонков</div>
+                        <div class="stat-value" id="empDynTotalCalls">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Всего отклонений</div>
+                        <div class="stat-value" id="empDynTotalIssues">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">% отклонений</div>
+                        <div class="stat-value" id="empDynIssueRate">0%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Средний % за период</div>
+                        <div class="stat-value" id="empDynAvgRate">0%</div>
+                    </div>
+                </div>
+
+                <!-- График динамики -->
+                <div class="collapsible-section">
+                    <div class="collapsible-header" id="empDynChartHeader">
+                        <h4 style="margin: 0; display: flex; align-items: center;">
+                            <span class="collapse-arrow">▼</span>
+                            <span style="margin-left: 10px;">График динамики</span>
+                        </h4>
+                    </div>
+                    <div class="collapsible-content" id="empDynChartContent">
+                        <div class="chart-card">
+                            <canvas id="empDynChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Таблица с данными по периодам -->
+                <div class="collapsible-section">
+                    <div class="collapsible-header" id="empDynTableHeader">
+                        <h4 style="margin: 0; display: flex; align-items: center;">
+                            <span class="collapse-arrow">▼</span>
+                            <span style="margin-left: 10px;">Детализация по периодам</span>
+                        </h4>
+                    </div>
+                    <div class="collapsible-content" id="empDynTableContent">
+                        <div id="empDynLoading" class="loading">Выберите сотрудника для просмотра данных</div>
+                        <table id="empDynTable" class="data-table" style="display: none;">
+                            <thead>
+                                <tr>
+                                    <th>Период</th>
+                                    <th>Звонков</th>
+                                    <th>Отклонений</th>
+                                    <th>% отклонений</th>
+                                    <th>Изменение</th>
+                                </tr>
+                            </thead>
+                            <tbody id="empDynTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Детализация по блокам 0 уровня -->
+                <div class="collapsible-section" id="empDynBlocksSection" style="display: none;">
+                    <div class="collapsible-header" id="empDynBlocksHeader">
+                        <h4 style="margin: 0; display: flex; align-items: center;">
+                            <span class="collapse-arrow">▼</span>
+                            <span style="margin-left: 10px;">Детализация по блокам (Block 0)</span>
+                        </h4>
+                    </div>
+                    <div class="collapsible-content" id="empDynBlocksContent">
+                        <div class="charts-grid">
+                            <div class="chart-card">
+                                <h5>Топ-3 проблемных блока</h5>
+                                <canvas id="empDynTopBlocksChart"></canvas>
+                            </div>
+                            <div class="chart-card">
+                                <h5>Динамика по блокам</h5>
+                                <canvas id="empDynBlocksDynamicsChart"></canvas>
+                            </div>
+                            <div class="chart-card">
+                                <h5>Распределение отклонений</h5>
+                                <canvas id="empDynBlocksDistributionChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Сравнение с другим сотрудником -->
+                <div class="collapsible-section" id="empDynComparisonSection" style="display: none;">
+                    <div class="collapsible-header" id="empDynComparisonHeader">
+                        <h4 style="margin: 0; display: flex; align-items: center;">
+                            <span class="collapse-arrow">▼</span>
+                            <span style="margin-left: 10px;">Сравнение сотрудников</span>
+                        </h4>
+                    </div>
+                    <div class="collapsible-content" id="empDynComparisonContent">
+                        <!-- Сравнительная статистика -->
+                        <div class="comparison-stats-grid">
+                            <div class="comparison-card">
+                                <h5 id="empDynCompareEmployee1Name">Сотрудник 1</h5>
+                                <div class="comparison-stats">
+                                    <div class="comparison-stat">
+                                        <span class="stat-label">Всего записей:</span>
+                                        <span class="stat-value" id="empDynCompare1Total">0</span>
+                                    </div>
+                                    <div class="comparison-stat">
+                                        <span class="stat-label">Отклонений:</span>
+                                        <span class="stat-value" id="empDynCompare1Issues">0</span>
+                                    </div>
+                                    <div class="comparison-stat">
+                                        <span class="stat-label">% отклонений:</span>
+                                        <span class="stat-value" id="empDynCompare1Rate">0%</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="comparison-vs">VS</div>
+                            <div class="comparison-card">
+                                <h5 id="empDynCompareEmployee2Name">Сотрудник 2</h5>
+                                <div class="comparison-stats">
+                                    <div class="comparison-stat">
+                                        <span class="stat-label">Всего записей:</span>
+                                        <span class="stat-value" id="empDynCompare2Total">0</span>
+                                    </div>
+                                    <div class="comparison-stat">
+                                        <span class="stat-label">Отклонений:</span>
+                                        <span class="stat-value" id="empDynCompare2Issues">0</span>
+                                    </div>
+                                    <div class="comparison-stat">
+                                        <span class="stat-label">% отклонений:</span>
+                                        <span class="stat-value" id="empDynCompare2Rate">0%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Графики сравнения -->
+                        <div class="charts-grid">
+                            <div class="chart-card">
+                                <h5>Сравнение динамики</h5>
+                                <canvas id="empDynComparisonDynamicsChart"></canvas>
+                            </div>
+                            <div class="chart-card">
+                                <h5>Сравнение по блокам</h5>
+                                <canvas id="empDynComparisonBlocksChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Подключение модулей -->
         <script>
             console.log('=== Начинаем загрузку скриптов ===');
@@ -1245,6 +1707,8 @@
         <script src="js/modules/checklist-charts.js"></script>
         <script src="js/modules/block-details.js"></script>
         <script src="js/checklist-dashboard.js"></script>
+        <script src="js/employee-details-dashboard.js"></script>
+        <script src="js/employee-dynamics-dashboard.js"></script>
         <script src="js/modules/app.js"></script>
 
         <script>

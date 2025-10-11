@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Тест загрузки данных</title>
+</head>
+<body>
+    <h1>Тест загрузки данных</h1>
+    <div id="result">Загрузка...</div>
+    
+    <script>
+        async function testDataLoad() {
+            console.log('Начинаем тест загрузки данных...');
+            
+            try {
+                console.log('Пытаемся загрузить operator_data_days.json...');
+                const response = await fetch('operator_data_days.json');
+                console.log('Response status:', response.status);
+                console.log('Response ok:', response.ok);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('Данные загружены:', data.length, 'записей');
+                
+                if (data.length > 0) {
+                    console.log('Первая запись:', data[0]);
+                    
+                    // Получаем уникальные значения
+                    const operators = [...new Set(data.map(item => item.operator))];
+                    const groups = [...new Set(data.map(item => item.group))];
+                    const kcs = [...new Set(data.map(item => item.kc))];
+                    
+                    console.log('Операторы:', operators);
+                    console.log('Группы:', groups);
+                    console.log('КЦ:', kcs);
+                    
+                    document.getElementById('result').innerHTML = `
+                        <h2>✅ Данные загружены успешно!</h2>
+                        <p><strong>Всего записей:</strong> ${data.length}</p>
+                        <p><strong>Операторов:</strong> ${operators.length}</p>
+                        <p><strong>Групп:</strong> ${groups.length}</p>
+                        <p><strong>КЦ:</strong> ${kcs.length}</p>
+                        <h3>Операторы:</h3>
+                        <ul>${operators.map(op => '<li>' + op + '</li>').join('')}</ul>
+                    `;
+                } else {
+                    document.getElementById('result').innerHTML = '❌ Файл пустой';
+                }
+                
+            } catch (error) {
+                console.error('Ошибка:', error);
+                document.getElementById('result').innerHTML = '❌ Ошибка: ' + error.message;
+            }
+        }
+        
+        // Запускаем тест при загрузке страницы
+        document.addEventListener('DOMContentLoaded', testDataLoad);
+    </script>
+</body>
+</html>

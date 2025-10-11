@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Простой тест - Детализация по сотруднику</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .filter-item { margin: 10px 0; }
+        select, input { padding: 5px; margin: 5px; }
+        button { padding: 10px 20px; background: #007bff; color: white; border: none; cursor: pointer; }
+        .loading { padding: 20px; background: #f0f0f0; margin: 10px 0; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background: #f5f5f5; }
+    </style>
+</head>
+<body>
+    <h1>Простой тест - Детализация по сотруднику</h1>
+    
+    <div class="filter-item">
+        <label>Колл-центр:</label>
+        <select id="empDetailsKcFilter">
+            <option value="">Все КЦ</option>
+        </select>
+    </div>
+    
+    <div class="filter-item">
+        <label>Группа:</label>
+        <select id="empDetailsGroupFilter">
+            <option value="">Все группы</option>
+        </select>
+    </div>
+    
+    <div class="filter-item">
+        <label>Сотрудник:</label>
+        <select id="empDetailsOperatorFilter">
+            <option value="">Выберите сотрудника</option>
+        </select>
+    </div>
+    
+    <div class="filter-item">
+        <button id="empDetailsUpdateButton">Обновить</button>
+        <button onclick="testData()">Тест данных</button>
+    </div>
+    
+    <div id="empDetailsLoading" class="loading">Загрузка данных...</div>
+    
+    <div id="stats">
+        <p>Всего записей: <span id="empDetailsTotalRecords">0</span></p>
+        <p>Проблем: <span id="empDetailsTotalIssues">0</span></p>
+        <p>% отклонений: <span id="empDetailsIssueRate">0%</span></p>
+    </div>
+    
+    <table id="empDetailsTable" style="display: none;">
+        <thead>
+            <tr>
+                <th>Дата</th>
+                <th>Оператор</th>
+                <th>Блок 0</th>
+                <th>Блок 1</th>
+                <th>Балл</th>
+            </tr>
+        </thead>
+        <tbody id="empDetailsTableBody">
+        </tbody>
+    </table>
+
+    <!-- Подключаем основной модуль -->
+    <script src="js/employee-details-dashboard.js"></script>
+    
+    <script>
+        // Простая версия модуля
+        let allData = [];
+        let filteredData = [];
+
+        // Загрузка данных
+        async function loadData() {
+            console.log('Загружаем данные...');
+            const loading = document.getElementById('empDetailsLoading');
+            
+            try {
+                const response = await fetch('operator_data_days.json');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                allData = await response.json();
+                console.log('Загружено записей:', allData.length);
+                
+                if (allData.length > 0) {
+                    console.log('Пример записи:', allData[0]);
+                    populateFilters();
+                    loading.innerHTML = 'Данные загружены. Выберите сотрудника.';
+                } else {
+                    loading.innerHTML = 'Файл пустой';
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки:', error);
+                loading.innerHTML = 'Ошибка загрузки: ' + error.message;
+            }
+        }
+
+        // Заполнение фильтров
+        function populateFilters() {
+            console.log('Заполняем фильтры...');
+            
+            const kcs = [...new Set(allData.map(item => item.kc))].sort();
+            const groups = [...new Set(allData.map(item => item.group))].sort();
+            const operators = [...new Set(allData.map(item => item.operator))].sort();
+            
+            console.log('КЦ:', kcs);
+            console.log('Группы:', groups);
+            console.log('Операторы:', operators.length);
+
+            // Заполняем КЦ
+            const kcSelect = document.getElementById('empDetailsKcFilter');
+            kcSelect.innerHTML = '<option value="">Все КЦ</option>';
+            kcs.forEach(kc => {
+                const option = document.createElement('option');
+                option.value = kc;
+                option.textContent = kc;
+                kcSelect.appendChild(option);
+            });
+
+            // Заполняем группы
+            const groupSelect = document.getElementById('empDetailsGroupFilter');
+            groupSelect.innerHTML = '<option value="">Все группы</option>';
+            groups.forEach(group => {
+                const option = document.createElement('option');
+                option.value = group;
+                option.textContent = group;
+                groupSelect.appendChild(option);
+            });
+
+            // Заполняем операторов
+            const operatorSelect = document.getElementById('empDetailsOperatorFilter');
+            operatorSelect.innerHTML = '<option value="">Выберите сотрудника</option>';
+            operators.forEach(operator => {
+                const option = document.createElement('option');
+                option.value = operator;
+                option.textContent = operator;
+                operatorSelect.appendChild(option);
+            });
+            
+            console.log('Фильтры заполнены');
+        }
+
+        // Применение фильтров
+        function applyFilters() {
+            const selectedOperator = document.getElementById('empDetailsOperatorFilter').value;
+            
+            if (!selectedOperator) {
+                document.getElementById('empDetailsLoading').innerHTML = 'Выберите сотрудника';
+                document.getElementById('empDetailsTable').style.display = 'none';
+                return;
+            }
+
+            filteredData = allData.filter(item => item.operator === selectedOperator);
+            console.log('Отфильтровано записей:', filteredData.length);
+
+            updateStats();
+            updateTable();
+            
+            document.getElementById('empDetailsLoading').style.display = 'none';
+            document.getElementById('empDetailsTable').style.display = 'table';
+        }
+
+        // Обновление статистики
+        function updateStats() {
+            const total = filteredData.length;
+            const issues = filteredData.filter(item => item.score === 1).length;
+            const rate = total > 0 ? ((issues / total) * 100).toFixed(1) : 0;
+
+            document.getElementById('empDetailsTotalRecords').textContent = total;
+            document.getElementById('empDetailsTotalIssues').textContent = issues;
+            document.getElementById('empDetailsIssueRate').textContent = rate + '%';
+        }
+
+        // Обновление таблицы
+        function updateTable() {
+            const tbody = document.getElementById('empDetailsTableBody');
+            tbody.innerHTML = '';
+
+            filteredData.slice(0, 50).forEach(item => { // Показываем только первые 50 записей
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.date}</td>
+                    <td>${item.operator}</td>
+                    <td>${item.Block_0_lvl}</td>
+                    <td>${item.Block_1_lvl}</td>
+                    <td>${item.score}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Тестовая функция
+        function testData() {
+            console.log('=== ТЕСТ ДАННЫХ ===');
+            console.log('Всего данных:', allData.length);
+            console.log('Отфильтровано:', filteredData.length);
+            console.log('Элементы найдены:', {
+                kcFilter: !!document.getElementById('empDetailsKcFilter'),
+                groupFilter: !!document.getElementById('empDetailsGroupFilter'),
+                operatorFilter: !!document.getElementById('empDetailsOperatorFilter'),
+                updateButton: !!document.getElementById('empDetailsUpdateButton')
+            });
+        }
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Страница загружена');
+            
+            // Обработчик кнопки обновления
+            document.getElementById('empDetailsUpdateButton').addEventListener('click', applyFilters);
+            
+            // Загружаем данные
+            loadData();
+        });
+    </script>
+</body>
+</html>

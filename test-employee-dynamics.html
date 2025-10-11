@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест - Динамика сотрудника</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Тест вкладки "Динамика сотрудника"</h2>
+        
+        <!-- Фильтры -->
+        <div class="sticky-header">
+            <div class="filters-container">
+                <div class="filter-group">
+                    <div class="filter-item">
+                        <span class="filter-label">Сотрудник:</span>
+                        <select id="empDynOperator" class="date-input">
+                            <option value="">Выберите сотрудника</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <span class="filter-label">Период с:</span>
+                        <input type="date" id="empDynStartDate" value="2025-05-01" class="date-input">
+                    </div>
+                    <div class="filter-item">
+                        <span class="filter-label">по:</span>
+                        <input type="date" id="empDynEndDate" value="2025-07-31" class="date-input">
+                    </div>
+                    <div class="filter-item">
+                        <span class="filter-label">Группировка:</span>
+                        <select id="empDynGranularity" class="date-input">
+                            <option value="week">Неделя</option>
+                            <option value="month" selected>Месяц</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <button id="empDynUpdateButton" class="btn btn-primary">Обновить</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Контент -->
+        <div class="scrollable-content">
+            <!-- Информация о сотруднике -->
+            <div id="empDynEmployeeInfo" class="employee-profile-card" style="display: none;">
+                <h4>Информация о сотруднике</h4>
+                <div class="employee-info-grid">
+                    <div class="info-item">
+                        <span class="info-label">ФИО:</span>
+                        <span class="info-value" id="empDynName">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Группа:</span>
+                        <span class="info-value" id="empDynGroup">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">КЦ:</span>
+                        <span class="info-value" id="empDynKc">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Статистика -->
+            <div id="empDynStatsCards" class="stats-cards-container" style="display: none;">
+                <div class="stat-card">
+                    <div class="stat-label">Всего звонков</div>
+                    <div class="stat-value" id="empDynTotalCalls">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Всего отклонений</div>
+                    <div class="stat-value" id="empDynTotalIssues">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">% отклонений</div>
+                    <div class="stat-value" id="empDynIssueRate">0%</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Средний % за период</div>
+                    <div class="stat-value" id="empDynAvgRate">0%</div>
+                </div>
+            </div>
+
+            <!-- График -->
+            <div class="collapsible-section">
+                <div class="collapsible-header" id="empDynChartHeader">
+                    <h4 style="margin: 0; display: flex; align-items: center;">
+                        <span class="collapse-arrow">▼</span>
+                        <span style="margin-left: 10px;">График динамики</span>
+                    </h4>
+                </div>
+                <div class="collapsible-content" id="empDynChartContent">
+                    <div class="chart-card">
+                        <canvas id="empDynChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Таблица -->
+            <div class="collapsible-section">
+                <div class="collapsible-header" id="empDynTableHeader">
+                    <h4 style="margin: 0; display: flex; align-items: center;">
+                        <span class="collapse-arrow">▼</span>
+                        <span style="margin-left: 10px;">Детализация по периодам</span>
+                    </h4>
+                </div>
+                <div class="collapsible-content" id="empDynTableContent">
+                    <div id="empDynLoading" class="loading">Выберите сотрудника для просмотра данных</div>
+                    <table id="empDynTable" class="data-table" style="display: none;">
+                        <thead>
+                            <tr>
+                                <th>Период</th>
+                                <th>Звонков</th>
+                                <th>Отклонений</th>
+                                <th>% отклонений</th>
+                                <th>Изменение</th>
+                            </tr>
+                        </thead>
+                        <tbody id="empDynTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Подключение Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    
+    <!-- Подключение модулей -->
+    <script src="js/modules/ui-helpers.js"></script>
+    <script src="js/employee-dynamics-dashboard.js"></script>
+    
+    <script>
+        // Инициализация при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Инициализация тестовой страницы...');
+            
+            // Загружаем данные
+            if (typeof loadEmployeeDynamicsData === 'function') {
+                loadEmployeeDynamicsData();
+            }
+            
+            // Инициализируем обработчики
+            if (typeof initEmployeeDynamicsEventListeners === 'function') {
+                initEmployeeDynamicsEventListeners();
+            }
+        });
+    </script>
+</body>
+</html>

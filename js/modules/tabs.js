@@ -64,6 +64,20 @@ function initTabs() {
                     } else {
                         console.error('Функция initBlockDetailsModule не найдена');
                     }
+                } 
+                // Специальная обработка для вкладки "Детализация по сотруднику"
+                else if (tabId === 'employeeDetails') {
+                    console.log('Инициализируем модуль детализации по сотруднику');
+                    if (typeof initEmployeeDetailsModule === 'function') {
+                        try {
+                            initEmployeeDetailsModule();
+                            console.log('Модуль детализации по сотруднику инициализирован успешно');
+                        } catch (error) {
+                            console.error('Ошибка инициализации модуля детализации по сотруднику:', error);
+                        }
+                    } else {
+                        console.error('Функция initEmployeeDetailsModule не найдена');
+                    }
                 } else {
                     if (typeof updateActiveTab === 'function') {
                         updateActiveTab();

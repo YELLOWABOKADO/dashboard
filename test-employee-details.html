@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест - Детализация по сотруднику</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Тест - Детализация по сотруднику</h1>
+        
+        <!-- Employee Details Tab Content -->
+        <div id="employeeDetailsTab" class="tab-content active">
+            <div class="checklist-dashboard">
+                <!-- Фильтры -->
+                <div class="filters-container">
+                    <div class="filter-group">
+                        <div class="filter-item">
+                            <span class="filter-label">Дашборд:</span>
+                            <select id="empDetailsDashboard">
+                                <option value="Автооценка" selected>Автооценка</option>
+                                <option value="Автооценка УАВ/ПреХард">Автооценка УАВ/ПреХард</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <span class="filter-label">Период с:</span>
+                            <input type="date" id="empDetailsDateFrom" value="2025-05-01" class="date-input">
+                        </div>
+                        <div class="filter-item">
+                            <span class="filter-label">по:</span>
+                            <input type="date" id="empDetailsDateTo" value="2025-07-30" class="date-input">
+                        </div>
+                        <div class="filter-item">
+                            <span class="filter-label">Колл-центр:</span>
+                            <select id="empDetailsKcFilter">
+                                <option value="">Все КЦ</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <div class="filter-item">
+                            <span class="filter-label">Группа:</span>
+                            <select id="empDetailsGroupFilter">
+                                <option value="">Все группы</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <span class="filter-label">Сотрудник:</span>
+                            <select id="empDetailsOperatorFilter">
+                                <option value="">Выберите сотрудника</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <span class="filter-label">Режим сравнения:</span>
+                            <select id="empDetailsCompareMode">
+                                <option value="single" selected>Один сотрудник</option>
+                                <option value="compare">Сравнение сотрудников</option>
+                            </select>
+                        </div>
+                        <div class="filter-item" id="empDetailsSecondOperatorContainer" style="display: none;">
+                            <span class="filter-label">Сравнить с:</span>
+                            <select id="empDetailsSecondOperator">
+                                <option value="">Выберите второго сотрудника</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <button id="empDetailsUpdateButton" class="btn btn-primary">Обновить</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Статистические карточки -->
+                <div class="checklist-stats-grid" id="empDetailsStatsGrid">
+                    <div class="checklist-stat-card">
+                        <div class="checklist-stat-number" id="empDetailsTotalRecords">0</div>
+                        <div class="checklist-stat-label">Всего записей</div>
+                    </div>
+                    <div class="checklist-stat-card">
+                        <div class="checklist-stat-number" id="empDetailsTotalIssues">0</div>
+                        <div class="checklist-stat-label">Проблем (score=1)</div>
+                    </div>
+                    <div class="checklist-stat-card">
+                        <div class="checklist-stat-number" id="empDetailsIssueRate">0%</div>
+                        <div class="checklist-stat-label">% отклонений</div>
+                    </div>
+                    <div class="checklist-stat-card">
+                        <div class="checklist-stat-number" id="empDetailsDateRange">0</div>
+                        <div class="checklist-stat-label">Дней в периоде</div>
+                    </div>
+                </div>
+
+                <!-- Загрузка -->
+                <div id="empDetailsLoading" class="loading">Загрузка данных...</div>
+
+                <!-- Таблица -->
+                <table id="empDetailsTable" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th>Дата</th>
+                            <th>Блок 0</th>
+                            <th>Блок 1</th>
+                            <th>Блок 2</th>
+                            <th>Балл</th>
+                            <th>Статус</th>
+                        </tr>
+                    </thead>
+                    <tbody id="empDetailsTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Подключение скриптов -->
+    <script src="js/employee-details-dashboard.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('=== Тестовая страница загружена ===');
+            
+            // Тестируем модуль
+            if (typeof testEmployeeDetailsModule === 'function') {
+                testEmployeeDetailsModule();
+            }
+            
+            // Инициализируем модуль
+            if (typeof initEmployeeDetailsModule === 'function') {
+                console.log('Инициализируем модуль...');
+                initEmployeeDetailsModule();
+            } else {
+                console.error('Функция initEmployeeDetailsModule не найдена');
+            }
+            
+            // Добавляем кнопку для тестирования
+            const testButton = document.createElement('button');
+            testButton.textContent = 'Тест модуля';
+            testButton.style.position = 'fixed';
+            testButton.style.top = '10px';
+            testButton.style.right = '10px';
+            testButton.style.zIndex = '9999';
+            testButton.onclick = function() {
+                if (typeof testEmployeeDetailsModule === 'function') {
+                    testEmployeeDetailsModule();
+                }
+            };
+            document.body.appendChild(testButton);
+        });
+    </script>
+</body>
+</html>

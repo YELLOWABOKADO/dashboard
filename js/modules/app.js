@@ -52,6 +52,24 @@ async function updateActiveTab() {
                 window.checklistDashboard.applyFilters();
             }
             break;
+        case 'employeeDetails':
+            console.log('Обновляем дашборд детализации по сотруднику...');
+            if (typeof applyEmployeeDetailsFilters === 'function') {
+                applyEmployeeDetailsFilters();
+            }
+            break;
+        case 'employeeDynamics':
+            console.log('Переключились на вкладку динамики сотрудника...');
+            // Загружаем данные при первом открытии вкладки
+            if (typeof window.empDynDataLoaded === 'undefined') {
+                console.log('[Employee Dynamics] Первое открытие вкладки, загружаем данные...');
+                if (typeof loadEmployeeDynamicsData === 'function') {
+                    await loadEmployeeDynamicsData();
+                    window.empDynDataLoaded = true;
+                }
+            }
+            // Данные будут отображены после выбора сотрудника и нажатия "Обновить"
+            break;
     }
 }
 
@@ -135,6 +153,19 @@ function initApp() {
         } else {
             console.error('Дашборд чек-листов не найден!');
         }
+
+        // Инициализируем модуль детализации по сотруднику (только обработчики, без загрузки данных)
+        if (typeof initEmployeeDetailsEventListeners === 'function') {
+            console.log('Инициализируем обработчики детализации по сотруднику...');
+            initEmployeeDetailsEventListeners();
+        }
+
+        // Инициализируем модуль динамики сотрудника (только обработчики)
+        if (typeof initEmployeeDynamicsEventListeners === 'function') {
+            console.log('Инициализируем обработчики динамики сотрудника...');
+            initEmployeeDynamicsEventListeners();
+        }
+        // Данные будут загружены при первом открытии вкладки
 
         // Повторно инициализируем сворачивающиеся блоки после загрузки всех модулей
         if (typeof initCollapsibleSections === 'function') {
