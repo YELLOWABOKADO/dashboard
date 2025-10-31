@@ -158,9 +158,12 @@ function applyChecklistFilters() {
     window.checklistFilteredData = checklistFilteredData;
 
     updateChecklistStats();
-    updateChecklistCharts();
+    if (typeof window.initChecklistCharts === 'function') {
+        window.initChecklistCharts();
+    }
     updateChecklistOperatorTable();
     updateChecklistTable();
+    updateKcSubblocksChart(); // Обновляем диаграмму по подблокам
 
     // Обновляем заголовки таблиц с индикаторами сортировки
     updateOperatorTableHeaders();
@@ -666,6 +669,165 @@ function initTableSorting() {
             sortDetailsTable(index, header.textContent.trim());
         });
     });
+}// Создание диаграммы "Отклонения по подблокам в разрезе КЦ"
+let checklistKcSubblocksChart = null;
+
+function updateKcSubblocksChart() {
+    console.log('[Checklist Dashboard] Обновление диаграммы по подблокам в разрезе КЦ...');
+    
+    const ctx = document.getElementById('checklistKcSubblocksChart');
+    if (!ctx) {
+        console.log('[Checklist Dashboard] Canvas checklistKcSubblocksChart не найден');
+        return;
+    }
+
+    // Уничтожаем предыдущий график
+    if (checklistKcSubblocksChart) {
+        checklistKcSubblocksChart.destroy();
+    }
+
+    // Фильтруем только проблемы (score = 1)
+    const issues = checklistFilteredData.filter(item => item.score === 1);
+    
+    if (issues.length === 0) {
+        console.log('[Checklist Dashboard] Нет проблем для отображения');
+        return;
+    }
+
+    // Получаем уникальные КЦ
+    const kcs = [...new Set(issues.map(item => item.kc))].sort();
+    
+    // Получаем уникальные подблоки (Block_1_lvl)
+    const subblocks = [...new Set(issues.map(item => item.Block_1_lvl))].filter(b => b).sort();
+    
+    console.log('[Checklist Dashboard] КЦ:', kcs);
+    console.log('[Checklist Dashboard] Подблоки (Block_1_lvl):', subblocks);
+
+    // Подсчитываем отклонения по каждому подблоку для каждого КЦ
+    const data = {};
+    subblocks.forEach(subblock => {
+        data[subblock] = {};
+        kcs.forEach(kc => {
+            data[subblock][kc] = 0;
+        });
+    });
+
+    issues.forEach(item => {
+        if (item.Block_1_lvl && item.kc) {
+            data[item.Block_1_lvl][item.kc]++;
+        }
+    });
+
+    console.log('[Checklist Dashboard] Данные по подблокам:', data);
+
+    // Создаем датасеты для каждого подблока
+    const colors = [
+        '#E74C3C', // Красный
+        '#3498DB', // Синий  
+        '#2ECC71', // Зеленый
+        '#F39C12', // Оранжевый
+        '#9B59B6', // Фиолетовый
+        '#1ABC9C', // Бирюзовый
+        '#E67E22', // Темно-оранжевый
+        '#34495E', // Темно-серый
+        '#16A085', // Темно-бирюзовый
+        '#27AE60'  // Темно-зеленый
+    ];
+
+    const datasets = subblocks.map((subblock, index) => ({
+        label: subblock,
+        data: kcs.map(kc => data[subblock][kc]),
+        backgroundColor: colors[index % colors.length],
+        borderColor: colors[index % colors.length],
+        borderWidth: 1
+    }));
+
+    // Создаем график
+    checklistKcSubblocksChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: kcs,
+            datasets: datasets
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Отклонения по подблокам в разрезе КЦ',
+                    font: {
+                        size: 16,
+                        weight: 'bold'
+                    }
+                },
+                legend: {
+                    display: true,
+                    position: 'right',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 10,
+                        font: {
+                            size: 11
+                        }
+                    }
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleColor: '#fff',
+                    bodyColor: '#fff',
+                    borderColor: '#ddd',
+                    borderWidth: 1,
+                    callbacks: {
+                        label: function(context) {
+                            return context.dataset.label + ': ' + context.parsed.y + ' отклонений';
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    stacked: true,
+                    display: true,
+                    title: {
+                        display: true,
+                        text: 'Колл-центр',
+                        font: {
+                            size: 12,
+                            weight: 'bold'
+                        }
+                    },
+                    grid: {
+                        display: false
+                    }
+                },
+                y: {
+                    stacked: true,
+                    display: true,
+                    title: {
+                        display: true,
+                        text: 'Количество отклонений',
+                        font: {
+                            size: 12,
+                            weight: 'bold'
+                        }
+                    },
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    }
+                }
+            },
+            interaction: {
+                mode: 'index',
+                intersect: false
+            }
+        }
+    });
+
+    console.log('[Checklist Dashboard] ✅ Диаграмма по подблокам создана');
 }
 
 // Инициализация дашборда чек-листов

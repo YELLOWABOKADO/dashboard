@@ -45,42 +45,125 @@
 
         <!-- Контент -->
         <div class="scrollable-content">
-            <!-- Информация о сотруднике -->
-            <div id="empDynEmployeeInfo" class="employee-profile-card" style="display: none;">
-                <h4>Информация о сотруднике</h4>
-                <div class="employee-info-grid">
-                    <div class="info-item">
-                        <span class="info-label">ФИО:</span>
-                        <span class="info-value" id="empDynName">-</span>
+            <!-- Информация о сотруднике и статистика -->
+            <div id="empDynEmployeeInfo" class="employee-info-section" style="display: none;">
+                <div class="employee-header-card">
+                    <div class="employee-avatar">
+                        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="24" cy="24" r="24" fill="#007bff" opacity="0.1"/>
+                            <path d="M24 24C27.3137 24 30 21.3137 30 18C30 14.6863 27.3137 12 24 12C20.6863 12 18 14.6863 18 18C18 21.3137 20.6863 24 24 24Z" fill="#007bff"/>
+                            <path d="M24 27C17.3726 27 12 29.6863 12 33V36H36V33C36 29.6863 30.6274 27 24 27Z" fill="#007bff"/>
+                        </svg>
                     </div>
-                    <div class="info-item">
-                        <span class="info-label">Группа:</span>
-                        <span class="info-value" id="empDynGroup">-</span>
+                    <div class="employee-main-info">
+                        <h3 class="employee-name" id="empDynName">-</h3>
+                        <div class="employee-meta">
+                            <span class="meta-item">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                    <path d="M8 8C9.65685 8 11 6.65685 11 5C11 3.34315 9.65685 2 8 2C6.34315 2 5 3.34315 5 5C5 6.65685 6.34315 8 8 8Z" fill="#6c757d"/>
+                                    <path d="M8 9.5C5.51472 9.5 3.5 10.7909 3.5 12.375V14H12.5V12.375C12.5 10.7909 10.4853 9.5 8 9.5Z" fill="#6c757d"/>
+                                </svg>
+                                <span id="empDynGroup">-</span>
+                            </span>
+                            <span class="meta-item">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                    <path d="M8 2L2 5L8 8L14 5L8 2Z" fill="#6c757d"/>
+                                    <path d="M2 7V11L8 14L14 11V7L8 10L2 7Z" fill="#6c757d"/>
+                                </svg>
+                                <span id="empDynKc">-</span>
+                            </span>
+                        </div>
                     </div>
-                    <div class="info-item">
-                        <span class="info-label">КЦ:</span>
-                        <span class="info-value" id="empDynKc">-</span>
+                </div>
+                
+                <div class="employee-stats-grid">
+                    <div class="stat-card-modern">
+                        <div class="stat-icon stat-icon-blue">
+                            📊
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-label">Всего звонков</div>
+                            <div class="stat-value" id="empDynTotalCalls">0</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card-modern">
+                        <div class="stat-icon stat-icon-yellow-light">
+                            ✅
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-label">Всего отклонений</div>
+                            <div class="stat-value" id="empDynTotalIssues">0</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card-modern">
+                        <div class="stat-icon stat-icon-yellow">
+                            ⚠️
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-label">% отклонений</div>
+                            <div class="stat-value" id="empDynIssueRate">0%</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card-modern">
+                        <div class="stat-icon stat-icon-orange">
+                            📈
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-label">Средний % за период</div>
+                            <div class="stat-value" id="empDynAvgRate">0%</div>
+                        </div>
                     </div>
                 </div>
             </div>
-
-            <!-- Статистика -->
-            <div id="empDynStatsCards" class="stats-cards-container" style="display: none;">
-                <div class="stat-card">
-                    <div class="stat-label">Всего звонков</div>
-                    <div class="stat-value" id="empDynTotalCalls">0</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Всего отклонений</div>
-                    <div class="stat-value" id="empDynTotalIssues">0</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">% отклонений</div>
-                    <div class="stat-value" id="empDynIssueRate">0%</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Средний % за период</div>
-                    <div class="stat-value" id="empDynAvgRate">0%</div>
+            
+            <!-- Рейтинг сотрудника -->
+            <div id="empDynRankingSection" class="ranking-section" style="display: none;">
+                <h4 class="section-title">🏆 Рейтинг сотрудника</h4>
+                <div class="ranking-cards-grid">
+                    <div class="ranking-card">
+                        <div class="ranking-header">
+                            <span class="ranking-icon">🌍</span>
+                            <span class="ranking-title">Общий зачет</span>
+                        </div>
+                        <div class="ranking-position">
+                            <span class="rank-number" id="empDynRankOverall">-</span>
+                            <span class="rank-total">из <span id="empDynRankOverallTotal">-</span></span>
+                        </div>
+                        <div class="ranking-percentage">
+                            <span id="empDynRankOverallPercent">-%</span> отклонений
+                        </div>
+                    </div>
+                    
+                    <div class="ranking-card">
+                        <div class="ranking-header">
+                            <span class="ranking-icon">🏢</span>
+                            <span class="ranking-title">По КЦ</span>
+                        </div>
+                        <div class="ranking-position">
+                            <span class="rank-number" id="empDynRankKc">-</span>
+                            <span class="rank-total">из <span id="empDynRankKcTotal">-</span></span>
+                        </div>
+                        <div class="ranking-percentage">
+                            <span id="empDynRankKcPercent">-%</span> отклонений
+                        </div>
+                    </div>
+                    
+                    <div class="ranking-card">
+                        <div class="ranking-header">
+                            <span class="ranking-icon">👥</span>
+                            <span class="ranking-title">По группе</span>
+                        </div>
+                        <div class="ranking-position">
+                            <span class="rank-number" id="empDynRankGroup">-</span>
+                            <span class="rank-total">из <span id="empDynRankGroupTotal">-</span></span>
+                        </div>
+                        <div class="ranking-percentage">
+                            <span id="empDynRankGroupPercent">-%</span> отклонений
+                        </div>
+                    </div>
                 </div>
             </div>
 

@@ -89,9 +89,10 @@ async function applyEmployeeDynamicsFilters() {
         document.getElementById('empDynLoading').innerHTML = 'Выберите сотрудника для просмотра данных';
         document.getElementById('empDynTable').style.display = 'none';
         document.getElementById('empDynEmployeeInfo').style.display = 'none';
-        document.getElementById('empDynStatsCards').style.display = 'none';
         document.getElementById('empDynBlocksSection').style.display = 'none';
+        document.getElementById('empDynBlocks1Section').style.display = 'none';
         document.getElementById('empDynComparisonSection').style.display = 'none';
+        document.getElementById('empDynRankingSection').style.display = 'none';
         return;
     }
     
@@ -133,9 +134,17 @@ async function applyEmployeeDynamicsFilters() {
     // Обновляем график
     updateEmployeeDynamicsChartNew(groupedData);
     
-    // Обновляем детализацию по блокам
+    // Обновляем детализацию по блокам 0 уровня
     updateBlocksAnalysis(empDynFilteredData);
     document.getElementById('empDynBlocksSection').style.display = 'block';
+    
+    // Обновляем детализацию по блокам 1 уровня
+    updateBlocks1Analysis(empDynFilteredData);
+    document.getElementById('empDynBlocks1Section').style.display = 'block';
+    
+    // Обновляем рейтинг
+    updateEmployeeRanking(selectedOperator, dateFrom, dateTo);
+    document.getElementById('empDynRankingSection').style.display = 'block';
     
     // Обработка сравнения
     if (compareOperator && compareOperator !== selectedOperator) {
@@ -159,7 +168,6 @@ async function applyEmployeeDynamicsFilters() {
     
     document.getElementById('empDynLoading').style.display = 'none';
     document.getElementById('empDynTable').style.display = 'table';
-    document.getElementById('empDynStatsCards').style.display = 'flex';
     
     console.log('[Employee Dynamics] ✅ Данные обновлены успешно');
 }
@@ -304,16 +312,16 @@ function updateEmployeeDynamicsChart(groupedData) {
                 {
                     label: '% отклонений',
                     data: groupedData.map(item => item.rate),
-                    borderColor: '#e74c3c',
-                    backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                    borderColor: '#EE964B',
+                    backgroundColor: 'rgba(238, 150, 75, 0.1)',
                     tension: 0.3,
                     yAxisID: 'y'
                 },
                 {
                     label: 'Количество звонков',
                     data: groupedData.map(item => item.calls),
-                    borderColor: '#3498db',
-                    backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                    borderColor: '#0D3B66',
+                    backgroundColor: 'rgba(13, 59, 102, 0.1)',
                     tension: 0.3,
                     yAxisID: 'y1'
                 }
@@ -499,16 +507,16 @@ function updateEmployeeDynamicsChartNew(groupedData) {
                 {
                     label: '% отклонений',
                     data: groupedData.map(item => item.rate),
-                    borderColor: '#e74c3c',
-                    backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                    borderColor: '#EE964B',
+                    backgroundColor: 'rgba(238, 150, 75, 0.1)',
                     tension: 0.3,
                     yAxisID: 'y'
                 },
                 {
                     label: 'Количество записей',
                     data: groupedData.map(item => item.total),
-                    borderColor: '#3498db',
-                    backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                    borderColor: '#0D3B66',
+                    backgroundColor: 'rgba(13, 59, 102, 0.1)',
                     tension: 0.3,
                     yAxisID: 'y1'
                 }
@@ -599,7 +607,7 @@ function updateTopBlocksChart(topBlocks) {
             datasets: [{
                 label: 'Количество отклонений',
                 data: topBlocks.map(b => b.issues),
-                backgroundColor: ['#e74c3c', '#e67e22', '#f39c12']
+                backgroundColor: ['#EE964B', '#F4D35E', '#FAF0CA']
             }]
         },
         options: {
@@ -639,7 +647,7 @@ function updateBlocksDynamicsChart(data, topBlockNames) {
     });
     
     const dates = Object.keys(byDate).sort();
-    const colors = ['#e74c3c', '#e67e22', '#f39c12'];
+    const colors = ['#EE964B', '#F4D35E', '#FAF0CA'];
     
     const datasets = topBlockNames.map((block, index) => ({
         label: block,
@@ -677,7 +685,7 @@ function updateBlocksDistributionChart(blockStats) {
     }
     
     const blocks = Object.keys(blockStats);
-    const colors = ['#e74c3c', '#e67e22', '#f39c12', '#3498db', '#9b59b6', '#1abc9c'];
+    const colors = ['#EE964B', '#F4D35E', '#FAF0CA', '#0D3B66', '#7c9ff5', '#9b8fd9'];
     
     empDynBlockCharts.distribution = new Chart(ctx, {
         type: 'pie',
@@ -694,6 +702,168 @@ function updateBlocksDistributionChart(blockStats) {
             plugins: {
                 legend: {
                     position: 'right'
+                }
+            }
+        }
+    });
+}
+
+// ===== АНАЛИЗ ПО БЛОКАМ 1 УРОВНЯ =====
+let empDynBlock1Charts = {}; // Графики по блокам 1 уровня
+
+// Анализ по блокам 1 уровня
+function updateBlocks1Analysis(data) {
+    // Подсчет по блокам 1 уровня
+    const blockStats = {};
+    data.forEach(item => {
+        const block = item.Block_1_lvl;
+        if (!blockStats[block]) {
+            blockStats[block] = { total: 0, issues: 0 };
+        }
+        blockStats[block].total++;
+        if (item.score === 1) {
+            blockStats[block].issues++;
+        }
+    });
+    
+    // Топ-5 проблемных блоков
+    const topBlocks = Object.keys(blockStats)
+        .map(block => ({
+            block,
+            ...blockStats[block],
+            rate: (blockStats[block].issues / blockStats[block].total) * 100
+        }))
+        .sort((a, b) => b.issues - a.issues)
+        .slice(0, 5);
+    
+    updateTopBlocks1Chart(topBlocks);
+    updateBlocks1DynamicsChart(data, topBlocks.map(b => b.block));
+    updateBlocks1DistributionChart(blockStats);
+}
+
+// График топ-5 блоков 1 уровня
+function updateTopBlocks1Chart(topBlocks) {
+    const ctx = document.getElementById('empDynTopBlocks1Chart');
+    if (!ctx) return;
+    
+    if (empDynBlock1Charts.top) {
+        empDynBlock1Charts.top.destroy();
+    }
+    
+    empDynBlock1Charts.top = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: topBlocks.map(b => b.block),
+            datasets: [{
+                label: 'Количество отклонений',
+                data: topBlocks.map(b => b.issues),
+                backgroundColor: ['#EE964B', '#F4D35E', '#FAF0CA', '#0D3B66', '#7c9ff5']
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            indexAxis: 'y',
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+// График динамики по блокам 1 уровня
+function updateBlocks1DynamicsChart(data, topBlockNames) {
+    const ctx = document.getElementById('empDynBlocks1DynamicsChart');
+    if (!ctx) return;
+    
+    if (empDynBlock1Charts.dynamics) {
+        empDynBlock1Charts.dynamics.destroy();
+    }
+    
+    // Группируем по датам и блокам
+    const byDate = {};
+    data.forEach(item => {
+        if (!topBlockNames.includes(item.Block_1_lvl)) return;
+        if (!byDate[item.date]) {
+            byDate[item.date] = {};
+        }
+        if (!byDate[item.date][item.Block_1_lvl]) {
+            byDate[item.date][item.Block_1_lvl] = 0;
+        }
+        if (item.score === 1) {
+            byDate[item.date][item.Block_1_lvl]++;
+        }
+    });
+    
+    const dates = Object.keys(byDate).sort();
+    const colors = ['#EE964B', '#F4D35E', '#FAF0CA', '#0D3B66', '#7c9ff5'];
+    
+    const datasets = topBlockNames.map((block, index) => ({
+        label: block,
+        data: dates.map(date => byDate[date][block] || 0),
+        borderColor: colors[index],
+        backgroundColor: colors[index] + '33',
+        tension: 0.3
+    }));
+    
+    empDynBlock1Charts.dynamics = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: dates.map(d => new Date(d).toLocaleDateString('ru-RU')),
+            datasets: datasets
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    position: 'top'
+                }
+            }
+        }
+    });
+}
+
+// График распределения по блокам 1 уровня
+function updateBlocks1DistributionChart(blockStats) {
+    const ctx = document.getElementById('empDynBlocks1DistributionChart');
+    if (!ctx) return;
+    
+    if (empDynBlock1Charts.distribution) {
+        empDynBlock1Charts.distribution.destroy();
+    }
+    
+    const blocks = Object.keys(blockStats);
+    const colors = ['#EE964B', '#F4D35E', '#FAF0CA', '#0D3B66', '#7c9ff5', '#9b8fd9', '#FAF0CA', '#EE964B'];
+    
+    empDynBlock1Charts.distribution = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: blocks,
+            datasets: [{
+                data: blocks.map(b => blockStats[b].issues),
+                backgroundColor: colors
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: {
+                        boxWidth: 12,
+                        font: {
+                            size: 11
+                        }
+                    }
                 }
             }
         }
@@ -756,8 +926,8 @@ function updateComparisonDynamicsChart(data1, data2, name1, name2, granularity) 
                         const item = grouped1.find(g => g.period === p);
                         return item ? item.rate : null;
                     }),
-                    borderColor: '#3498db',
-                    backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                    borderColor: '#0D3B66',
+                    backgroundColor: 'rgba(13, 59, 102, 0.1)',
                     tension: 0.3
                 },
                 {
@@ -766,8 +936,8 @@ function updateComparisonDynamicsChart(data1, data2, name1, name2, granularity) 
                         const item = grouped2.find(g => g.period === p);
                         return item ? item.rate : null;
                     }),
-                    borderColor: '#e74c3c',
-                    backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                    borderColor: '#EE964B',
+                    backgroundColor: 'rgba(238, 150, 75, 0.1)',
                     tension: 0.3
                 }
             ]
@@ -826,7 +996,7 @@ function updateComparisonBlocksChart(data1, data2, name1, name2) {
                         const stats = blocks1[b];
                         return stats ? ((stats.issues / stats.total) * 100).toFixed(2) : 0;
                     }),
-                    backgroundColor: 'rgba(52, 152, 219, 0.8)'
+                    backgroundColor: 'rgba(13, 59, 102, 0.8)'
                 },
                 {
                     label: name2,
@@ -834,7 +1004,7 @@ function updateComparisonBlocksChart(data1, data2, name1, name2) {
                         const stats = blocks2[b];
                         return stats ? ((stats.issues / stats.total) * 100).toFixed(2) : 0;
                     }),
-                    backgroundColor: 'rgba(231, 76, 60, 0.8)'
+                    backgroundColor: 'rgba(238, 150, 75, 0.8)'
                 }
             ]
         },
@@ -878,6 +1048,7 @@ function initEmployeeDynamicsEventListeners() {
         { id: 'empDynChartHeader', content: 'empDynChartContent' },
         { id: 'empDynTableHeader', content: 'empDynTableContent' },
         { id: 'empDynBlocksHeader', content: 'empDynBlocksContent' },
+        { id: 'empDynBlocks1Header', content: 'empDynBlocks1Content' },
         { id: 'empDynComparisonHeader', content: 'empDynComparisonContent' }
     ];
     
@@ -892,6 +1063,112 @@ function initEmployeeDynamicsEventListeners() {
     
     window.empDynListenersInitialized = true;
     console.log('[Employee Dynamics] Обработчики инициализированы');
+}
+
+// Расчет рейтинга сотрудника
+function updateEmployeeRanking(selectedOperator, dateFrom, dateTo) {
+    console.log('[Employee Dynamics] Рассчитываем рейтинг для:', selectedOperator);
+    
+    // Фильтруем данные по периоду
+    const periodData = empDynAllData.filter(item => {
+        const itemDate = new Date(item.date);
+        const from = dateFrom ? new Date(dateFrom) : null;
+        const to = dateTo ? new Date(dateTo) : null;
+        
+        return (!from || itemDate >= from) && (!to || itemDate <= to);
+    });
+    
+    if (periodData.length === 0) {
+        console.log('[Employee Dynamics] Нет данных для расчета рейтинга');
+        return;
+    }
+    
+    // Получаем информацию о сотруднике
+    const employeeInfo = periodData.find(item => item.operator === selectedOperator);
+    if (!employeeInfo) return;
+    
+    const employeeKc = employeeInfo.kc;
+    const employeeGroup = employeeInfo.group;
+    
+    // Рассчитываем статистику для всех операторов
+    const operatorStats = {};
+    
+    periodData.forEach(item => {
+        if (!operatorStats[item.operator]) {
+            operatorStats[item.operator] = {
+                operator: item.operator,
+                kc: item.kc,
+                group: item.group,
+                total: 0,
+                issues: 0
+            };
+        }
+        operatorStats[item.operator].total++;
+        if (item.score === 1) {
+            operatorStats[item.operator].issues++;
+        }
+    });
+    
+    // Преобразуем в массив и добавляем процент
+    const operatorList = Object.values(operatorStats).map(op => ({
+        ...op,
+        rate: op.total > 0 ? (op.issues / op.total) * 100 : 0
+    }));
+    
+    // Сортируем по проценту отклонений (меньше = лучше)
+    operatorList.sort((a, b) => a.rate - b.rate);
+    
+    // Общий рейтинг
+    const overallRank = operatorList.findIndex(op => op.operator === selectedOperator) + 1;
+    const overallTotal = operatorList.length;
+    const overallRate = operatorList.find(op => op.operator === selectedOperator).rate;
+    
+    // Рейтинг по КЦ
+    const kcOperators = operatorList.filter(op => op.kc === employeeKc);
+    const kcRank = kcOperators.findIndex(op => op.operator === selectedOperator) + 1;
+    const kcTotal = kcOperators.length;
+    const kcRate = kcOperators.find(op => op.operator === selectedOperator).rate;
+    
+    // Рейтинг по группе
+    const groupOperators = operatorList.filter(op => op.group === employeeGroup);
+    const groupRank = groupOperators.findIndex(op => op.operator === selectedOperator) + 1;
+    const groupTotal = groupOperators.length;
+    const groupRate = groupOperators.find(op => op.operator === selectedOperator).rate;
+    
+    // Обновляем UI
+    updateRankingCard('empDynRankOverall', overallRank, overallTotal, overallRate);
+    updateRankingCard('empDynRankKc', kcRank, kcTotal, kcRate);
+    updateRankingCard('empDynRankGroup', groupRank, groupTotal, groupRate);
+    
+    console.log('[Employee Dynamics] ✅ Рейтинг обновлен');
+}
+
+// Обновление карточки рейтинга
+function updateRankingCard(prefix, rank, total, rate) {
+    const rankElement = document.getElementById(prefix);
+    const totalElement = document.getElementById(prefix + 'Total');
+    const percentElement = document.getElementById(prefix + 'Percent');
+    
+    if (rankElement) {
+        rankElement.textContent = rank;
+        
+        // Добавляем класс для топ-3
+        const card = rankElement.closest('.ranking-card');
+        if (card) {
+            card.classList.remove('rank-1', 'rank-2', 'rank-3');
+            if (rank === 1) card.classList.add('rank-1');
+            else if (rank === 2) card.classList.add('rank-2');
+            else if (rank === 3) card.classList.add('rank-3');
+        }
+    }
+    
+    if (totalElement) {
+        totalElement.textContent = total;
+    }
+    
+    if (percentElement) {
+        percentElement.textContent = rate.toFixed(2) + '%';
+    }
 }
 
 // Экспорт функций
