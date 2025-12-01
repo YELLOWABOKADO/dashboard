@@ -294,6 +294,18 @@ async function updateRatingsData() {
     const filters = getRatingsFilters();
     console.log('Фильтры рейтингов:', filters);
 
+    if (typeof renderRatingsSummary === 'function') {
+        await renderRatingsSummary(filters);
+    }
+
+    if (window.ratingsViewMode === 'summary') {
+        const container = document.getElementById('ratingsDetails');
+        if (container) {
+            container.innerHTML = '<div class="placeholder">Режим сводки активен. Нажмите «Подробно», чтобы увидеть таблицу.</div>';
+        }
+        return;
+    }
+
     // Проверяем валидность диапазона дат
     if (!validateDateRange(filters.startDate, filters.endDate, null)) {
         return;

@@ -11,6 +11,45 @@
 
 <body>
     <div class="container">
+        <div class="global-filters">
+            <div class="global-filters__row">
+                <div class="filter-item">
+                    <span class="filter-label">Период с:</span>
+                    <input type="date" id="globalStartDate" value="2025-07-01" class="date-input">
+                </div>
+                <div class="filter-item">
+                    <span class="filter-label">по:</span>
+                    <input type="date" id="globalEndDate" value="2025-07-31" class="date-input">
+                </div>
+                <div class="filter-item">
+                    <span class="filter-label">Гранулярность:</span>
+                    <select id="globalGranularity">
+                        <option value="День">День</option>
+                        <option value="Неделя">Неделя</option>
+                        <option value="Месяц" selected>Месяц</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <span class="filter-label">КЦ:</span>
+                    <select id="globalCallCenter">
+                        <option value="Все КЦ">Все КЦ</option>
+                        <option value="КЦ 1">КЦ 1</option>
+                        <option value="КЦ 2">КЦ 2</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <span class="filter-label">Дашборд:</span>
+                    <select id="globalDashboard">
+                        <option value="Автооценка" selected>Автооценка</option>
+                        <option value="Автооценка УАВ/ПреХард">Автооценка УАВ/ПреХард</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <button id="applyGlobalFilters" class="btn btn-primary">Применить ко всем</button>
+                </div>
+            </div>
+            <div class="global-filters__hint">Все вкладки берут значения отсюда. Локальные фильтры можно менять точечно.</div>
+        </div>
         <!-- Вкладки -->
         <div class="tabs">
             <button class="tab-button active" data-tab="org">Оргструктура</button>
@@ -439,6 +478,11 @@
 
         <!-- Dynamics Tab Content -->
         <div id="dynamicsTab" class="tab-content">
+            <div class="view-mode-toggle" id="dynamicsViewModeToggle">
+                <span class="view-mode-label">Отображение:</span>
+                <button class="view-mode-btn active" data-mode="summary" data-target="dynamics">Сводка</button>
+                <button class="view-mode-btn" data-mode="detail" data-target="dynamics">Подробно</button>
+            </div>
             <!-- Закрепленная панель фильтров -->
             <div class="sticky-header">
                 <!-- Фильтры для динамики -->
@@ -619,8 +663,24 @@
 
             <!-- Прокручиваемый контент -->
             <div class="scrollable-content">
+                <div id="dynamicsSummary" class="summary-cards">
+                    <div class="summary-card">
+                        <div class="summary-card__title">Сотрудников в выборке</div>
+                        <div class="summary-card__value" id="dynSummaryCount">—</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-card__title">Средний % отклонений</div>
+                        <div class="summary-card__value" id="dynSummaryAvg">—</div>
+                        <div class="summary-card__hint" id="dynSummaryCalls">—</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-card__title">Лучший / худший</div>
+                        <div class="summary-card__value" id="dynSummaryBest">—</div>
+                        <div class="summary-card__hint" id="dynSummaryWorst">—</div>
+                    </div>
+                </div>
                 <!-- Блок с динамикой по команде -->
-                <div class="collapsible-section">
+                <div class="collapsible-section" data-heavy="true">
                     <div class="collapsible-header" id="dynamicsTeamDetailsHeader">
                         <h4 style="margin: 0; display: flex; align-items: center;">
                             <span class="collapse-arrow">▼</span>
@@ -635,7 +695,7 @@
                 </div>
 
                 <!-- Блок с динамикой по подразделениям -->
-                <div class="collapsible-section">
+                <div class="collapsible-section" data-heavy="true">
                     <div class="collapsible-header" id="dynamicsDepartmentsDetailsHeader">
                         <h4 style="margin: 0; display: flex; align-items: center;">
                             <span class="collapse-arrow">▼</span>
@@ -650,7 +710,7 @@
                 </div>
 
                 <!-- Динамика по сотруднику -->
-                <div class="collapsible-section">
+                <div class="collapsible-section" data-heavy="true">
                     <div class="collapsible-header" id="employeeDynamicsHeader">
                         <h4 style="margin: 0; display: flex; align-items: center;">
                             <span class="collapse-arrow">▼</span>
@@ -976,6 +1036,28 @@
 
         <!-- Ratings Tab Content -->
         <div id="ratingsTab" class="tab-content">
+            <div class="view-mode-toggle" id="ratingsViewModeToggle">
+                <span class="view-mode-label">Отображение:</span>
+                <button class="view-mode-btn active" data-mode="summary" data-target="ratings">Сводка</button>
+                <button class="view-mode-btn" data-mode="detail" data-target="ratings">Подробно</button>
+            </div>
+            <div id="ratingsSummary" class="summary-cards">
+                <div class="summary-card">
+                    <div class="summary-card__title">Лучший по % отклонений</div>
+                    <div class="summary-card__value" id="ratSummaryBest">—</div>
+                    <div class="summary-card__hint" id="ratSummaryBestGroup">—</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-card__title">Худший по % отклонений</div>
+                    <div class="summary-card__value" id="ratSummaryWorst">—</div>
+                    <div class="summary-card__hint" id="ratSummaryWorstGroup">—</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-card__title">Средний % по выборке</div>
+                    <div class="summary-card__value" id="ratSummaryAvg">—</div>
+                    <div class="summary-card__hint" id="ratSummaryCount">—</div>
+                </div>
+            </div>
             <!-- Закрепленная панель фильтров -->
             <div class="sticky-header">
                 <!-- Фильтры для рейтингов -->
@@ -1135,7 +1217,7 @@
                             <span style="margin-left: 10px;">🏆 Рейтинг операторов</span>
                         </h4>
                     </div>
-                    <div class="collapsible-content show" id="ratingsDetailsContent">
+                    <div class="collapsible-content show" id="ratingsDetailsContent" data-heavy="true">
                         <div id="ratingsDetails" class="details-container">
                             <div class="loading">Загрузка рейтингов...</div>
                         </div>
@@ -1806,6 +1888,8 @@
         <script src="js/checklist-dashboard.js"></script>
         <script src="js/employee-details-dashboard.js"></script>
         <script src="js/employee-dynamics-dashboard.js"></script>
+        <script src="js/modules/global-filters.js"></script>
+        <script src="js/modules/view-modes.js"></script>
         <script src="js/modules/app.js"></script>
 
         <script>

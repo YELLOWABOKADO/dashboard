@@ -112,8 +112,27 @@ async function updateDynamicsData() {
     const filters = getDynamicsFilters();
     console.log('Фильтры динамики:', filters);
 
+    if (typeof renderDynamicsSummary === 'function') {
+        await renderDynamicsSummary(filters);
+    }
+
     if (typeof syncEmployeeDynamicsFilters === 'function') {
         syncEmployeeDynamicsFilters();
+    }
+
+    if (window.dynamicsViewMode === 'summary') {
+        if (typeof renderDynamicsSummary === 'function') {
+            await renderDynamicsSummary(filters);
+        }
+        // В режиме сводки не рендерим тяжёлые таблицы
+        const teamContainer = document.getElementById('dynamicsTeamDetails');
+        const depContainer = document.getElementById('dynamicsDepartmentsDetails');
+        [teamContainer, depContainer].forEach(c => {
+            if (c) {
+                c.innerHTML = '<div class="placeholder">Режим сводки активен. Нажмите «Подробно», чтобы увидеть детали.</div>';
+            }
+        });
+        return;
     }
     
     // Проверяем валидность диапазона дат
