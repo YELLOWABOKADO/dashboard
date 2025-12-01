@@ -23,9 +23,32 @@ function showChecklistDebug(message) {
     console.log('[Checklist Dashboard]', message);
 }
 
+function updateChecklistStructureStatus(summary) {
+    const statusEl = document.getElementById('checklistStructureStatus');
+    if (!statusEl || !summary) return;
+
+    const issues = (summary.missingBlock0 || 0) + (summary.missingBlock1 || 0) + (summary.missingBlock2 || 0);
+    const total = summary.total || 0;
+    if (issues === 0) {
+        statusEl.textContent = `Структура блоков согласована (${total} записей проверено)`;
+        statusEl.classList.remove('status-warning');
+        statusEl.classList.add('status-ok');
+    } else {
+        statusEl.textContent = `Несоответствия структуры блоков: ${issues} из ${total}`;
+        statusEl.classList.add('status-warning');
+        statusEl.classList.remove('status-ok');
+    }
+}
+
 // Загрузка данных для дашборда чек-листов
 async function loadChecklistData(dashboardType = 'Автооценка') {
     console.log(`[Checklist Dashboard] Начинаем загрузку данных для дашборда: ${dashboardType}...`);
+
+    if (window.checklistLoadingInProgress) {
+        console.log('[Checklist Dashboard] Загрузка уже выполняется, пропускаем повторный вызов');
+        return;
+    }
+    window.checklistLoadingInProgress = true;
 
     // Показываем индикатор загрузки
     const loadingElement = document.getElementById('checklistLoading');
@@ -60,7 +83,16 @@ async function loadChecklistData(dashboardType = 'Автооценка') {
                 console.log(`[Checklist Dashboard] Процент проблем: ${((korotenkoIssues.length / korotenkoRecords.length) * 100).toFixed(1)}%`);
             }
 
-            populateChecklistFilters();
+            let baseStructure = null;
+            if (typeof loadBaseBlockStructure === 'function') {
+                baseStructure = await loadBaseBlockStructure();
+            }
+            if (baseStructure && typeof validateBlockStructure === 'function') {
+                const validation = validateBlockStructure(checklistAllData, baseStructure);
+                updateChecklistStructureStatus(validation);
+            }
+
+            populateChecklistFilters(baseStructure);
             applyChecklistFilters();
 
             // Инициализируем сортировку таблиц после загрузки данных
@@ -68,6 +100,9 @@ async function loadChecklistData(dashboardType = 'Автооценка') {
             // Обновляем заголовки таблиц с индикаторами сортировки по умолчанию
             updateOperatorTableHeaders();
             updateDetailsTableHeaders();
+
+            window.checklistLoadedOnce = true;
+            window.checklistRenderedOnce = true;
 
             if (loadingElement) {
                 loadingElement.style.display = 'none';
@@ -85,20 +120,27 @@ async function loadChecklistData(dashboardType = 'Автооценка') {
         if (loadingElement) {
             loadingElement.innerHTML = `Ошибка загрузки данных для дашборда "${dashboardType}"`;
         }
+    } finally {
+        window.checklistLoadingInProgress = false;
     }
 }
 
 
 
 // Заполнение фильтров
-function populateChecklistFilters() {
+function populateChecklistFilters(structure = window.baseBlockStructure) {
     console.log('[Checklist Dashboard] Заполняем фильтры...');
 
     const kcs = [...new Set(checklistAllData.map(item => item.kc))].sort();
     const groups = [...new Set(checklistAllData.map(item => item.group))].sort();
     const operators = [...new Set(checklistAllData.map(item => item.operator))].sort();
-    const blocks0 = [...new Set(checklistAllData.map(item => item.Block_0_lvl))].sort();
-    const blocks1 = [...new Set(checklistAllData.map(item => item.Block_1_lvl))].sort();
+    const baseStructure = structure || window.baseBlockStructure;
+    const blocks0 = baseStructure
+        ? Object.keys(baseStructure)
+        : [...new Set(checklistAllData.map(item => item.Block_0_lvl))].sort();
+    const blocks1 = baseStructure && typeof getBlock1List === 'function'
+        ? getBlock1List(baseStructure)
+        : [...new Set(checklistAllData.map(item => item.Block_1_lvl))].sort();
 
     console.log(`[Checklist Dashboard] КЦ: ${kcs.length}, Группы: ${groups.length}, Операторы: ${operators.length}, Блоки 0: ${blocks0.length}, Блоки 1: ${blocks1.length}`);
 
@@ -168,6 +210,8 @@ function applyChecklistFilters() {
     // Обновляем заголовки таблиц с индикаторами сортировки
     updateOperatorTableHeaders();
     updateDetailsTableHeaders();
+
+    window.checklistRenderedOnce = true;
 }
 
 // Обновление статистики

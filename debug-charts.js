@@ -17,8 +17,6 @@ console.log('- initChartToggle:', typeof initChartToggle);
 console.log('Canvas элементы:');
 console.log('- departmentsBarChart:', !!document.getElementById('departmentsBarChart'));
 console.log('- employeesBarChart:', !!document.getElementById('employeesBarChart'));
-console.log('- pieChart:', !!document.getElementById('pieChart'));
-console.log('- employeesPieChart:', !!document.getElementById('employeesPieChart'));
 
 // Проверяем переключатели
 console.log('Переключатели:');

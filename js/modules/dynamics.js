@@ -111,6 +111,10 @@ async function updateDynamicsData() {
     // Получаем параметры фильтров
     const filters = getDynamicsFilters();
     console.log('Фильтры динамики:', filters);
+
+    if (typeof syncEmployeeDynamicsFilters === 'function') {
+        syncEmployeeDynamicsFilters();
+    }
     
     // Проверяем валидность диапазона дат
     if (!validateDateRange(filters.startDate, filters.endDate, filters.timeGranularity)) {
@@ -192,6 +196,10 @@ async function loadDynamicsTeamDetails() {
         // Генерируем HTML таблицы динамики по команде
         const tableHTML = generateDynamicsTeamTable(filteredEmployees, operatorData, periods, filters.timeGranularity);
         container.innerHTML = tableHTML;
+
+        if (typeof refreshCollapsibleHeight === 'function') {
+            refreshCollapsibleHeight('dynamicsTeamDetailsContent');
+        }
         
         console.log(`Динамика по команде загружена успешно (${filters.timeGranularity}, ${periods.length} периодов, ${filteredEmployees.length} сотрудников)`);
         
@@ -247,6 +255,10 @@ async function loadDynamicsDepartmentsDetails() {
         // Генерируем HTML таблицы динамики по подразделениям
         const tableHTML = generateDynamicsDepartmentsTable(departmentsData, periods, filters.timeGranularity);
         container.innerHTML = tableHTML;
+
+        if (typeof refreshCollapsibleHeight === 'function') {
+            refreshCollapsibleHeight('dynamicsDepartmentsDetailsContent');
+        }
         
         console.log(`Динамика по подразделениям загружена успешно (${filters.timeGranularity}, ${periods.length} периодов, ${Object.keys(departmentsData).length} подразделений)`);
         

@@ -179,32 +179,24 @@ function toggleCollapsibleSection(headerId, contentId) {
             arrow.classList.remove('collapsed');
         }
 
-        // Сначала убираем max-height, чтобы получить реальную высоту
-        content.style.maxHeight = 'none';
-        const realHeight = content.scrollHeight;
-        content.style.maxHeight = '0px';
-
-        // Запускаем анимацию
+        // Даем блоку вырасти до реального размера и освобождаем max-height,
+        // чтобы динамически подгружаемый контент не обрезался.
+        content.style.maxHeight = content.scrollHeight + 'px';
         setTimeout(() => {
-            content.style.maxHeight = realHeight + 'px';
-        }, 10);
+            content.style.maxHeight = 'none';
+        }, 320);
 
         // Специальная обработка для блоков с графиками
-        if (contentId.includes('Charts')) {
+        if (contentId.includes('Charts') || contentId === 'departmentsTableContent') {
             setTimeout(() => {
                 // Перерисовываем графики после разворачивания
-                if (contentId === 'departmentsChartsContent' && typeof cachedDepartmentsData !== 'undefined' && typeof initDepartmentCharts === 'function') {
+                if (contentId === 'departmentsTableContent' && typeof cachedDepartmentsData !== 'undefined' && typeof initDepartmentCharts === 'function') {
                     initDepartmentCharts(cachedDepartmentsData);
                 } else if (contentId === 'employeesChartsContent' && typeof cachedEmployeesData !== 'undefined' && typeof initEmployeeCharts === 'function') {
                     initEmployeeCharts(cachedEmployeesData);
                 }
 
-                // Обновляем max-height после перерисовки графиков
-                setTimeout(() => {
-                    content.style.maxHeight = 'none';
-                    const newHeight = content.scrollHeight;
-                    content.style.maxHeight = newHeight + 'px';
-                }, 100);
+                refreshCollapsibleHeight(content);
             }, 300);
         }
 
@@ -218,10 +210,27 @@ function toggleCollapsibleSection(headerId, contentId) {
         }
 
         // Устанавливаем max-height в 0 для анимации
-        content.style.maxHeight = '0px';
+        content.style.maxHeight = content.scrollHeight + 'px';
+        requestAnimationFrame(() => {
+            content.style.maxHeight = '0px';
+        });
 
         console.log(`Блок ${contentId} свернут`);
     }
+}
+
+// Помощник для пересчета высоты открытого блока после динамического обновления
+function refreshCollapsibleHeight(contentOrId) {
+    const content = typeof contentOrId === 'string' ? document.getElementById(contentOrId) : contentOrId;
+    if (!content || content.classList.contains('collapsed')) {
+        return;
+    }
+    content.style.maxHeight = 'none';
+    const newHeight = content.scrollHeight;
+    content.style.maxHeight = newHeight + 'px';
+    setTimeout(() => {
+        content.style.maxHeight = 'none';
+    }, 200);
 }
 
 // Функция для инициализации всех сворачивающихся блоков
@@ -272,8 +281,8 @@ function initCollapsibleSections() {
                 if (arrow) {
                     arrow.classList.remove('collapsed');
                 }
-                content.style.maxHeight = content.scrollHeight + 'px';
-                console.log(`Блок ${contentId} развернут по умолчанию, высота: ${content.scrollHeight}px`);
+                content.style.maxHeight = 'none';
+                console.log(`Блок ${contentId} развернут по умолчанию`);
             }, 100);
         }
     });
@@ -306,5 +315,6 @@ if (typeof window !== 'undefined') {
     window.toggleCollapsibleSection = toggleCollapsibleSection;
     window.initCollapsibleSections = initCollapsibleSections;
     window.resetCollapsibleSections = resetCollapsibleSections;
+    window.refreshCollapsibleHeight = refreshCollapsibleHeight;
     console.log('=== ui-helpers.js загружен, функции экспортированы ===');
 }

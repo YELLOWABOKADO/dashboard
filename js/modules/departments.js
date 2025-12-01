@@ -182,12 +182,10 @@ function renderDepartmentsTable(departmentsData) {
     
     // Показываем графики и инициализируем их
     const chartsContainer = document.getElementById('departmentsCharts');
-    const chartsContent = document.getElementById('departmentsChartsContent');
+    const tableContent = document.getElementById('departmentsTableContent');
     if (chartsContainer && typeof initDepartmentCharts === 'function') {
-        chartsContainer.style.display = 'grid';
-        // Проверяем, не свернут ли блок графиков
-        const isChartsCollapsed = chartsContent && chartsContent.classList.contains('collapsed');
-        if (!isChartsCollapsed) {
+        const isCollapsed = tableContent && tableContent.classList.contains('collapsed');
+        if (!isCollapsed) {
             // Небольшая задержка для корректной отрисовки canvas элементов
             setTimeout(() => {
                 initDepartmentCharts(cachedDepartmentsData);
@@ -221,10 +219,8 @@ function renderDepartmentsTable(departmentsData) {
         
         // Обновляем высоту сворачивающегося блока после отрисовки
         const content = document.getElementById('departmentsTableContent');
-        if (content && !content.classList.contains('collapsed')) {
-            setTimeout(() => {
-                content.style.maxHeight = content.scrollHeight + 'px';
-            }, 50);
+        if (content && !content.classList.contains('collapsed') && typeof refreshCollapsibleHeight === 'function') {
+            setTimeout(() => refreshCollapsibleHeight(content), 60);
         }
     }, 100);
 }
@@ -248,6 +244,10 @@ function setupDepartmentFilters() {
             console.log('=== Клик по кнопке обновления подразделений ===');
             e.preventDefault();
             updateDepartmentsData();
+            if (typeof updateEmployeesData === 'function') {
+                console.log('Синхронно обновляем блок команды после подразделений');
+                updateEmployeesData();
+            }
         });
         
         // Убираем возможные блокировки

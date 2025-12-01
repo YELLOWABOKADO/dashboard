@@ -18,9 +18,9 @@ async function loadEmployeeDetailsData(dashboardType = 'Автооценка') {
     console.log(`[Employee Details] Начинаем загрузку данных для дашборда: ${dashboardType}...`);
 
     // Проверяем, что вкладка существует (убираем проверку активности для отладки)
-    const tab = document.getElementById('employeeDetailsTab');
+    const tab = document.getElementById('employeeDetailsSectionContent');
     if (!tab) {
-        console.error('[Employee Details] Вкладка employeeDetailsTab не найдена');
+        console.error('[Employee Details] Блок employeeDetailsSectionContent не найден');
         return;
     }
     console.log('[Employee Details] Вкладка найдена, активна:', tab.classList.contains('active'));

@@ -20,25 +20,29 @@ async function updateActiveTab() {
     }
 
     switch (currentTab) {
-        case 'company':
-            console.log('Обновляем данные компании...');
+        case 'org':
+            console.log('Обновляем данные компании и подразделений...');
             await updateCompanyData();
-            break;
-        case 'departments':
-            console.log('Обновляем данные подразделений...');
             await updateDepartmentsData();
-            break;
-        case 'employees':
-            console.log('Обновляем данные команды...');
-            await updateEmployeesData();
+            if (typeof updateEmployeesData === 'function') {
+                console.log('Обновляем встроенный блок команды...');
+                await updateEmployeesData();
+            }
             break;
         case 'dynamics':
             console.log('Обновляем данные динамики...');
             await updateDynamicsData();
+            if (typeof syncEmployeeDynamicsFilters === 'function') {
+                syncEmployeeDynamicsFilters();
+            }
+            if (typeof window.empDynDataLoaded === 'undefined' && typeof loadEmployeeDynamicsData === 'function') {
+                console.log('[Employee Dynamics] Первое открытие, загружаем данные...');
+                await loadEmployeeDynamicsData();
+                window.empDynDataLoaded = true;
+            }
             break;
         case 'ratings':
             console.log('Переключились на вкладку рейтингов...');
-            // Инициализируем модуль рейтингов при первом посещении
             if (typeof initRatingsModule === 'function' && typeof window.ratingsInitialized === 'undefined') {
                 console.log('Инициализируем модуль рейтингов...');
                 initRatingsModule();
@@ -46,30 +50,59 @@ async function updateActiveTab() {
             }
             await updateRatingsData();
             break;
-        case 'checklist':
-            console.log('Обновляем дашборд чек-листов...');
-            if (typeof window.checklistDashboard === 'object' && typeof window.checklistDashboard.applyFilters === 'function') {
-                window.checklistDashboard.applyFilters();
-            }
-            break;
-        case 'employeeDetails':
-            console.log('Обновляем дашборд детализации по сотруднику...');
-            if (typeof applyEmployeeDetailsFilters === 'function') {
-                applyEmployeeDetailsFilters();
-            }
-            break;
-        case 'employeeDynamics':
-            console.log('Переключились на вкладку динамики сотрудника...');
-            // Загружаем данные при первом открытии вкладки
-            if (typeof window.empDynDataLoaded === 'undefined') {
-                console.log('[Employee Dynamics] Первое открытие вкладки, загружаем данные...');
-                if (typeof loadEmployeeDynamicsData === 'function') {
-                    await loadEmployeeDynamicsData();
-                    window.empDynDataLoaded = true;
+        case 'details':
+            console.log('Обновляем вкладку детализации...');
+            const activeDetailsTab = document.querySelector('.details-tab-button.active')?.dataset.target || 'detailsChecklistSection';
+
+            if (activeDetailsTab === 'detailsChecklistSection') {
+                if (!window.checklistLoadedOnce && typeof window.checklistDashboard === 'object' && typeof window.checklistDashboard.loadData === 'function') {
+                    await window.checklistDashboard.loadData();
+                    window.checklistLoadedOnce = true;
+                    window.checklistRenderedOnce = true;
+                } else if (!window.checklistRenderedOnce && typeof window.checklistDashboard === 'object' && typeof window.checklistDashboard.applyFilters === 'function') {
+                    window.checklistDashboard.applyFilters();
+                    window.checklistRenderedOnce = true;
                 }
             }
-            // Данные будут отображены после выбора сотрудника и нажатия "Обновить"
+
+            if (activeDetailsTab === 'detailsBlocksSection' && typeof initBlockDetailsModule === 'function' && !window.blockDetailsInitialized) {
+                initBlockDetailsModule();
+                window.blockDetailsInitialized = true;
+            }
+
+            if (!window.empDetailsModuleInitialized && typeof initEmployeeDetailsModule === 'function') {
+                await initEmployeeDetailsModule();
+            }
+            if (!window.empDetailsRenderedOnce && typeof applyEmployeeDetailsFilters === 'function') {
+                applyEmployeeDetailsFilters();
+                window.empDetailsRenderedOnce = true;
+            }
             break;
+    }
+}
+
+function syncEmployeeDynamicsFilters() {
+    const dynStart = document.getElementById('dynStartDate');
+    const dynEnd = document.getElementById('dynEndDate');
+    const dynGranularity = document.getElementById('dynTimeGranularity');
+
+    const empStart = document.getElementById('empDynStartDate');
+    const empEnd = document.getElementById('empDynEndDate');
+    const empGranularity = document.getElementById('empDynGranularity');
+
+    if (dynStart && empStart) {
+        empStart.value = dynStart.value;
+    }
+    if (dynEnd && empEnd) {
+        empEnd.value = dynEnd.value;
+    }
+    if (dynGranularity && empGranularity) {
+        const dynValue = dynGranularity.value;
+        if (dynValue === 'Неделя') {
+            empGranularity.value = 'week';
+        } else if (dynValue === 'Месяц') {
+            empGranularity.value = 'month';
+        }
     }
 }
 
@@ -79,6 +112,7 @@ function initApp() {
 
     // Инициализируем вкладки
     initTabs();
+    initDetailsInnerTabs();
 
     // Инициализируем функциональность сворачивания таблиц
     if (typeof initTableCollapse === 'function') {
@@ -212,4 +246,5 @@ function initApp() {
 if (typeof window !== 'undefined') {
     window.updateActiveTab = updateActiveTab;
     window.initApp = initApp;
+    window.syncEmployeeDynamicsFilters = syncEmployeeDynamicsFilters;
 }

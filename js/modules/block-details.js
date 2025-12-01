@@ -178,13 +178,29 @@ async function populateBlockDetailsBlocks() {
         return;
     }
 
-    // Сначала пробуем загрузить реальные данные из operator_data_days.json
+    const structure = typeof loadBaseBlockStructure === 'function'
+        ? await loadBaseBlockStructure()
+        : null;
+
+    let blockPaths = [];
+    if (structure && typeof getBlockPathsFromStructure === 'function') {
+        blockPaths = getBlockPathsFromStructure(structure);
+    }
+
+    // Загружаем данные для валидации и фолбека
     let sourceData = await loadChecklistSourceData();
-    if (!sourceData || sourceData.length === 0) {
-        // Фолбек на уже имеющиеся данные, если они появились из других модулей
-        if (Array.isArray(window.checklistFilteredData) && window.checklistFilteredData.length > 0) {
-            sourceData = window.checklistFilteredData;
-        } else {
+    if ((!sourceData || sourceData.length === 0) && Array.isArray(window.checklistFilteredData) && window.checklistFilteredData.length > 0) {
+        sourceData = window.checklistFilteredData;
+    }
+
+    if (structure && typeof validateBlockStructure === 'function' && sourceData && sourceData.length) {
+        const validation = validateBlockStructure(sourceData, structure);
+        console.log('[block-details] Результат проверки структуры блоков:', validation);
+    }
+
+    // Если базовая структура не дала путей, строим их из данных
+    if (blockPaths.length === 0) {
+        if (!sourceData || sourceData.length === 0) {
             console.log('Не удалось загрузить operator_data_days.json. Показываем тестовые блоки.');
             const testBlocks = [
                 'Влияние на бизнес',
@@ -199,29 +215,27 @@ async function populateBlockDetailsBlocks() {
             });
             return;
         }
+
+        console.log('Найдены данные чек-листов:', sourceData.length, 'записей');
+        const blockSet = new Set();
+        sourceData.forEach(item => {
+            const b0 = item.Block_0_lvl || '';
+            const b1 = item.Block_1_lvl || '';
+            const b2 = item.Block_2_lvl || '';
+            const b3 = item.Block_3_lvl || '';
+            if (!b0) return;
+            blockSet.add(`${b0}`);
+            if (b1) blockSet.add(`${b0} > ${b1}`);
+            if (b2) blockSet.add(`${b0} > ${b1} > ${b2}`);
+            if (b3) blockSet.add(`${b0} > ${b1} > ${b2} > ${b3}`);
+        });
+        blockPaths = Array.from(blockSet).sort();
     }
 
-    // Строим список путей блоков из загруженных данных (до 3 уровня)
-    console.log('Найдены данные чек-листов:', sourceData.length, 'записей');
-    const blockSet = new Set();
-    sourceData.forEach(item => {
-        const b0 = item.Block_0_lvl || '';
-        const b1 = item.Block_1_lvl || '';
-        const b2 = item.Block_2_lvl || '';
-        const b3 = item.Block_3_lvl || '';
-        if (!b0) return;
-        // Добавляем последовательные уровни как отдельные варианты
-        blockSet.add(`${b0}`);
-        if (b1) blockSet.add(`${b0} > ${b1}`);
-        if (b2) blockSet.add(`${b0} > ${b1} > ${b2}`);
-        if (b3) blockSet.add(`${b0} > ${b1} > ${b2} > ${b3}`);
-    });
-
-    const blocks = Array.from(blockSet).sort();
-    console.log('Найдено уникальных путей блоков:', blocks.length);
+    console.log('Найдено уникальных путей блоков:', blockPaths.length);
 
     blockSelect.innerHTML = '<option value="">Выберите блок</option>';
-    blocks.forEach(block => {
+    blockPaths.forEach(block => {
         const optionHtml = `<option value="${block}" title="${block}">${block}</option>`;
         blockSelect.innerHTML += optionHtml;
     });

@@ -2,23 +2,6 @@
  * Модуль для работы с графиками
  */
 
-// Функция для определения контрастного цвета текста
-function getContrastColor(hexColor) {
-    // Убираем # если есть
-    const hex = hexColor.replace('#', '');
-    
-    // Конвертируем в RGB
-    const r = parseInt(hex.substr(0, 2), 16);
-    const g = parseInt(hex.substr(2, 2), 16);
-    const b = parseInt(hex.substr(4, 2), 16);
-    
-    // Вычисляем яркость по формуле
-    const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-    
-    // Возвращаем черный для светлых цветов, белый для темных
-    return brightness > 128 ? '#000000' : '#ffffff';
-}
-
 // Инициализация Chart.js графиков
 function initDepartmentCharts(departmentsData) {
     console.log('=== Инициализация графиков подразделений ===');
@@ -34,9 +17,10 @@ function initDepartmentCharts(departmentsData) {
     // Сохраняем данные для переключения
     window.departmentsChartData = chartData;
     
-    // Создаем графики
-    createPieChart(chartData);
-    createDepartmentsBarChart(chartData, 'count'); // По умолчанию показываем количество
+    // Создаем график, учитывая активный режим
+    const activeButton = document.querySelector('.toggle-btn[data-target="departments"].active');
+    const mode = activeButton ? activeButton.dataset.mode : 'count';
+    createDepartmentsBarChart(chartData, mode);
     
     // Инициализируем обработчики переключателя
     initChartToggle('departments');
@@ -44,18 +28,6 @@ function initDepartmentCharts(departmentsData) {
 
 // Подготовка данных для графиков
 function prepareDepartmentChartData(departmentsData) {
-    const colors = [
-        '#E74C3C', // Красный (темнее)
-        '#3498DB', // Синий
-        '#2ECC71', // Зеленый
-        '#F39C12', // Оранжевый
-        '#9B59B6', // Фиолетовый
-        '#1ABC9C', // Бирюзовый
-        '#34495E', // Темно-серый
-        '#E67E22', // Темно-оранжевый
-        '#8E44AD'  // Темно-фиолетовый
-    ];
-
     // Создаем массив данных для сортировки
     const dataArray = [];
     Object.keys(departmentsData).forEach((deptKey) => {
@@ -69,8 +41,8 @@ function prepareDepartmentChartData(departmentsData) {
         }
     });
 
-    // Сортируем по убыванию процента отклонений
-    dataArray.sort((a, b) => b.percentage - a.percentage);
+    // Сортируем по возрастанию процента отклонений (меньше = лучше)
+    dataArray.sort((a, b) => a.percentage - b.percentage);
 
     // Извлекаем отсортированные данные
     const departments = dataArray.map(item => item.name);
@@ -80,231 +52,9 @@ function prepareDepartmentChartData(departmentsData) {
     return {
         departments,
         deviations,
-        percentages,
-        colors: colors.slice(0, departments.length)
+        percentages
     };
 }
-
-// Создание круговой диаграммы "Доля отклонений по КЦ"
-function createPieChart(chartData) {
-    const ctx = document.getElementById('pieChart');
-    if (!ctx) return;
-
-    // Уничтожаем предыдущий график если есть
-    if (window.pieChartInstance) {
-        window.pieChartInstance.destroy();
-    }
-
-    window.pieChartInstance = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: chartData.departments,
-            datasets: [{
-                data: chartData.percentages,
-                backgroundColor: chartData.colors,
-                borderWidth: 2,
-                borderColor: '#ffffff'
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                },
-                datalabels: {
-                    display: true,
-                    color: '#fff',
-                    font: {
-                        weight: 'bold',
-                        size: 14
-                    },
-                    formatter: (value, context) => {
-                        return value.toFixed(2) + '%';
-                    }
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return context.label + ': ' + context.parsed.toFixed(2) + '%';
-                        }
-                    }
-                }
-            }
-        },
-        plugins: [{
-            id: 'datalabels',
-            afterDatasetsDraw: function(chart) {
-                const ctx = chart.ctx;
-                chart.data.datasets.forEach((dataset, i) => {
-                    const meta = chart.getDatasetMeta(i);
-                    meta.data.forEach((element, index) => {
-                        const value = dataset.data[index];
-                        // Показываем текст только для секторов больше 1%
-                        if (value > 1) {
-                            const position = element.tooltipPosition();
-                            const backgroundColor = dataset.backgroundColor[index];
-                            
-                            // Определяем контрастный цвет для текста
-                            const textColor = getContrastColor(backgroundColor);
-                            
-                            // Настройки текста
-                            ctx.font = 'bold 14px Arial';
-                            ctx.textAlign = 'center';
-                            ctx.textBaseline = 'middle';
-                            
-                            // Добавляем тень для лучшей читаемости
-                            ctx.shadowColor = textColor === '#ffffff' ? '#000000' : '#ffffff';
-                            ctx.shadowBlur = 3;
-                            ctx.shadowOffsetX = 1;
-                            ctx.shadowOffsetY = 1;
-                            
-                            // Основной текст
-                            ctx.fillStyle = textColor;
-                            ctx.fillText(value.toFixed(2) + '%', position.x, position.y);
-                            
-                            // Сбрасываем тень
-                            ctx.shadowColor = 'transparent';
-                            ctx.shadowBlur = 0;
-                            ctx.shadowOffsetX = 0;
-                            ctx.shadowOffsetY = 0;
-                        }
-                    });
-                });
-            }
-        }]
-    });
-    
-    // Создаем кастомную легенду
-    createCustomLegend(chartData);
-}
-
-// Создание кастомной легенды для круговой диаграммы
-function createCustomLegend(chartData) {
-    const legendContainer = document.getElementById('pieChartLegend');
-    if (!legendContainer) return;
-    
-    let legendHTML = '';
-    chartData.departments.forEach((department, index) => {
-        const color = chartData.colors[index];
-        const percentage = chartData.percentages[index];
-        
-        legendHTML += `
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: ${color};"></div>
-                <span>${department}: ${percentage.toFixed(2)}%</span>
-            </div>
-        `;
-    });
-    
-    legendContainer.innerHTML = legendHTML;
-}
-
-// Создание второй круговой диаграммы "Топ отклонений" для подразделений
-function createDepartmentsTopChart(chartData) {
-    const ctx = document.getElementById('departmentsTopChart');
-    if (!ctx) return;
-
-    // Уничтожаем предыдущий график если есть
-    if (window.departmentsTopChartInstance) {
-        window.departmentsTopChartInstance.destroy();
-    }
-
-    // Берем топ-5 подразделений по количеству отклонений
-    const topData = chartData.departments.map((dept, index) => ({
-        name: dept,
-        deviations: chartData.deviations[index],
-        percentage: chartData.percentages[index],
-        color: chartData.colors[index]
-    })).sort((a, b) => b.deviations - a.deviations).slice(0, 5);
-
-    window.departmentsTopChartInstance = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: topData.map(item => item.name),
-            datasets: [{
-                data: topData.map(item => item.deviations),
-                backgroundColor: topData.map(item => item.color),
-                borderWidth: 2,
-                borderColor: '#ffffff'
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return context.label + ': ' + context.parsed.toLocaleString() + ' отклонений';
-                        }
-                    }
-                }
-            }
-        },
-        plugins: [{
-            id: 'datalabels',
-            afterDatasetsDraw: function(chart) {
-                const ctx = chart.ctx;
-                chart.data.datasets.forEach((dataset, i) => {
-                    const meta = chart.getDatasetMeta(i);
-                    meta.data.forEach((element, index) => {
-                        const value = dataset.data[index];
-                        if (value > 0) {
-                            const position = element.tooltipPosition();
-                            const backgroundColor = dataset.backgroundColor[index];
-                            
-                            const textColor = getContrastColor(backgroundColor);
-                            
-                            ctx.font = 'bold 12px Arial';
-                            ctx.textAlign = 'center';
-                            ctx.textBaseline = 'middle';
-                            
-                            ctx.shadowColor = textColor === '#ffffff' ? '#000000' : '#ffffff';
-                            ctx.shadowBlur = 3;
-                            ctx.shadowOffsetX = 1;
-                            ctx.shadowOffsetY = 1;
-                            
-                            ctx.fillStyle = textColor;
-                            ctx.fillText(value.toLocaleString(), position.x, position.y);
-                            
-                            ctx.shadowColor = 'transparent';
-                            ctx.shadowBlur = 0;
-                            ctx.shadowOffsetX = 0;
-                            ctx.shadowOffsetY = 0;
-                        }
-                    });
-                });
-            }
-        }]
-    });
-    
-    // Создаем кастомную легенду
-    createDepartmentsTopLegend(topData);
-}
-
-// Создание кастомной легенды для топ диаграммы подразделений
-function createDepartmentsTopLegend(topData) {
-    const legendContainer = document.getElementById('departmentsTopChartLegend');
-    if (!legendContainer) return;
-    
-    let legendHTML = '';
-    topData.forEach((item, index) => {
-        legendHTML += `
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: ${item.color};"></div>
-                <span>${item.name}: ${item.deviations.toLocaleString()}</span>
-            </div>
-        `;
-    });
-    
-    legendContainer.innerHTML = legendHTML;
-}
-
 
 
 // Инициализация графиков для сотрудников
@@ -322,9 +72,10 @@ function initEmployeeCharts(employeesData) {
     // Сохраняем данные для переключения
     window.employeesChartData = chartData;
     
-    // Создаем графики
-    createEmployeePieChart(chartData);
-    createEmployeesBarChart(chartData, 'count'); // По умолчанию показываем количество
+    // Создаем график, учитывая активный режим
+    const activeButton = document.querySelector('.toggle-btn[data-target="employees"].active');
+    const mode = activeButton ? activeButton.dataset.mode : 'count';
+    createEmployeesBarChart(chartData, mode); // По умолчанию показываем количество
     
     // Инициализируем обработчики переключателя
     initChartToggle('employees');
@@ -332,12 +83,6 @@ function initEmployeeCharts(employeesData) {
 
 // Подготовка данных для графиков сотрудников
 function prepareEmployeeChartData(employeesData) {
-    const colors = [
-        '#E74C3C', '#3498DB', '#2ECC71', '#F39C12', '#9B59B6', 
-        '#1ABC9C', '#34495E', '#E67E22', '#8E44AD', '#95A5A6',
-        '#F1C40F', '#E91E63', '#FF5722', '#607D8B', '#795548'
-    ];
-
     // Создаем массив данных для сортировки (берем только первые 10 для читаемости)
     const dataArray = employeesData.current
         .map(emp => ({
@@ -345,8 +90,8 @@ function prepareEmployeeChartData(employeesData) {
             deviations: emp.deviations,
             percentage: emp.percentage
         }))
-        .sort((a, b) => b.percentage - a.percentage)
-        .slice(0, 10); // Ограничиваем 10 сотрудниками
+        .sort((a, b) => a.percentage - b.percentage)
+        .slice(0, 10); // Ограничиваем 10 сотрудниками (лучшие по отклонениям)
 
     // Извлекаем отсортированные данные
     const employees = dataArray.map(item => item.name);
@@ -356,232 +101,27 @@ function prepareEmployeeChartData(employeesData) {
     return {
         employees,
         deviations,
-        percentages,
-        colors: colors.slice(0, employees.length)
+        percentages
     };
 }
-
-// Создание круговой диаграммы для сотрудников
-function createEmployeePieChart(chartData) {
-    const ctx = document.getElementById('employeesPieChart');
-    if (!ctx) return;
-
-    // Уничтожаем предыдущий график если есть
-    if (window.employeesPieChartInstance) {
-        window.employeesPieChartInstance.destroy();
-    }
-
-    window.employeesPieChartInstance = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: chartData.employees,
-            datasets: [{
-                data: chartData.percentages,
-                backgroundColor: chartData.colors,
-                borderWidth: 2,
-                borderColor: '#ffffff'
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return context.label + ': ' + context.parsed.toFixed(2) + '%';
-                        }
-                    }
-                }
-            }
-        },
-        plugins: [{
-            id: 'datalabels',
-            afterDatasetsDraw: function(chart) {
-                const ctx = chart.ctx;
-                chart.data.datasets.forEach((dataset, i) => {
-                    const meta = chart.getDatasetMeta(i);
-                    meta.data.forEach((element, index) => {
-                        const value = dataset.data[index];
-                        // Показываем текст только для секторов больше 1%
-                        if (value > 1) {
-                            const position = element.tooltipPosition();
-                            const backgroundColor = dataset.backgroundColor[index];
-                            
-                            // Определяем контрастный цвет для текста
-                            const textColor = getContrastColor(backgroundColor);
-                            
-                            // Настройки текста
-                            ctx.font = 'bold 12px Arial';
-                            ctx.textAlign = 'center';
-                            ctx.textBaseline = 'middle';
-                            
-                            // Добавляем тень для лучшей читаемости
-                            ctx.shadowColor = textColor === '#ffffff' ? '#000000' : '#ffffff';
-                            ctx.shadowBlur = 2;
-                            ctx.shadowOffsetX = 1;
-                            ctx.shadowOffsetY = 1;
-                            
-                            // Основной текст
-                            ctx.fillStyle = textColor;
-                            ctx.fillText(value.toFixed(2) + '%', position.x, position.y);
-                            
-                            // Сбрасываем тень
-                            ctx.shadowColor = 'transparent';
-                            ctx.shadowBlur = 0;
-                            ctx.shadowOffsetX = 0;
-                            ctx.shadowOffsetY = 0;
-                        }
-                    });
-                });
-            }
-        }]
-    });
-    
-    // Создаем кастомную легенду
-    createEmployeeCustomLegend(chartData);
-}
-
-// Создание кастомной легенды для сотрудников
-function createEmployeeCustomLegend(chartData) {
-    const legendContainer = document.getElementById('employeesPieChartLegend');
-    if (!legendContainer) return;
-    
-    let legendHTML = '';
-    chartData.employees.forEach((employee, index) => {
-        const color = chartData.colors[index];
-        const percentage = chartData.percentages[index];
-        
-        legendHTML += `
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: ${color};"></div>
-                <span>${employee}: ${percentage.toFixed(2)}%</span>
-            </div>
-        `;
-    });
-    
-    legendContainer.innerHTML = legendHTML;
-}
-
-// Создание второй круговой диаграммы "Топ отклонений" для сотрудников
-function createEmployeesTopChart(chartData) {
-    const ctx = document.getElementById('employeesTopChart');
-    if (!ctx) return;
-
-    // Уничтожаем предыдущий график если есть
-    if (window.employeesTopChartInstance) {
-        window.employeesTopChartInstance.destroy();
-    }
-
-    // Берем топ-5 сотрудников по количеству отклонений
-    const topData = chartData.employees.map((emp, index) => ({
-        name: emp,
-        deviations: chartData.deviations[index],
-        percentage: chartData.percentages[index],
-        color: chartData.colors[index]
-    })).sort((a, b) => b.deviations - a.deviations).slice(0, 5);
-
-    window.employeesTopChartInstance = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: topData.map(item => item.name),
-            datasets: [{
-                data: topData.map(item => item.deviations),
-                backgroundColor: topData.map(item => item.color),
-                borderWidth: 2,
-                borderColor: '#ffffff'
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return context.label + ': ' + context.parsed.toLocaleString() + ' отклонений';
-                        }
-                    }
-                }
-            }
-        },
-        plugins: [{
-            id: 'datalabels',
-            afterDatasetsDraw: function(chart) {
-                const ctx = chart.ctx;
-                chart.data.datasets.forEach((dataset, i) => {
-                    const meta = chart.getDatasetMeta(i);
-                    meta.data.forEach((element, index) => {
-                        const value = dataset.data[index];
-                        if (value > 0) {
-                            const position = element.tooltipPosition();
-                            const backgroundColor = dataset.backgroundColor[index];
-                            
-                            const textColor = getContrastColor(backgroundColor);
-                            
-                            ctx.font = 'bold 10px Arial';
-                            ctx.textAlign = 'center';
-                            ctx.textBaseline = 'middle';
-                            
-                            ctx.shadowColor = textColor === '#ffffff' ? '#000000' : '#ffffff';
-                            ctx.shadowBlur = 2;
-                            ctx.shadowOffsetX = 1;
-                            ctx.shadowOffsetY = 1;
-                            
-                            ctx.fillStyle = textColor;
-                            ctx.fillText(value.toLocaleString(), position.x, position.y);
-                            
-                            ctx.shadowColor = 'transparent';
-                            ctx.shadowBlur = 0;
-                            ctx.shadowOffsetX = 0;
-                            ctx.shadowOffsetY = 0;
-                        }
-                    });
-                });
-            }
-        }]
-    });
-    
-    // Создаем кастомную легенду
-    createEmployeesTopLegend(topData);
-}
-
-// Создание кастомной легенды для топ диаграммы сотрудников
-function createEmployeesTopLegend(topData) {
-    const legendContainer = document.getElementById('employeesTopChartLegend');
-    if (!legendContainer) return;
-    
-    let legendHTML = '';
-    topData.forEach((item, index) => {
-        legendHTML += `
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: ${item.color};"></div>
-                <span>${item.name}: ${item.deviations.toLocaleString()}</span>
-            </div>
-        `;
-    });
-    
-    legendContainer.innerHTML = legendHTML;
-}
-
 
 
 // Инициализация обработчиков переключателя
 function initChartToggle(target) {
     console.log('initChartToggle вызвана для:', target);
     
-    const toggleButtons = document.querySelectorAll(`.toggle-btn[data-target="${target}"]`);
+    const toggleButtons = Array.from(document.querySelectorAll(`.toggle-btn[data-target="${target}"]`));
     console.log('Найдено кнопок переключателя:', toggleButtons.length);
     
     toggleButtons.forEach(button => {
+        if (button.dataset.chartToggleInitialized === 'true') {
+            return;
+        }
+
+        button.dataset.chartToggleInitialized = 'true';
+
         button.addEventListener('click', function() {
-            const mode = this.dataset.mode;
+            const mode = this.dataset.mode || 'count';
             const target = this.dataset.target;
             
             // Обновляем активную кнопку
@@ -589,8 +129,10 @@ function initChartToggle(target) {
             this.classList.add('active');
             
             // Обновляем заголовок
-            const title = mode === 'count' ? 'Количество отклонений' : 'Процент отклонений';
-            document.getElementById(`${target}BarChartTitle`).textContent = title;
+            const titleElement = document.getElementById(`${target}BarChartTitle`);
+            if (titleElement) {
+                titleElement.textContent = mode === 'count' ? 'Количество отклонений' : 'Процент отклонений';
+            }
             
             // Перерисовываем диаграмму
             if (target === 'departments' && window.departmentsChartData) {
@@ -623,11 +165,11 @@ function createDepartmentsBarChart(chartData, mode) {
     const data = isCountMode ? chartData.deviations : chartData.percentages;
     const labels = chartData.departments;
 
-    // Сортируем данные по убыванию
+    // Сортируем данные по возрастанию (меньше отклонений сверху)
     const sortedData = labels.map((dept, index) => ({
         department: dept,
         value: data[index]
-    })).sort((a, b) => b.value - a.value);
+    })).sort((a, b) => a.value - b.value);
 
     const sortedLabels = sortedData.map(item => item.department);
     const sortedValues = sortedData.map(item => item.value);
@@ -746,11 +288,11 @@ function createEmployeesBarChart(chartData, mode) {
     const data = isCountMode ? chartData.deviations : chartData.percentages;
     const labels = chartData.employees;
 
-    // Сортируем данные по убыванию
+    // Сортируем данные по возрастанию (меньше отклонений сверху)
     const sortedData = labels.map((emp, index) => ({
         employee: emp,
         value: data[index]
-    })).sort((a, b) => b.value - a.value);
+    })).sort((a, b) => a.value - b.value);
 
     const sortedLabels = sortedData.map(item => item.employee);
     const sortedValues = sortedData.map(item => item.value);
@@ -850,19 +392,10 @@ function createEmployeesBarChart(chartData, mode) {
 
 // Экспорт для браузера
 if (typeof window !== 'undefined') {
-    window.getContrastColor = getContrastColor;
     window.initDepartmentCharts = initDepartmentCharts;
     window.prepareDepartmentChartData = prepareDepartmentChartData;
-    window.createPieChart = createPieChart;
-    window.createCustomLegend = createCustomLegend;
-    window.createDepartmentsTopChart = createDepartmentsTopChart;
-    window.createDepartmentsTopLegend = createDepartmentsTopLegend;
     window.initEmployeeCharts = initEmployeeCharts;
     window.prepareEmployeeChartData = prepareEmployeeChartData;
-    window.createEmployeePieChart = createEmployeePieChart;
-    window.createEmployeeCustomLegend = createEmployeeCustomLegend;
-    window.createEmployeesTopChart = createEmployeesTopChart;
-    window.createEmployeesTopLegend = createEmployeesTopLegend;
     window.initChartToggle = initChartToggle;
     window.createDepartmentsBarChart = createDepartmentsBarChart;
     window.createEmployeesBarChart = createEmployeesBarChart;

@@ -4,6 +4,14 @@
 
 console.log('🚀 МОДУЛЬ RATINGS.JS НАЧАЛ ЗАГРУЖАТЬСЯ');
 
+let ratingsSortState = {
+    column: 'percentage',
+    direction: 'asc'
+};
+
+let ratingsCache = [];
+let ratingsFiltersCache = null;
+
 // Функция инициализации модуля рейтингов
 async function initRatingsModule() {
     console.log('=== Инициализация модуля рейтингов ===');
@@ -317,6 +325,119 @@ function getRatingsFilters() {
     return filters;
 }
 
+// Индикатор сортировки
+function getRatingsSortIndicator(column) {
+    if (ratingsSortState.column !== column) {
+        return '<span class="sort-indicator">↕</span>';
+    }
+    return ratingsSortState.direction === 'asc'
+        ? '<span class="sort-indicator active">↑</span>'
+        : '<span class="sort-indicator active">↓</span>';
+}
+
+// Сортировка рейтингов по выбранной колонке
+function sortRatingsData(data) {
+    const sorted = [...data];
+    sorted.sort((a, b) => {
+        const col = ratingsSortState.column;
+        let valueA;
+        let valueB;
+
+        switch (col) {
+            case 'overallPosition':
+                valueA = a.overallPosition;
+                valueB = b.overallPosition;
+                break;
+            case 'callCenterPosition':
+                valueA = a.callCenterPosition;
+                valueB = b.callCenterPosition;
+                break;
+            case 'name':
+                valueA = a.name.toLowerCase();
+                valueB = b.name.toLowerCase();
+                break;
+            case 'group':
+                valueA = (a.group || '').toLowerCase();
+                valueB = (b.group || '').toLowerCase();
+                break;
+            case 'callCenter':
+                valueA = (a.callCenter || '').toLowerCase();
+                valueB = (b.callCenter || '').toLowerCase();
+                break;
+            case 'totalCalls':
+                valueA = a.totalCalls;
+                valueB = b.totalCalls;
+                break;
+            case 'totalDeviations':
+                valueA = a.totalDeviations;
+                valueB = b.totalDeviations;
+                break;
+            case 'percentage':
+                valueA = a.percentage;
+                valueB = b.percentage;
+                break;
+            case 'percentageChange':
+                valueA = a.percentageChange;
+                valueB = b.percentageChange;
+                break;
+            case 'daysCount':
+                valueA = a.daysCount;
+                valueB = b.daysCount;
+                break;
+            default:
+                valueA = 0;
+                valueB = 0;
+        }
+
+        if (valueA < valueB) {
+            return ratingsSortState.direction === 'asc' ? -1 : 1;
+        }
+        if (valueA > valueB) {
+            return ratingsSortState.direction === 'asc' ? 1 : -1;
+        }
+        return 0;
+    });
+    return sorted;
+}
+
+// Рендер таблицы рейтингов с учетом сортировки
+function renderRatingsTable(filters) {
+    const container = document.getElementById('ratingsDetails');
+    if (!container || !ratingsCache || ratingsCache.length === 0) {
+        return;
+    }
+
+    const sorted = sortRatingsData(ratingsCache);
+    container.innerHTML = generateRatingsTable(sorted, filters || ratingsFiltersCache || {});
+    setupRatingsSortingHandlers();
+}
+
+// Навешиваем обработчики сортировки на заголовки
+function setupRatingsSortingHandlers() {
+    const headers = document.querySelectorAll('#ratingsDetails .sortable-header');
+    headers.forEach(header => {
+        header.addEventListener('click', function () {
+            const column = this.getAttribute('data-column');
+            if (!column) return;
+
+            if (ratingsSortState.column === column) {
+                ratingsSortState.direction = ratingsSortState.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                ratingsSortState.column = column;
+                if (['overallPosition', 'callCenterPosition', 'percentage'].includes(column)) {
+                    ratingsSortState.direction = 'asc';
+                } else if (['name', 'group', 'callCenter'].includes(column)) {
+                    ratingsSortState.direction = 'asc';
+                } else {
+                    ratingsSortState.direction = 'desc';
+                }
+            }
+
+            renderRatingsTable();
+        });
+    });
+}
+
 // Получение выбранных значений мультиселекта рейтингов
 function getSelectedRatingsValues(prefix) {
     const dropdown = document.getElementById(prefix + 'Dropdown');
@@ -380,6 +501,7 @@ async function loadRatingsDetails() {
 
         if (filteredEmployees.length === 0) {
             console.log('Нет данных для выбранных фильтров, показываем сообщение');
+            ratingsCache = [];
             container.innerHTML = '<div style="padding: 20px; text-align: center;">Нет данных для выбранных фильтров</div>';
             return;
         }
@@ -388,9 +510,9 @@ async function loadRatingsDetails() {
         const ratingsData = calculateRatings(operatorData, filteredEmployees, filters);
         console.log('Вычислены рейтинги для', ratingsData.length, 'сотрудников');
 
-        // Генерируем HTML таблицы рейтингов
-        const tableHTML = generateRatingsTable(ratingsData, filters);
-        container.innerHTML = tableHTML;
+        ratingsCache = ratingsData;
+        ratingsFiltersCache = filters;
+        renderRatingsTable(filters);
 
         console.log(`Рейтинги загружены успешно (${filteredEmployees.length} сотрудников)`);
 
@@ -469,9 +591,16 @@ function calculateRatings(operatorData, filteredEmployees, filters) {
         let totalCalls = 0;
         let totalDeviations = 0;
         let daysCount = 0;
+        let prevCalls = 0;
+        let prevDeviations = 0;
+        let prevDaysCount = 0;
 
         const startDate = new Date(filters.startDate);
         const endDate = new Date(filters.endDate);
+        const dayMs = 24 * 60 * 60 * 1000;
+        const periodLength = Math.max(1, Math.round((endDate - startDate) / dayMs) + 1);
+        const prevEndDate = new Date(startDate.getTime() - dayMs);
+        const prevStartDate = new Date(prevEndDate.getTime() - (periodLength - 1) * dayMs);
         console.log(`📅 Период анализа: ${startDate.toISOString().split('T')[0]} - ${endDate.toISOString().split('T')[0]}`);
 
         Object.keys(employeeData).forEach(dateStr => {
@@ -486,10 +615,20 @@ function calculateRatings(operatorData, filteredEmployees, filters) {
                 daysCount++;
 
                 console.log(`📊 День ${dateStr}: звонков=${calls}, отклонений=${deviations}`);
+            } else if (date >= prevStartDate && date <= prevEndDate) {
+                const dayData = employeeData[dateStr];
+                const calls = dayData['Звонков'] || 0;
+                const deviations = dayData['Отклонений'] || 0;
+
+                prevCalls += calls;
+                prevDeviations += deviations;
+                prevDaysCount++;
             }
         });
 
         const percentage = totalCalls > 0 ? (totalDeviations / totalCalls) * 100 : 0;
+        const prevPercentage = prevCalls > 0 ? (prevDeviations / prevCalls) * 100 : 0;
+        const percentageChange = percentage - prevPercentage;
 
         const rating = {
             name: employeeName,
@@ -498,7 +637,14 @@ function calculateRatings(operatorData, filteredEmployees, filters) {
             totalCalls: totalCalls,
             totalDeviations: totalDeviations,
             daysCount: daysCount,
-            percentage: Math.round(percentage * 100) / 100
+            previousCalls: prevCalls,
+            previousDeviations: prevDeviations,
+            previousPercentage: Math.round(prevPercentage * 100) / 100,
+            percentage: Math.round(percentage * 100) / 100,
+            percentageChange: Math.round(percentageChange * 100) / 100,
+            callsChange: totalCalls - prevCalls,
+            deviationsChange: totalDeviations - prevDeviations,
+            prevDaysCount
         };
 
         console.log(`✅ Рейтинг для ${employeeName}:`, rating);
@@ -556,22 +702,23 @@ function generateRatingsTable(ratingsData, filters) {
                 <table class="ratings-table">
                     <thead>
                         <tr>
-                            <th>Место</th>
-                            <th>Место в КЦ</th>
-                            <th>ФИО</th>
-                            <th>Группа</th>
-                            <th>КЦ</th>
-                            <th>Всего звонков</th>
-                            <th>Отклонений</th>
-                            <th>% отклонений</th>
-                            <th>Дней</th>
+                            <th class="sortable-header" data-column="overallPosition">Место ${getRatingsSortIndicator('overallPosition')}</th>
+                            <th class="sortable-header" data-column="callCenterPosition">Место в КЦ ${getRatingsSortIndicator('callCenterPosition')}</th>
+                            <th class="sortable-header" data-column="name">ФИО ${getRatingsSortIndicator('name')}</th>
+                            <th class="sortable-header" data-column="group">Группа ${getRatingsSortIndicator('group')}</th>
+                            <th class="sortable-header" data-column="callCenter">КЦ ${getRatingsSortIndicator('callCenter')}</th>
+                            <th class="sortable-header" data-column="totalCalls">Всего звонков ${getRatingsSortIndicator('totalCalls')}</th>
+                            <th class="sortable-header" data-column="totalDeviations">Отклонений ${getRatingsSortIndicator('totalDeviations')}</th>
+                            <th class="sortable-header" data-column="percentage">% отклонений ${getRatingsSortIndicator('percentage')}</th>
+                            <th class="sortable-header" data-column="percentageChange">Δ к пред. периоду ${getRatingsSortIndicator('percentageChange')}</th>
+                            <th class="sortable-header" data-column="daysCount">Дней ${getRatingsSortIndicator('daysCount')}</th>
                         </tr>
                     </thead>
                     <tbody>
     `;
 
     ratingsData.forEach((rating, index) => {
-        const position = index + 1;
+        const position = rating.overallPosition || (index + 1);
         let rankIcon = '';
 
         // Отмечаем первые три места звездочками
@@ -595,6 +742,10 @@ function generateRatingsTable(ratingsData, filters) {
             ccRankIcon = '🥉';
         }
 
+        const prevInfo = Number.isFinite(rating.previousPercentage)
+            ? `<div class="prev-percentage">было ${rating.previousPercentage.toFixed(2)}%</div>`
+            : '';
+
         tableHTML += `
             <tr class="${rowClass}">
                 <td class="position-cell">
@@ -611,6 +762,7 @@ function generateRatingsTable(ratingsData, filters) {
                 <td class="calls-cell">${rating.totalCalls.toLocaleString()}</td>
                 <td class="deviations-cell">${rating.totalDeviations.toLocaleString()}</td>
                 <td class="percentage-cell">${rating.percentage.toFixed(2)}%</td>
+                <td class="change-cell">${createChangeBadge(rating.percentageChange || 0, 'percentage')} ${prevInfo}</td>
                 <td class="days-cell">${rating.daysCount}</td>
             </tr>
         `;

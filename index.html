@@ -13,461 +13,427 @@
     <div class="container">
         <!-- Вкладки -->
         <div class="tabs">
-            <button class="tab-button active" data-tab="company">Компания</button>
-            <button class="tab-button" data-tab="departments">Подразделения</button>
-            <button class="tab-button" data-tab="employees">Команда</button>
+            <button class="tab-button active" data-tab="org">Оргструктура</button>
             <button class="tab-button" data-tab="dynamics">Динамика</button>
             <button class="tab-button" data-tab="ratings">Рейтинги</button>
-            <button class="tab-button" data-tab="checklist">Детализация по чек-листам</button>
-            <button class="tab-button" data-tab="blockDetails">Детализация по блокам</button>
-            <!-- <button class="tab-button" data-tab="employeeDetails">Детализация по сотруднику</button> -->
-            <button class="tab-button" data-tab="employeeDynamics">Динамика сотрудника</button>
+            <button class="tab-button" data-tab="details">Детализация</button>
         </div>
 
-        <!-- Company Tab Content -->
-        <div id="companyTab" class="tab-content active">
-            <!-- Закрепленная панель фильтров -->
-            <div class="sticky-header">
-                <!-- Фильтры -->
-                <div class="filters-container">
-                    <div class="filter-group">
-                        <div class="filter-item">
-                            <span class="filter-label">Период с:</span>
-                            <input type="date" id="startDate" value="2025-07-01" class="date-input">
-                        </div>
-                        <div class="filter-item">
-                            <span class="filter-label">по:</span>
-                            <input type="date" id="endDate" value="2025-07-31" class="date-input">
-                        </div>
-                    </div>
-
-                    <div class="filter-group">
-                        <div class="filter-item">
-                            <span class="filter-label">Режим отображения:</span>
-                            <select id="timeGranularity">
-                                <option value="День">День</option>
-                                <option value="Неделя">Неделя</option>
-                                <option value="Месяц" selected>Месяц</option>
-                            </select>
-                        </div>
-
-                        <div class="filter-item">
-                            <select id="callCenter">
-                                <option value="Все КЦ">Все КЦ</option>
-                                <option value="КЦ 1">КЦ 1</option>
-                                <option value="КЦ 2">КЦ 2</option>
-                            </select>
-                        </div>
-
-
-
-                        <div class="filter-item">
-                            <span class="filter-label">Дашборд:</span>
-                            <select id="dashboard">
-                                <option value="Автооценка" selected>Автооценка</option>
-                                <option value="Автооценка УАВ/ПреХард">Автооценка УАВ/ПреХард</option>
-                            </select>
-                        </div>
-
-                        <div class="filter-item">
-                            <button id="updateButton" class="btn btn-primary">Обновить</button>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- Прокручиваемый контент -->
+        <!-- Org Tab Content -->
+        <div id="orgTab" class="tab-content active">
             <div class="scrollable-content">
-                <!-- Таблица с данными сводной информации -->
-                <div id="companySummaryTable" class="mt-4">
-                    <div class="loading">Загрузка данных...</div>
-                </div>
-
-                <!-- Сворачивающийся блок с динамикой компании -->
-                <div class="collapsible-section mt-4">
-                    <div class="collapsible-header" id="companyDynamicsHeader">
-                        <h4 style="margin: 0; display: flex; align-items: center;">
-                            <span class="collapse-arrow">▼</span>
-                            <span style="margin-left: 10px;">Динамика</span>
-                        </h4>
-                    </div>
-                    <div class="collapsible-content show" id="companyDynamicsContent">
-                        <div id="companyDynamics" class="details-container">
-                            <div class="loading">Загрузка динамики компании...</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Departments Tab Content -->
-        <div id="departmentsTab" class="tab-content">
-            <!-- Закрепленная панель фильтров -->
-            <div class="sticky-header">
-                <!-- Фильтры для подразделений -->
-                <div class="filters-container">
-                    <div class="filter-group">
-                        <div class="filter-item">
-                            <span class="filter-label">Период с:</span>
-                            <input type="date" id="deptStartDate" value="2025-07-01" class="date-input">
-                        </div>
-                        <div class="filter-item">
-                            <span class="filter-label">по:</span>
-                            <input type="date" id="deptEndDate" value="2025-07-31" class="date-input">
-                        </div>
-                    </div>
-
-                    <div class="filter-group">
-                        <div class="filter-item">
-                            <span class="filter-label">КЦ:</span>
-                            <select id="deptCallCenter">
-                                <option value="Все КЦ">Все КЦ</option>
-                                <option value="КЦ 1">КЦ 1</option>
-                                <option value="КЦ 2">КЦ 2</option>
-                            </select>
-                        </div>
-
-                        <div class="filter-item">
-                            <span class="filter-label">Группы:</span>
-                            <div class="multi-select-container">
-                                <button type="button" class="multi-select-button" id="deptDepartmentsButton">
-                                    <span id="deptDepartmentsText">Все группы</span>
-                                    <span class="multi-select-arrow">▼</span>
-                                </button>
-                                <div class="multi-select-dropdown" id="deptDepartmentsDropdown" style="display: none;">
-                                    <div class="multi-select-option">
-                                        <input type="checkbox" id="dept_all" value="all" checked>
-                                        <label for="dept_all">Все группы</label>
-                                    </div>
-                                    <div class="multi-select-option">
-                                        <input type="checkbox" id="dept_gridchina" value="Гридчина">
-                                        <label for="dept_gridchina">Гридчина - группа</label>
-                                    </div>
-                                    <div class="multi-select-option">
-                                        <input type="checkbox" id="dept_korovina" value="Коровина">
-                                        <label for="dept_korovina">Коровина - группа</label>
-                                    </div>
-                                    <div class="multi-select-option">
-                                        <input type="checkbox" id="dept_melnikova" value="Мельникова">
-                                        <label for="dept_melnikova">Мельникова - группа</label>
-                                    </div>
-                                    <div class="multi-select-option">
-                                        <input type="checkbox" id="dept_sycheva" value="Сычева">
-                                        <label for="dept_sycheva">Сычева - группа</label>
-                                    </div>
-                                    <div class="multi-select-option">
-                                        <input type="checkbox" id="dept_group1" value="группа 1">
-                                        <label for="dept_group1">Группа 1 - группа</label>
-                                    </div>
-                                    <div class="multi-select-option">
-                                        <input type="checkbox" id="dept_group2" value="группа 2">
-                                        <label for="dept_group2">Группа 2 - группа</label>
-                                    </div>
-                                    <div class="multi-select-option">
-                                        <input type="checkbox" id="dept_group3" value="группа 3">
-                                        <label for="dept_group3">Группа 3 - группа</label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="filter-item">
-                            <span class="filter-label">Дашборд:</span>
-                            <select id="deptDashboard">
-                                <option value="Автооценка" selected>Автооценка</option>
-                            </select>
-                        </div>
-
-                        <div class="filter-item">
-                            <button id="deptUpdateButton" class="btn btn-primary">Обновить</button>
-                        </div>
-                    </div>
-                </div>
-
-
-            </div>
-
-            <!-- Прокручиваемый контент -->
-            <div class="scrollable-content">
-
-                <!-- Сворачивающийся блок с таблицей подразделений -->
                 <div class="collapsible-section">
-                    <div class="collapsible-header" id="departmentsTableHeader">
+                    <div class="collapsible-header" id="orgCompanyHeader">
                         <h4 style="margin: 0; display: flex; align-items: center;">
                             <span class="collapse-arrow">▼</span>
-                            <span style="margin-left: 10px;">Подразделения</span>
+                            <span style="margin-left: 10px;">Компания</span>
                         </h4>
                     </div>
-                    <div class="collapsible-content show" id="departmentsTableContent">
-                        <div id="departmentsTable" class="mt-4">
-                            <div class="loading">Загрузка данных...</div>
+                    <div class="collapsible-content show" id="orgCompanyContent">
+                        <!-- Закрепленная панель фильтров -->
+                        <div class="sticky-header">
+                            <!-- Фильтры -->
+                            <div class="filters-container">
+                                <div class="filter-group">
+                                    <div class="filter-item">
+                                        <span class="filter-label">Период с:</span>
+                                        <input type="date" id="startDate" value="2025-07-01" class="date-input">
+                                    </div>
+                                    <div class="filter-item">
+                                        <span class="filter-label">по:</span>
+                                        <input type="date" id="endDate" value="2025-07-31" class="date-input">
+                                    </div>
+                                </div>
+
+                                <div class="filter-group">
+                                    <div class="filter-item">
+                                        <span class="filter-label">Режим отображения:</span>
+                                        <select id="timeGranularity">
+                                            <option value="День">День</option>
+                                            <option value="Неделя">Неделя</option>
+                                            <option value="Месяц" selected>Месяц</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="filter-item">
+                                        <select id="callCenter">
+                                            <option value="Все КЦ">Все КЦ</option>
+                                            <option value="КЦ 1">КЦ 1</option>
+                                            <option value="КЦ 2">КЦ 2</option>
+                                        </select>
+                                    </div>
+
+
+
+                                    <div class="filter-item">
+                                        <span class="filter-label">Дашборд:</span>
+                                        <select id="dashboard">
+                                            <option value="Автооценка" selected>Автооценка</option>
+                                            <option value="Автооценка УАВ/ПреХард">Автооценка УАВ/ПреХард</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="filter-item">
+                                        <button id="updateButton" class="btn btn-primary">Обновить</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- Прокручиваемый контент -->
+                        <div class="scrollable-content">
+                            <!-- Таблица с данными сводной информации -->
+                            <div id="companySummaryTable" class="mt-4">
+                                <div class="loading">Загрузка данных...</div>
+                            </div>
+
+                            <!-- Сворачивающийся блок с динамикой компании -->
+                            <div class="collapsible-section mt-4">
+                                <div class="collapsible-header" id="companyDynamicsHeader">
+                                    <h4 style="margin: 0; display: flex; align-items: center;">
+                                        <span class="collapse-arrow">▼</span>
+                                        <span style="margin-left: 10px;">Динамика</span>
+                                    </h4>
+                                </div>
+                                <div class="collapsible-content show" id="companyDynamicsContent">
+                                    <div id="companyDynamics" class="details-container">
+                                        <div class="loading">Загрузка динамики компании...</div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Сворачивающийся блок с графиками -->
                 <div class="collapsible-section">
-                    <div class="collapsible-header" id="departmentsChartsHeader">
+                    <div class="collapsible-header" id="orgDepartmentsHeader">
                         <h4 style="margin: 0; display: flex; align-items: center;">
                             <span class="collapse-arrow">▼</span>
-                            <span style="margin-left: 10px;">Графики</span>
+                            <span style="margin-left: 10px;">Подразделения и команда</span>
                         </h4>
                     </div>
-                    <div class="collapsible-content show" id="departmentsChartsContent">
-                        <div id="departmentsCharts" class="charts-container">
-                            <div class="chart-card">
-                                <h5>Доля отклонений</h5>
-                                <div class="pie-chart-wrapper">
-                                    <canvas id="pieChart"></canvas>
-                                </div>
-                                <div id="pieChartLegend" class="custom-legend"></div>
-                            </div>
-                            <div class="chart-card">
-                                <div class="chart-header">
-                                    <h5 id="departmentsBarChartTitle">Количество отклонений</h5>
-                                    <div class="chart-toggle">
-                                        <button class="toggle-btn active" data-mode="count"
-                                            data-target="departments">шт</button>
-                                        <button class="toggle-btn" data-mode="percent"
-                                            data-target="departments">%</button>
+                    <div class="collapsible-content show" id="orgDepartmentsContent">
+                        <!-- Закрепленная панель фильтров -->
+                        <div class="sticky-header">
+                            <!-- Фильтры для подразделений -->
+                            <div class="filters-container">
+                                <div class="filter-group">
+                                    <div class="filter-item">
+                                        <span class="filter-label">Период с:</span>
+                                        <input type="date" id="deptStartDate" value="2025-07-01" class="date-input">
+                                    </div>
+                                    <div class="filter-item">
+                                        <span class="filter-label">по:</span>
+                                        <input type="date" id="deptEndDate" value="2025-07-31" class="date-input">
                                     </div>
                                 </div>
-                                <div class="chart-wrapper">
-                                    <canvas id="departmentsBarChart"></canvas>
+
+                                <div class="filter-group">
+                                    <div class="filter-item">
+                                        <span class="filter-label">КЦ:</span>
+                                        <select id="deptCallCenter">
+                                            <option value="Все КЦ">Все КЦ</option>
+                                            <option value="КЦ 1">КЦ 1</option>
+                                            <option value="КЦ 2">КЦ 2</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="filter-item">
+                                        <span class="filter-label">Группы:</span>
+                                        <div class="multi-select-container">
+                                            <button type="button" class="multi-select-button" id="deptDepartmentsButton">
+                                                <span id="deptDepartmentsText">Все группы</span>
+                                                <span class="multi-select-arrow">▼</span>
+                                            </button>
+                                            <div class="multi-select-dropdown" id="deptDepartmentsDropdown" style="display: none;">
+                                                <div class="multi-select-option">
+                                                    <input type="checkbox" id="dept_all" value="all" checked>
+                                                    <label for="dept_all">Все группы</label>
+                                                </div>
+                                                <div class="multi-select-option">
+                                                    <input type="checkbox" id="dept_gridchina" value="Гридчина">
+                                                    <label for="dept_gridchina">Гридчина - группа</label>
+                                                </div>
+                                                <div class="multi-select-option">
+                                                    <input type="checkbox" id="dept_korovina" value="Коровина">
+                                                    <label for="dept_korovina">Коровина - группа</label>
+                                                </div>
+                                                <div class="multi-select-option">
+                                                    <input type="checkbox" id="dept_melnikova" value="Мельникова">
+                                                    <label for="dept_melnikova">Мельникова - группа</label>
+                                                </div>
+                                                <div class="multi-select-option">
+                                                    <input type="checkbox" id="dept_sycheva" value="Сычева">
+                                                    <label for="dept_sycheva">Сычева - группа</label>
+                                                </div>
+                                                <div class="multi-select-option">
+                                                    <input type="checkbox" id="dept_group1" value="группа 1">
+                                                    <label for="dept_group1">Группа 1 - группа</label>
+                                                </div>
+                                                <div class="multi-select-option">
+                                                    <input type="checkbox" id="dept_group2" value="группа 2">
+                                                    <label for="dept_group2">Группа 2 - группа</label>
+                                                </div>
+                                                <div class="multi-select-option">
+                                                    <input type="checkbox" id="dept_group3" value="группа 3">
+                                                    <label for="dept_group3">Группа 3 - группа</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="filter-item">
+                                        <span class="filter-label">Дашборд:</span>
+                                        <select id="deptDashboard">
+                                            <option value="Автооценка" selected>Автооценка</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="filter-item">
+                                        <button id="deptUpdateButton" class="btn btn-primary">Обновить</button>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+
+                        <!-- Прокручиваемый контент -->
+                        <div class="scrollable-content">
+
+                            <!-- Сворачивающийся блок с таблицей подразделений -->
+                            <div class="collapsible-section">
+                                <div class="collapsible-header" id="departmentsTableHeader">
+                                    <h4 style="margin: 0; display: flex; align-items: center;">
+                                        <span class="collapse-arrow">▼</span>
+                                        <span style="margin-left: 10px;">Подразделения</span>
+                                    </h4>
+                                </div>
+                                <div class="collapsible-content show" id="departmentsTableContent">
+                                    <div id="departmentsTable" class="mt-4">
+                                        <div class="loading">Загрузка данных...</div>
+                                    </div>
+
+                                    <div id="departmentsCharts" class="charts-container mt-4">
+                                        <div class="chart-card">
+                                            <div class="chart-header">
+                                                <h5 id="departmentsBarChartTitle">Количество отклонений</h5>
+                                                <div class="chart-toggle">
+                                                    <button class="toggle-btn active" data-mode="count"
+                                                        data-target="departments">шт</button>
+                                                    <button class="toggle-btn" data-mode="percent"
+                                                        data-target="departments">%</button>
+                                                </div>
+                                            </div>
+                                            <div class="chart-wrapper">
+                                                <canvas id="departmentsBarChart"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Сворачивающийся блок с командой -->
+                            <div class="collapsible-section">
+                                <div class="collapsible-header" id="departmentsTeamHeader">
+                                    <h4 style="margin: 0; display: flex; align-items: center;">
+                                        <span class="collapse-arrow">▼</span>
+                                        <span style="margin-left: 10px;">Команда</span>
+                                    </h4>
+                                </div>
+                                <div class="collapsible-content show" id="departmentsTeamContent">
+                                    <div class="filters-container embedded-filters">
+                                        <div class="filter-group">
+                                            <div class="filter-item">
+                                                <span class="filter-label">Период с:</span>
+                                                <input type="date" id="empStartDate" value="2025-07-01" class="date-input">
+                                            </div>
+                                            <div class="filter-item">
+                                                <span class="filter-label">по:</span>
+                                                <input type="date" id="empEndDate" value="2025-07-31" class="date-input">
+                                            </div>
+                                        </div>
+
+                                        <div class="filter-group">
+                                            <div class="filter-item">
+                                                <span class="filter-label">КЦ:</span>
+                                                <select id="empCallCenter">
+                                                    <option value="Все КЦ">Все КЦ</option>
+                                                    <option value="КЦ 1">КЦ 1</option>
+                                                    <option value="КЦ 2">КЦ 2</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="filter-item">
+                                                <span class="filter-label">Группы:</span>
+                                                <div class="multi-select-container">
+                                                    <button type="button" class="multi-select-button" id="empDepartmentsButton">
+                                                        <span id="empDepartmentsText">Все группы</span>
+                                                        <span class="multi-select-arrow">▼</span>
+                                                    </button>
+                                                    <div class="multi-select-dropdown" id="empDepartmentsDropdown" style="display: none;">
+                                                        <div class="multi-select-option">
+                                                            <input type="checkbox" id="emp_dept_all" value="all" checked>
+                                                            <label for="emp_dept_all">Все группы</label>
+                                                        </div>
+                                                        <div class="multi-select-option">
+                                                            <input type="checkbox" id="emp_dept_gridchina" value="Гридчина">
+                                                            <label for="emp_dept_gridchina">Гридчина - группа</label>
+                                                        </div>
+                                                        <div class="multi-select-option">
+                                                            <input type="checkbox" id="emp_dept_korovina" value="Коровина">
+                                                            <label for="emp_dept_korovina">Коровина - группа</label>
+                                                        </div>
+                                                        <div class="multi-select-option">
+                                                            <input type="checkbox" id="emp_dept_melnikova" value="Мельникова">
+                                                            <label for="emp_dept_melnikova">Мельникова - группа</label>
+                                                        </div>
+                                                        <div class="multi-select-option">
+                                                            <input type="checkbox" id="emp_dept_sycheva" value="Сычева">
+                                                            <label for="emp_dept_sycheva">Сычева - группа</label>
+                                                        </div>
+                                                        <div class="multi-select-option">
+                                                            <input type="checkbox" id="emp_dept_group1" value="группа 1">
+                                                            <label for="emp_dept_group1">Группа 1 - группа</label>
+                                                        </div>
+                                                        <div class="multi-select-option">
+                                                            <input type="checkbox" id="emp_dept_group2" value="группа 2">
+                                                            <label for="emp_dept_group2">Группа 2 - группа</label>
+                                                        </div>
+                                                        <div class="multi-select-option">
+                                                            <input type="checkbox" id="emp_dept_group3" value="группа 3">
+                                                            <label for="emp_dept_group3">Группа 3 - группа</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="filter-item">
+                                                <span class="filter-label">Сотрудники:</span>
+                                                <div class="multi-select-container">
+                                                    <button type="button" class="multi-select-button" id="empEmployeesButton">
+                                                        <span id="empEmployeesText">Все сотрудники</span>
+                                                        <span class="multi-select-arrow">▼</span>
+                                                    </button>
+                                                    <div class="multi-select-dropdown" id="empEmployeesDropdown" style="display: none;">
+                                                        <div class="multi-select-option">
+                                                            <input type="checkbox" id="emp_all" value="all" checked>
+                                                            <label for="emp_all">Все сотрудники</label>
+                                                        </div>
+                                                        <div class="multi-select-option">
+                                                            <input type="checkbox" id="emp_markina" value="Маркина И. М.">
+                                                            <label for="emp_markina">Маркина И. М.</label>
+                                                        </div>
+                                                        <div class="multi-select-option">
+                                                            <input type="checkbox" id="emp_ermoshina" value="Ермошина С. В.">
+                                                            <label for="emp_ermoshina">Ермошина С. В.</label>
+                                                        </div>
+                                                        <div class="multi-select-option">
+                                                            <input type="checkbox" id="emp_kuznetsova" value="Кузнецова В. Ю.">
+                                                            <label for="emp_kuznetsova">Кузнецова В. Ю.</label>
+                                                        </div>
+                                                        <div class="multi-select-option">
+                                                            <input type="checkbox" id="emp_anpilogov" value="Анпилогов Е. А.">
+                                                            <label for="emp_anpilogov">Анпилогов Е. А.</label>
+                                                        </div>
+                                                        <div class="multi-select-option">
+                                                            <input type="checkbox" id="emp_tarasova" value="Тарасова К. И.">
+                                                            <label for="emp_tarasova">Тарасова К. И.</label>
+                                                        </div>
+                                                        <div class="multi-select-option">
+                                                            <input type="checkbox" id="emp_borisova" value="Борисова В. А.">
+                                                            <label for="emp_borisova">Борисова В. А.</label>
+                                                        </div>
+                                                        <div class="multi-select-option">
+                                                            <input type="checkbox" id="emp_moiseenko" value="Моисеенко А. А.">
+                                                            <label for="emp_moiseenko">Моисеенко А. А.</label>
+                                                        </div>
+                                                        <div class="multi-select-option">
+                                                            <input type="checkbox" id="emp_ladygina" value="Ладыгина Д. В.">
+                                                            <label for="emp_ladygina">Ладыгина Д. В.</label>
+                                                        </div>
+                                                        <div class="multi-select-option">
+                                                            <input type="checkbox" id="emp_zabrovskaya" value="Забровская А. В.">
+                                                            <label for="emp_zabrovskaya">Забровская А. В.</label>
+                                                        </div>
+                                                        <div class="multi-select-option">
+                                                            <input type="checkbox" id="emp_sukhorukova" value="Сухорукова И. В.">
+                                                            <label for="emp_sukhorukova">Сухорукова И. В.</label>
+                                                        </div>
+                                                        <div class="multi-select-option">
+                                                            <input type="checkbox" id="emp_korotenko" value="Коротенко П. Р.">
+                                                            <label for="emp_korotenko">Коротенко П. Р.</label>
+                                                        </div>
+                                                        <div class="multi-select-option">
+                                                            <input type="checkbox" id="emp_bakina" value="Бакина В. О.">
+                                                            <label for="emp_bakina">Бакина В. О.</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="filter-item">
+                                                <span class="filter-label">Дашборд:</span>
+                                                <select id="empDashboard">
+                                                    <option value="Автооценка" selected>Автооценка</option>
+                                                    <option value="Автооценка УАВ/ПреХард">Автооценка УАВ/ПреХард</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="filter-item">
+                                                <button id="empUpdateButton" class="btn btn-primary">Обновить команду</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Сворачивающийся блок с таблицей сотрудников -->
+                                    <div class="collapsible-section nested-collapsible">
+                                        <div class="collapsible-header" id="employeesTableHeader">
+                                            <h4 style="margin: 0; display: flex; align-items: center;">
+                                                <span class="collapse-arrow">▼</span>
+                                                <span style="margin-left: 10px;">Сотрудники</span>
+                                            </h4>
+                                        </div>
+                                    <div class="collapsible-content show" id="employeesTableContent">
+                                            <div id="employeesTable" class="mt-4">
+                                                <div class="loading">Загрузка данных...</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Сворачивающийся блок с графиками сотрудников -->
+                                    <div class="collapsible-section nested-collapsible">
+                                        <div class="collapsible-header" id="employeesChartsHeader">
+                                            <h4 style="margin: 0; display: flex; align-items: center;">
+                                                <span class="collapse-arrow">▼</span>
+                                                <span style="margin-left: 10px;">Графики</span>
+                                            </h4>
+                                        </div>
+                                        <div class="collapsible-content show" id="employeesChartsContent">
+                                            <div id="employeesCharts" class="charts-container">
+                                                <div class="chart-card">
+                                                    <div class="chart-header">
+                                                        <h5 id="employeesBarChartTitle">Количество отклонений</h5>
+                                                        <div class="chart-toggle">
+                                                            <button class="toggle-btn active" data-mode="count"
+                                                                data-target="employees">шт</button>
+                                                            <button class="toggle-btn" data-mode="percent"
+                                                                data-target="employees">%</button>
+                                                        </div>
+                                                    </div>
+                                                    <div class="chart-wrapper">
+                                                        <canvas id="employeesBarChart"></canvas>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <!-- Employees Tab Content -->
-        <div id="employeesTab" class="tab-content">
-            <!-- Закрепленная панель фильтров -->
-            <div class="sticky-header">
-                <!-- Фильтры для команды -->
-                <div class="filters-container">
-                    <div class="filter-group">
-                        <div class="filter-item">
-                            <span class="filter-label">Период с:</span>
-                            <input type="date" id="empStartDate" value="2025-07-01" class="date-input">
-                        </div>
-                        <div class="filter-item">
-                            <span class="filter-label">по:</span>
-                            <input type="date" id="empEndDate" value="2025-07-31" class="date-input">
-                        </div>
-                    </div>
-
-                    <div class="filter-group">
-                        <div class="filter-item">
-                            <span class="filter-label">КЦ:</span>
-                            <select id="empCallCenter">
-                                <option value="Все КЦ">Все КЦ</option>
-                                <option value="КЦ 1">КЦ 1</option>
-                                <option value="КЦ 2">КЦ 2</option>
-                            </select>
-                        </div>
-
-                        <div class="filter-item">
-                            <span class="filter-label">Группы:</span>
-                            <div class="multi-select-container">
-                                <button type="button" class="multi-select-button" id="empDepartmentsButton">
-                                    <span id="empDepartmentsText">Все группы</span>
-                                    <span class="multi-select-arrow">▼</span>
-                                </button>
-                                <div class="multi-select-dropdown" id="empDepartmentsDropdown" style="display: none;">
-                                    <div class="multi-select-option">
-                                        <input type="checkbox" id="emp_dept_all" value="all" checked>
-                                        <label for="emp_dept_all">Все группы</label>
-                                    </div>
-                                    <div class="multi-select-option">
-                                        <input type="checkbox" id="emp_dept_gridchina" value="Гридчина">
-                                        <label for="emp_dept_gridchina">Гридчина - группа</label>
-                                    </div>
-                                    <div class="multi-select-option">
-                                        <input type="checkbox" id="emp_dept_korovina" value="Коровина">
-                                        <label for="emp_dept_korovina">Коровина - группа</label>
-                                    </div>
-                                    <div class="multi-select-option">
-                                        <input type="checkbox" id="emp_dept_melnikova" value="Мельникова">
-                                        <label for="emp_dept_melnikova">Мельникова - группа</label>
-                                    </div>
-                                    <div class="multi-select-option">
-                                        <input type="checkbox" id="emp_dept_sycheva" value="Сычева">
-                                        <label for="emp_dept_sycheva">Сычева - группа</label>
-                                    </div>
-                                    <div class="multi-select-option">
-                                        <input type="checkbox" id="emp_dept_group1" value="группа 1">
-                                        <label for="emp_dept_group1">Группа 1 - группа</label>
-                                    </div>
-                                    <div class="multi-select-option">
-                                        <input type="checkbox" id="emp_dept_group2" value="группа 2">
-                                        <label for="emp_dept_group2">Группа 2 - группа</label>
-                                    </div>
-                                    <div class="multi-select-option">
-                                        <input type="checkbox" id="emp_dept_group3" value="группа 3">
-                                        <label for="emp_dept_group3">Группа 3 - группа</label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="filter-item">
-                            <span class="filter-label">Сотрудники:</span>
-                            <div class="multi-select-container">
-                                <button type="button" class="multi-select-button" id="empEmployeesButton">
-                                    <span id="empEmployeesText">Все сотрудники</span>
-                                    <span class="multi-select-arrow">▼</span>
-                                </button>
-                                <div class="multi-select-dropdown" id="empEmployeesDropdown" style="display: none;">
-                                    <div class="multi-select-option">
-                                        <input type="checkbox" id="emp_all" value="all" checked>
-                                        <label for="emp_all">Все сотрудники</label>
-                                    </div>
-                                    <div class="multi-select-option">
-                                        <input type="checkbox" id="emp_markina" value="Маркина И. М.">
-                                        <label for="emp_markina">Маркина И. М.</label>
-                                    </div>
-                                    <div class="multi-select-option">
-                                        <input type="checkbox" id="emp_ermoshina" value="Ермошина С. В.">
-                                        <label for="emp_ermoshina">Ермошина С. В.</label>
-                                    </div>
-                                    <div class="multi-select-option">
-                                        <input type="checkbox" id="emp_kuznetsova" value="Кузнецова В. Ю.">
-                                        <label for="emp_kuznetsova">Кузнецова В. Ю.</label>
-                                    </div>
-                                    <div class="multi-select-option">
-                                        <input type="checkbox" id="emp_anpilogov" value="Анпилогов Е. А.">
-                                        <label for="emp_anpilogov">Анпилогов Е. А.</label>
-                                    </div>
-                                    <div class="multi-select-option">
-                                        <input type="checkbox" id="emp_tarasova" value="Тарасова К. И.">
-                                        <label for="emp_tarasova">Тарасова К. И.</label>
-                                    </div>
-                                    <div class="multi-select-option">
-                                        <input type="checkbox" id="emp_borisova" value="Борисова В. А.">
-                                        <label for="emp_borisova">Борисова В. А.</label>
-                                    </div>
-                                    <div class="multi-select-option">
-                                        <input type="checkbox" id="emp_ermoshina" value="Ермошина С. В.">
-                                        <label for="emp_ermoshina">Ермошина С. В.</label>
-                                    </div>
-                                    <div class="multi-select-option">
-                                        <input type="checkbox" id="emp_kuznetsova" value="Кузнецова В. Ю.">
-                                        <label for="emp_kuznetsova">Кузнецова В. Ю.</label>
-                                    </div>
-                                    <div class="multi-select-option">
-                                        <input type="checkbox" id="emp_anpilogov" value="Анпилогов Е. А.">
-                                        <label for="emp_anpilogov">Анпилогов Е. А.</label>
-                                    </div>
-                                    <div class="multi-select-option">
-                                        <input type="checkbox" id="emp_tarasova" value="Тарасова К. И.">
-                                        <label for="emp_tarasova">Тарасова К. И.</label>
-                                    </div>
-                                    <div class="multi-select-option">
-                                        <input type="checkbox" id="emp_borisova" value="Борисова В. А.">
-                                        <label for="emp_borisova">Борисова В. А.</label>
-                                    </div>
-                                    <div class="multi-select-option">
-                                        <input type="checkbox" id="emp_moiseenko" value="Моисеенко А. А.">
-                                        <label for="emp_moiseenko">Моисеенко А. А.</label>
-                                    </div>
-                                    <div class="multi-select-option">
-                                        <input type="checkbox" id="emp_ladygina" value="Ладыгина Д. В.">
-                                        <label for="emp_ladygina">Ладыгина Д. В.</label>
-                                    </div>
-                                    <div class="multi-select-option">
-                                        <input type="checkbox" id="emp_zabrovskaya" value="Забровская А. В.">
-                                        <label for="emp_zabrovskaya">Забровская А. В.</label>
-                                    </div>
-                                    <div class="multi-select-option">
-                                        <input type="checkbox" id="emp_sukhorukova" value="Сухорукова И. В.">
-                                        <label for="emp_sukhorukova">Сухорукова И. В.</label>
-                                    </div>
-                                    <div class="multi-select-option">
-                                        <input type="checkbox" id="emp_korotenko" value="Коротенко П. Р.">
-                                        <label for="emp_korotenko">Коротенко П. Р.</label>
-                                    </div>
-                                    <div class="multi-select-option">
-                                        <input type="checkbox" id="emp_bakina" value="Бакина В. О.">
-                                        <label for="emp_bakina">Бакина В. О.</label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="filter-item">
-                            <span class="filter-label">Дашборд:</span>
-                            <select id="empDashboard">
-                                <option value="Автооценка" selected>Автооценка</option>
-                                <option value="Автооценка УАВ/ПреХард">Автооценка УАВ/ПреХард</option>
-                            </select>
-                        </div>
-
-                        <div class="filter-item">
-                            <button id="empUpdateButton" class="btn btn-primary">Обновить</button>
-                        </div>
-                    </div>
-                </div>
-
-
-            </div>
-
-            <!-- Прокручиваемый контент -->
-            <div class="scrollable-content">
-                <!-- Сворачивающийся блок с таблицей сотрудников -->
-                <div class="collapsible-section">
-                    <div class="collapsible-header" id="employeesTableHeader">
-                        <h4 style="margin: 0; display: flex; align-items: center;">
-                            <span class="collapse-arrow">▼</span>
-                            <span style="margin-left: 10px;">Сотрудники</span>
-                        </h4>
-                    </div>
-                    <div class="collapsible-content show" id="employeesTableContent">
-                        <div id="employeesTable" class="mt-4">
-                            <div class="loading">Загрузка данных...</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Сворачивающийся блок с графиками сотрудников -->
-                <div class="collapsible-section">
-                    <div class="collapsible-header" id="employeesChartsHeader">
-                        <h4 style="margin: 0; display: flex; align-items: center;">
-                            <span class="collapse-arrow">▼</span>
-                            <span style="margin-left: 10px;">Графики</span>
-                        </h4>
-                    </div>
-                    <div class="collapsible-content show" id="employeesChartsContent">
-                        <div id="employeesCharts" class="charts-container">
-                            <div class="chart-card">
-                                <h5>Доля отклонений</h5>
-                                <div class="pie-chart-wrapper">
-                                    <canvas id="employeesPieChart"></canvas>
-                                </div>
-                                <div id="employeesPieChartLegend" class="custom-legend"></div>
-                            </div>
-                            <div class="chart-card">
-                                <div class="chart-header">
-                                    <h5 id="employeesBarChartTitle">Количество отклонений</h5>
-                                    <div class="chart-toggle">
-                                        <button class="toggle-btn active" data-mode="count"
-                                            data-target="employees">шт</button>
-                                        <button class="toggle-btn" data-mode="percent"
-                                            data-target="employees">%</button>
-                                    </div>
-                                </div>
-                                <div class="chart-wrapper">
-                                    <canvas id="employeesBarChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-
             </div>
         </div>
 
@@ -682,6 +648,329 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Динамика по сотруднику -->
+                <div class="collapsible-section">
+                    <div class="collapsible-header" id="employeeDynamicsHeader">
+                        <h4 style="margin: 0; display: flex; align-items: center;">
+                            <span class="collapse-arrow">▼</span>
+                            <span style="margin-left: 10px;">Динамика сотрудника</span>
+                        </h4>
+                    </div>
+                    <div class="collapsible-content show" id="employeeDynamicsContent">
+                        <div class="filters-container embedded-filters">
+                            <div class="filter-group">
+                                <div class="filter-item">
+                                    <span class="filter-label">Сотрудник:</span>
+                                    <select id="empDynOperator" class="date-input">
+                                        <option value="">Выберите сотрудника</option>
+                                    </select>
+                                </div>
+                                <div class="filter-item">
+                                    <span class="filter-label">Период с:</span>
+                                    <input type="date" id="empDynStartDate" value="2025-05-01" class="date-input">
+                                </div>
+                                <div class="filter-item">
+                                    <span class="filter-label">по:</span>
+                                    <input type="date" id="empDynEndDate" value="2025-07-31" class="date-input">
+                                </div>
+                                <div class="filter-item">
+                                    <span class="filter-label">Группировка:</span>
+                                    <select id="empDynGranularity" class="date-input">
+                                        <option value="week">Неделя</option>
+                                        <option value="month" selected>Месяц</option>
+                                    </select>
+                                </div>
+                                <div class="filter-item">
+                                    <span class="filter-label">Сравнить с:</span>
+                                    <select id="empDynCompareOperator" class="date-input">
+                                        <option value="">Не выбрано</option>
+                                    </select>
+                                </div>
+                                <div class="filter-item">
+                                    <button id="empDynUpdateButton" class="btn btn-primary">Обновить</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="scrollable-content">
+                            <div id="empDynEmployeeInfo" class="employee-info-section" style="display: none;">
+                                <div class="employee-header-card">
+                                    <div class="employee-avatar">
+                                        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <circle cx="24" cy="24" r="24" fill="#007bff" opacity="0.1"/>
+                                            <path d="M24 24C27.3137 24 30 21.3137 30 18C30 14.6863 27.3137 12 24 12C20.6863 12 18 14.6863 18 18C18 21.3137 20.6863 24 24 24Z" fill="#007bff"/>
+                                            <path d="M24 27C17.3726 27 12 29.6863 12 33V36H36V33C36 29.6863 30.6274 27 24 27Z" fill="#007bff"/>
+                                        </svg>
+                                    </div>
+                                    <div class="employee-main-info">
+                                        <h3 class="employee-name" id="empDynName">-</h3>
+                                        <div class="employee-meta">
+                                            <span class="meta-item">
+                                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                                    <path d="M8 8C9.65685 8 11 6.65685 11 5C11 3.34315 9.65685 2 8 2C6.34315 2 5 3.34315 5 5C5 6.65685 6.34315 8 8 8Z" fill="#6c757d"/>
+                                                    <path d="M8 9.5C5.51472 9.5 3.5 10.7909 3.5 12.375V14H12.5V12.375C12.5 10.7909 10.4853 9.5 8 9.5Z" fill="#6c757d"/>
+                                                </svg>
+                                                <span id="empDynGroup">-</span>
+                                            </span>
+                                            <span class="meta-item">
+                                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                                    <path d="M8 2L2 5L8 8L14 5L8 2Z" fill="#6c757d"/>
+                                                    <path d="M2 7V11L8 14L14 11V7L8 10L2 7Z" fill="#6c757d"/>
+                                                </svg>
+                                                <span id="empDynKc">-</span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="employee-stats-grid">
+                                    <div class="stat-card-modern">
+                                        <div class="stat-icon stat-icon-blue">
+                                            📊
+                                        </div>
+                                        <div class="stat-content">
+                                            <div class="stat-label">Всего звонков</div>
+                                            <div class="stat-value" id="empDynTotalCalls">0</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="stat-card-modern">
+                                        <div class="stat-icon stat-icon-yellow-light">
+                                            ✅
+                                        </div>
+                                        <div class="stat-content">
+                                            <div class="stat-label">Всего отклонений</div>
+                                            <div class="stat-value" id="empDynTotalIssues">0</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="stat-card-modern">
+                                        <div class="stat-icon stat-icon-yellow">
+                                            ⚠️
+                                        </div>
+                                        <div class="stat-content">
+                                            <div class="stat-label">% отклонений</div>
+                                            <div class="stat-value" id="empDynIssueRate">0%</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="stat-card-modern">
+                                        <div class="stat-icon stat-icon-orange">
+                                            📈
+                                        </div>
+                                        <div class="stat-content">
+                                            <div class="stat-label">Средний % за период</div>
+                                            <div class="stat-value" id="empDynAvgRate">0%</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div id="empDynRankingSection" class="ranking-section" style="display: none;">
+                                <h4 class="section-title">🏆 Рейтинг сотрудника</h4>
+                                <div class="ranking-cards-grid">
+                                    <div class="ranking-card">
+                                        <div class="ranking-header">
+                                            <span class="ranking-icon">🌍</span>
+                                            <span class="ranking-title">Общий зачет</span>
+                                        </div>
+                                        <div class="ranking-position">
+                                            <span class="rank-number" id="empDynRankOverall">-</span>
+                                            <span class="rank-total">из <span id="empDynRankOverallTotal">-</span></span>
+                                        </div>
+                                        <div class="ranking-percentage">
+                                            <span id="empDynRankOverallPercent">-%</span> отклонений
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="ranking-card">
+                                        <div class="ranking-header">
+                                            <span class="ranking-icon">🏢</span>
+                                            <span class="ranking-title">По КЦ</span>
+                                        </div>
+                                        <div class="ranking-position">
+                                            <span class="rank-number" id="empDynRankKc">-</span>
+                                            <span class="rank-total">из <span id="empDynRankKcTotal">-</span></span>
+                                        </div>
+                                        <div class="ranking-percentage">
+                                            <span id="empDynRankKcPercent">-%</span> отклонений
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="ranking-card">
+                                        <div class="ranking-header">
+                                            <span class="ranking-icon">👥</span>
+                                            <span class="ranking-title">По группе</span>
+                                        </div>
+                                        <div class="ranking-position">
+                                            <span class="rank-number" id="empDynRankGroup">-</span>
+                                            <span class="rank-total">из <span id="empDynRankGroupTotal">-</span></span>
+                                        </div>
+                                        <div class="ranking-percentage">
+                                            <span id="empDynRankGroupPercent">-%</span> отклонений
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="collapsible-section">
+                                <div class="collapsible-header" id="empDynChartHeader">
+                                    <h4 style="margin: 0; display: flex; align-items: center;">
+                                        <span class="collapse-arrow">▼</span>
+                                        <span style="margin-left: 10px;">График динамики</span>
+                                    </h4>
+                                </div>
+                                <div class="collapsible-content show" id="empDynChartContent">
+                                    <div class="chart-card">
+                                        <div class="chart-header">
+                                            <h5 style="margin: 0;">Динамика показателей</h5>
+                                            <div class="chart-toggle empdyn-chart-toggle">
+                                                <button class="toggle-btn active" data-mode="percent">%</button>
+                                                <button class="toggle-btn" data-mode="count">шт</button>
+                                            </div>
+                                        </div>
+                                        <canvas id="empDynChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="collapsible-section">
+                                <div class="collapsible-header" id="empDynTableHeader">
+                                    <h4 style="margin: 0; display: flex; align-items: center;">
+                                        <span class="collapse-arrow">▼</span>
+                                        <span style="margin-left: 10px;">Детализация по периодам</span>
+                                    </h4>
+                                </div>
+                                <div class="collapsible-content show" id="empDynTableContent">
+                                    <div id="empDynLoading" class="loading">Выберите сотрудника для просмотра данных</div>
+                                    <table id="empDynTable" class="data-table" style="display: none;">
+                                        <thead>
+                                            <tr>
+                                                <th>Период</th>
+                                                <th>Звонков</th>
+                                                <th>Отклонений</th>
+                                                <th>% отклонений</th>
+                                                <th>Изменение</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="empDynTableBody">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="collapsible-section" id="empDynBlocksSection" style="display: none;">
+                                <div class="collapsible-header" id="empDynBlocksHeader">
+                                    <h4 style="margin: 0; display: flex; align-items: center;">
+                                        <span class="collapse-arrow">▼</span>
+                                        <span style="margin-left: 10px;">📊 Детализация по блокам (Block 0)</span>
+                                    </h4>
+                                </div>
+                                <div class="collapsible-content show" id="empDynBlocksContent">
+                                    <div class="charts-grid">
+                                        <div class="chart-card">
+                                            <h5>Топ-3 проблемных блока</h5>
+                                            <canvas id="empDynTopBlocksChart"></canvas>
+                                        </div>
+                                        <div class="chart-card">
+                                            <h5>Динамика по блокам</h5>
+                                            <canvas id="empDynBlocksDynamicsChart"></canvas>
+                                        </div>
+                                        <div class="chart-card">
+                                            <h5>Распределение отклонений</h5>
+                                            <canvas id="empDynBlocksDistributionChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="collapsible-section" id="empDynBlocks1Section" style="display: none;">
+                                <div class="collapsible-header" id="empDynBlocks1Header">
+                                    <h4 style="margin: 0; display: flex; align-items: center;">
+                                        <span class="collapse-arrow">▼</span>
+                                        <span style="margin-left: 10px;">📈 Детализация по блокам (Block 1)</span>
+                                    </h4>
+                                </div>
+                                <div class="collapsible-content show" id="empDynBlocks1Content">
+                                    <div class="charts-grid">
+                                        <div class="chart-card">
+                                            <h5>Топ-5 проблемных блоков</h5>
+                                            <canvas id="empDynTopBlocks1Chart"></canvas>
+                                        </div>
+                                        <div class="chart-card">
+                                            <h5>Динамика по блокам</h5>
+                                            <canvas id="empDynBlocks1DynamicsChart"></canvas>
+                                        </div>
+                                        <div class="chart-card">
+                                            <h5>Распределение отклонений</h5>
+                                            <canvas id="empDynBlocks1DistributionChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="collapsible-section" id="empDynComparisonSection" style="display: none;">
+                                <div class="collapsible-header" id="empDynComparisonHeader">
+                                    <h4 style="margin: 0; display: flex; align-items: center;">
+                                        <span class="collapse-arrow">▼</span>
+                                        <span style="margin-left: 10px;">Сравнение сотрудников</span>
+                                    </h4>
+                                </div>
+                                <div class="collapsible-content show" id="empDynComparisonContent">
+                                    <div class="comparison-stats-grid">
+                                        <div class="comparison-card">
+                                            <h5 id="empDynCompareEmployee1Name">Сотрудник 1</h5>
+                                            <div class="comparison-stats">
+                                                <div class="comparison-stat">
+                                                    <span class="stat-label">Всего записей:</span>
+                                                    <span class="stat-value" id="empDynCompare1Total">0</span>
+                                                </div>
+                                                <div class="comparison-stat">
+                                                    <span class="stat-label">Отклонений:</span>
+                                                    <span class="stat-value" id="empDynCompare1Issues">0</span>
+                                                </div>
+                                                <div class="comparison-stat">
+                                                    <span class="stat-label">% отклонений:</span>
+                                                    <span class="stat-value" id="empDynCompare1Rate">0%</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="comparison-vs">VS</div>
+                                        <div class="comparison-card">
+                                            <h5 id="empDynCompareEmployee2Name">Сотрудник 2</h5>
+                                            <div class="comparison-stats">
+                                                <div class="comparison-stat">
+                                                    <span class="stat-label">Всего записей:</span>
+                                                    <span class="stat-value" id="empDynCompare2Total">0</span>
+                                                </div>
+                                                <div class="comparison-stat">
+                                                    <span class="stat-label">Отклонений:</span>
+                                                    <span class="stat-value" id="empDynCompare2Issues">0</span>
+                                                </div>
+                                                <div class="comparison-stat">
+                                                    <span class="stat-label">% отклонений:</span>
+                                                    <span class="stat-value" id="empDynCompare2Rate">0%</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="charts-grid">
+                                        <div class="chart-card">
+                                            <h5>Сравнение динамики</h5>
+                                            <canvas id="empDynComparisonDynamicsChart"></canvas>
+                                        </div>
+                                        <div class="chart-card">
+                                            <h5>Сравнение по блокам</h5>
+                                            <canvas id="empDynComparisonBlocksChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -855,603 +1144,283 @@
             </div>
         </div>
 
-        <!-- Checklist Tab Content -->
-        <div id="checklistTab" class="tab-content">
-            <div class="checklist-dashboard">
-                <div id="checklistDebugInfo" class="debug-info" style="display: none;"></div>
-
-                <!-- Фильтры -->
-                <div class="filters-container">
-                    <div class="filter-group">
-                        <div class="filter-item">
-                            <span class="filter-label">Дашборд:</span>
-                            <select id="checklistDashboard">
-                                <option value="Автооценка" selected>Автооценка</option>
-                                <option value="Автооценка УАВ/ПреХард">Автооценка УАВ/ПреХард</option>
-                            </select>
-                        </div>
-                        <div class="filter-item">
-                            <span class="filter-label">Период с:</span>
-                            <input type="date" id="checklistDateFrom" value="2025-05-01" class="date-input">
-                        </div>
-                        <div class="filter-item">
-                            <span class="filter-label">по:</span>
-                            <input type="date" id="checklistDateTo" value="2025-07-30" class="date-input">
-                        </div>
-                        <div class="filter-item">
-                            <span class="filter-label">Колл-центр:</span>
-                            <select id="checklistKcFilter">
-                                <option value="">Все КЦ</option>
-                            </select>
-                        </div>
-                        <div class="filter-item">
-                            <span class="filter-label">Группа:</span>
-                            <select id="checklistGroupFilter">
-                                <option value="">Все группы</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="filter-group">
-                        <div class="filter-item">
-                            <span class="filter-label">Оператор:</span>
-                            <select id="checklistOperatorFilter">
-                                <option value="">Все операторы</option>
-                            </select>
-                        </div>
-                        <div class="filter-item">
-                            <span class="filter-label">Блок 0 уровня:</span>
-                            <select id="checklistBlock0Filter">
-                                <option value="">Все блоки 0</option>
-                            </select>
-                        </div>
-                        <div class="filter-item">
-                            <span class="filter-label">Блок 1 уровня:</span>
-                            <select id="checklistBlock1Filter">
-                                <option value="">Все блоки 1</option>
-                            </select>
-                        </div>
-                        <div class="filter-item">
-                            <button id="checklistUpdateButton" class="btn btn-primary">Обновить</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Статистические карточки -->
-                <div class="checklist-stats-grid">
-                    <div class="checklist-stat-card">
-                        <div class="checklist-stat-number" id="checklistTotalRecords">0</div>
-                        <div class="checklist-stat-label">Всего</div>
-                    </div>
-                    <div class="checklist-stat-card">
-                        <div class="checklist-stat-number" id="checklistTotalIssues">0</div>
-                        <div class="checklist-stat-label">Проблем (score=1)</div>
-                    </div>
-                    <div class="checklist-stat-card">
-                        <div class="checklist-stat-number" id="checklistUniqueOperators">0</div>
-                        <div class="checklist-stat-label">Операторов</div>
-                    </div>
-                    <div class="checklist-stat-card">
-                        <div class="checklist-stat-number" id="checklistUniqueGroups">0</div>
-                        <div class="checklist-stat-label">Групп</div>
-                    </div>
-                    <div class="checklist-stat-card">
-                        <div class="checklist-stat-number" id="checklistIssueRate">0%</div>
-                        <div class="checklist-stat-label">% отклонений</div>
-                    </div>
-                    <div class="checklist-stat-card">
-                        <div class="checklist-stat-number" id="checklistDateRange">0</div>
-                        <div class="checklist-stat-label">Дней в периоде</div>
-                    </div>
-                </div>
-
-                <!-- Сводная информация -->
-                <div class="checklist-summary-section">
-                    <h3 style="margin-bottom: 15px; color: #2c3e50;">📈 Сводная информация</h3>
-                    <div class="checklist-summary-grid">
-                        <div class="checklist-summary-item">
-                            <div class="checklist-summary-title">Топ блок 0 по проблемам</div>
-                            <div class="checklist-summary-value" id="checklistTopBlock0">-</div>
-                        </div>
-                        <div class="checklist-summary-item">
-                            <div class="checklist-summary-title">Топ блок 1 по проблемам</div>
-                            <div class="checklist-summary-value" id="checklistTopBlock1">-</div>
-                        </div>
-                        <div class="checklist-summary-item">
-                            <div class="checklist-summary-title">Оператор с наибольшими проблемами</div>
-                            <div class="checklist-summary-value" id="checklistTopOperator">-</div>
-                        </div>
-                        <div class="checklist-summary-item">
-                            <div class="checklist-summary-title">Группа с наибольшими проблемами</div>
-                            <div class="checklist-summary-value" id="checklistTopGroup">-</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Сворачиваемый блок: Аналитические графики -->
-                <div class="collapsible-section">
-                    <div class="collapsible-header" id="checklistAnalyticsHeader">
-                        <h4 style="margin: 0; display: flex; align-items: center;">
-                            <span class="collapse-arrow">▼</span>
-                            <span style="margin-left: 10px;">📊 Аналитические графики</span>
-                        </h4>
-                    </div>
-                    <div class="collapsible-content show" id="checklistAnalyticsContent">
-                        <div class="checklist-analytics-section">
-                            <div class="checklist-chart-container">
-                                <div class="checklist-chart-title">📊 Статистика по блокам 0 уровня</div>
-                                <div id="checklistBlock0Chart" class="checklist-bar-chart"></div>
-                            </div>
-                            <div class="checklist-chart-container">
-                                <div class="checklist-chart-title">📊 Статистика по блокам 1 уровня</div>
-                                <div id="checklistBlock1Chart" class="checklist-bar-chart"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Сворачиваемый блок: Таблица операторов -->
-                <div class="collapsible-section">
-                    <div class="collapsible-header" id="checklistOperatorTableHeader">
-                        <h4 style="margin: 0; display: flex; align-items: center;">
-                            <span class="collapse-arrow">▼</span>
-                            <span style="margin-left: 10px;">📋 Детальные данные по операторам</span>
-                        </h4>
-                    </div>
-                    <div class="collapsible-content show" id="checklistOperatorTableContent">
-                        <div class="checklist-table-container">
-                            <div id="checklistLoading" class="loading">Загрузка данных...</div>
-                            <table id="checklistOperatorTable" style="display: none;">
-                                <thead>
-                                    <tr>
-                                        <th title="Нажмите для сортировки">Оператор</th>
-                                        <th title="Нажмите для сортировки">Группа</th>
-                                        <th title="Нажмите для сортировки">КЦ</th>
-                                        <th title="Нажмите для сортировки">Всего</th>
-                                        <th title="Нажмите для сортировки">Проблем</th>
-                                        <th title="Нажмите для сортировки">% отклонений</th>
-                                        <th title="Нажмите для сортировки">Топ блок 0</th>
-                                        <th title="Нажмите для сортировки">Топ блок 1</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="checklistOperatorBody">
-                                </tbody>
-                            </table>
-                            <div id="checklistNoData" class="no-data" style="display: none;">
-                                Нет данных для отображения
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Сворачиваемый блок: Подробные записи -->
-                <div class="collapsible-section">
-                    <div class="collapsible-header" id="checklistResultsTableHeader">
-                        <h4 style="margin: 0; display: flex; align-items: center;">
-                            <span class="collapse-arrow">▼</span>
-                            <span style="margin-left: 10px;">📋 Подробные записи (только проблемы)</span>
-                        </h4>
-                    </div>
-                    <div class="collapsible-content show" id="checklistResultsTableContent">
-                        <div class="checklist-table-container">
-                            <table id="checklistResultsTable" style="display: none;">
-                                <thead>
-                                    <tr>
-                                        <th title="Нажмите для сортировки">Дата</th>
-                                        <th title="Нажмите для сортировки">Оператор</th>
-                                        <th title="Нажмите для сортировки">Группа</th>
-                                        <th title="Нажмите для сортировки">КЦ</th>
-                                        <th title="Нажмите для сортировки">Блок 0</th>
-                                        <th title="Нажмите для сортировки">Блок 1</th>
-                                        <th title="Нажмите для сортировки">Блок 2</th>
-                                        <th title="Нажмите для сортировки">Балл</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="checklistResultsBody">
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Сворачиваемый блок: Отклонения по подблокам в разрезе КЦ -->
-                <div class="collapsible-section">
-                    <div class="collapsible-header" id="checklistKcSubblocksHeader">
-                        <h4 style="margin: 0; display: flex; align-items: center;">
-                            <span class="collapse-arrow">▼</span>
-                            <span style="margin-left: 10px;">📊 Отклонения по подблокам в разрезе КЦ</span>
-                        </h4>
-                    </div>
-                    <div class="collapsible-content show" id="checklistKcSubblocksContent">
-                        <div class="checklist-chart-card">
-                            <div class="checklist-chart-wrapper">
-                                <canvas id="checklistKcSubblocksChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Сворачиваемый блок: Графики динамики блоков -->
-                <div class="collapsible-section">
-                    <div class="collapsible-header" id="checklistChartsHeader">
-                        <h4 style="margin: 0; display: flex; align-items: center;">
-                            <span class="collapse-arrow">▼</span>
-                            <span style="margin-left: 10px;">📊 Динамика блоков по месяцам</span>
-                        </h4>
-                    </div>
-                    <div class="collapsible-content show" id="checklistChartsContent">
-                        <!-- Переключатели режимов отображения -->
-                        <div class="charts-controls-container">
-                            <div class="charts-mode-toggle-container">
-                                <span class="toggle-label">Режим отображения:</span>
-                                <div class="toggle-switch" id="checklistChartsToggle">
-                                    <div class="toggle-option active" data-mode="count">ШТ</div>
-                                    <div class="toggle-option" data-mode="percent">%</div>
-                                    <div class="toggle-slider"></div>
-                                </div>
-                            </div>
-                            <div class="charts-grouping-toggle-container">
-                                <span class="toggle-label">Группировка:</span>
-                                <div class="toggle-switch" id="checklistGroupingToggle">
-                                    <div class="toggle-option active" data-mode="months">По месяцам</div>
-                                    <div class="toggle-option" data-mode="departments">По подразделениям</div>
-                                    <div class="toggle-slider"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="checklist-dynamics-charts">
-                            <!-- График 1: Влияние на бизнес -->
-                            <div class="checklist-chart-card">
-                                <div class="checklist-chart-header">
-                                    <h5>Динамика блока: Влияние на бизнес</h5>
-                                </div>
-                                <div class="checklist-chart-wrapper">
-                                    <canvas id="checklistResultChart"></canvas>
-                                </div>
-                            </div>
-
-                            <!-- График 2: Влияние на мотивацию сотрудника -->
-                            <div class="checklist-chart-card">
-                                <div class="checklist-chart-header">
-                                    <h5>Динамика блока: Влияние на мотивацию сотрудника</h5>
-                                </div>
-                                <div class="checklist-chart-wrapper">
-                                    <canvas id="checklistMotivationChart"></canvas>
-                                </div>
-                            </div>
-
-                            <!-- График 3: Клиентоцентричность -->
-                            <div class="checklist-chart-card">
-                                <div class="checklist-chart-header">
-                                    <h5>Динамика блока: Клиентоцентричность</h5>
-                                </div>
-                                <div class="checklist-chart-wrapper">
-                                    <canvas id="checklistObjectionsChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <!-- Details Tab Content -->
+        <div id="detailsTab" class="tab-content">
+            <div class="details-tab-switcher">
+                <button class="details-tab-button active" data-target="detailsChecklistSection">Чек-листы</button>
+                <button class="details-tab-button" data-target="detailsBlocksSection">Блоки</button>
             </div>
-        </div>
 
-        <!-- Block Details Tab Content -->
-        <div id="blockDetailsTab" class="tab-content">
-            <div class="checklist-dashboard">
-                <!-- Фильтры для детализации по блокам -->
-                <div class="filters-container">
-                    <div class="filter-group">
-                        <div class="filter-item">
-                            <span class="filter-label">Блоки:</span>
-                            <select id="blockDetailsBlockFilter" class="block-select" title="Выберите блок">
-                                <option value="">Выберите блок</option>
-                            </select>
-                        </div>
-                        <div class="filter-item">
-                            <span class="filter-label">Период с:</span>
-                            <input type="date" id="blockDetailsDateFrom" value="2025-05-01" class="date-input">
-                        </div>
-                        <div class="filter-item">
-                            <span class="filter-label">по:</span>
-                            <input type="date" id="blockDetailsDateTo" value="2025-07-30" class="date-input">
-                        </div>
-                        <div class="filter-item">
-                            <span class="filter-label">Режим отображения:</span>
-                            <select id="blockDetailsTimeGranularity">
-                                <option value="Неделя">Неделя</option>
-                                <option value="Месяц" selected>Месяц</option>
-                            </select>
-                        </div>
-                    </div>
+            <div id="detailsChecklistSection" class="details-inner-section active">
+                <div class="checklist-dashboard">
+                    <div id="checklistDebugInfo" class="debug-info" style="display: none;"></div>
 
-                    <div class="filter-group">
-                        <div class="filter-item">
-                            <span class="filter-label">Колл-центр:</span>
-                            <select id="blockDetailsKcFilter">
-                                <option value="">Все КЦ</option>
-                            </select>
-                        </div>
-                        <div class="filter-item">
-                            <span class="filter-label">Группа:</span>
-                            <select id="blockDetailsGroupFilter">
-                                <option value="">Все группы</option>
-                            </select>
-                        </div>
-                        <div class="filter-item">
-                            <span class="filter-label">Оператор:</span>
-                            <select id="blockDetailsOperatorFilter">
-                                <option value="">Все операторы</option>
-                            </select>
-                        </div>
-                        <div class="filter-item">
-                            <button id="blockDetailsRefreshSelects" class="btn btn-secondary"
-                                style="margin-right: 10px;">Обновить списки</button>
-                            <button id="blockDetailsUpdateButton" class="btn btn-primary">Обновить</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Переключатель режима отображения -->
-                <div class="charts-mode-toggle-container">
-                    <span class="toggle-label">Режим отображения:</span>
-                    <div class="toggle-switch" id="blockDetailsChartsToggle">
-                        <div class="toggle-option active" data-mode="count">ШТ</div>
-                        <div class="toggle-option" data-mode="percent">%</div>
-                        <div class="toggle-slider"></div>
-                    </div>
-                </div>
-
-                <!-- График детализации по блоку -->
-                <div class="checklist-chart-card">
-                    <div class="checklist-chart-header">
-                        <h5 id="blockDetailsChartTitle">Детализация по выбранному блоку</h5>
-                    </div>
-                    <div class="checklist-chart-wrapper">
-                        <canvas id="blockDetailsChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Employee Details Tab Content -->
-        <div id="employeeDetailsTab" class="tab-content">
-            <div class="checklist-dashboard">
-                <!-- Фильтры -->
-                <div class="filters-container">
-                    <div class="filter-group">
-                        <div class="filter-item">
-                            <span class="filter-label">Дашборд:</span>
-                            <select id="empDetailsDashboard">
-                                <option value="Автооценка" selected>Автооценка</option>
-                                <option value="Автооценка УАВ/ПреХард">Автооценка УАВ/ПреХард</option>
-                            </select>
-                        </div>
-                        <div class="filter-item">
-                            <span class="filter-label">Период с:</span>
-                            <input type="date" id="empDetailsDateFrom" value="2025-05-01" class="date-input">
-                        </div>
-                        <div class="filter-item">
-                            <span class="filter-label">по:</span>
-                            <input type="date" id="empDetailsDateTo" value="2025-07-30" class="date-input">
-                        </div>
-                        <div class="filter-item">
-                            <span class="filter-label">Колл-центр:</span>
-                            <select id="empDetailsKcFilter">
-                                <option value="">Все КЦ</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="filter-group">
-                        <div class="filter-item">
-                            <span class="filter-label">Группа:</span>
-                            <select id="empDetailsGroupFilter">
-                                <option value="">Все группы</option>
-                            </select>
-                        </div>
-                        <div class="filter-item">
-                            <span class="filter-label">Сотрудник:</span>
-                            <select id="empDetailsOperatorFilter">
-                                <option value="">Выберите сотрудника</option>
-                            </select>
-                        </div>
-                        <div class="filter-item">
-                            <span class="filter-label">Режим сравнения:</span>
-                            <select id="empDetailsCompareMode">
-                                <option value="single" selected>Один сотрудник</option>
-                                <option value="compare">Сравнение сотрудников</option>
-                            </select>
-                        </div>
-                        <div class="filter-item" id="empDetailsSecondOperatorContainer" style="display: none;">
-                            <span class="filter-label">Сравнить с:</span>
-                            <select id="empDetailsSecondOperator">
-                                <option value="">Выберите второго сотрудника</option>
-                            </select>
-                        </div>
-                        <div class="filter-item">
-                            <button id="empDetailsUpdateButton" class="btn btn-primary">Обновить</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Статистические карточки -->
-                <div class="checklist-stats-grid" id="empDetailsStatsGrid">
-                    <div class="checklist-stat-card">
-                        <div class="checklist-stat-number" id="empDetailsTotalRecords">0</div>
-                        <div class="checklist-stat-label">Всего записей</div>
-                    </div>
-                    <div class="checklist-stat-card">
-                        <div class="checklist-stat-number" id="empDetailsTotalIssues">0</div>
-                        <div class="checklist-stat-label">Проблем (score=1)</div>
-                    </div>
-                    <div class="checklist-stat-card">
-                        <div class="checklist-stat-number" id="empDetailsIssueRate">0%</div>
-                        <div class="checklist-stat-label">% отклонений</div>
-                    </div>
-                    <div class="checklist-stat-card">
-                        <div class="checklist-stat-number" id="empDetailsDateRange">0</div>
-                        <div class="checklist-stat-label">Дней в периоде</div>
-                    </div>
-                    <div class="checklist-stat-card">
-                        <div class="checklist-stat-number" id="empDetailsTopBlock">-</div>
-                        <div class="checklist-stat-label">Топ проблемный блок</div>
-                    </div>
-                    <div class="checklist-stat-card">
-                        <div class="checklist-stat-number" id="empDetailsAvgDaily">0</div>
-                        <div class="checklist-stat-label">Среднее в день</div>
-                    </div>
-                </div>
-
-                <!-- Сводная информация по сотруднику -->
-                <div class="checklist-summary-section" id="empDetailsSummarySection">
-                    <h3 style="margin-bottom: 15px; color: #2c3e50;">👤 Профиль сотрудника</h3>
-                    <div class="checklist-summary-grid">
-                        <div class="checklist-summary-item">
-                            <div class="checklist-summary-title">ФИО</div>
-                            <div class="checklist-summary-value" id="empDetailsName">-</div>
-                        </div>
-                        <div class="checklist-summary-item">
-                            <div class="checklist-summary-title">Группа</div>
-                            <div class="checklist-summary-value" id="empDetailsGroup">-</div>
-                        </div>
-                        <div class="checklist-summary-item">
-                            <div class="checklist-summary-title">Колл-центр</div>
-                            <div class="checklist-summary-value" id="empDetailsKc">-</div>
-                        </div>
-                        <div class="checklist-summary-item">
-                            <div class="checklist-summary-title">Рейтинг в группе</div>
-                            <div class="checklist-summary-value" id="empDetailsRankInGroup">-</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Сворачиваемый блок: Детализация по блокам -->
-                <div class="collapsible-section">
-                    <div class="collapsible-header" id="empDetailsBlocksHeader">
-                        <h4 style="margin: 0; display: flex; align-items: center;">
-                            <span class="collapse-arrow">▼</span>
-                            <span style="margin-left: 10px;">📊 Детализация по блокам</span>
-                        </h4>
-                    </div>
-                    <div class="collapsible-content show" id="empDetailsBlocksContent">
-                        <div class="checklist-analytics-section">
-                            <div class="checklist-chart-container">
-                                <div class="checklist-chart-title">📊 Статистика по блокам 0 уровня</div>
-                                <div id="empDetailsBlock0Chart" class="checklist-bar-chart"></div>
+                    <!-- Фильтры -->
+                    <div class="filters-container">
+                        <div class="filter-group">
+                            <div class="filter-item">
+                                <span class="filter-label">Дашборд:</span>
+                                <select id="checklistDashboard">
+                                    <option value="Автооценка" selected>Автооценка</option>
+                                    <option value="Автооценка УАВ/ПреХард">Автооценка УАВ/ПреХард</option>
+                                </select>
                             </div>
-                            <div class="checklist-chart-container">
-                                <div class="checklist-chart-title">📊 Статистика по блокам 1 уровня</div>
-                                <div id="empDetailsBlock1Chart" class="checklist-bar-chart"></div>
+                            <div class="filter-item">
+                                <span class="filter-label">Период с:</span>
+                                <input type="date" id="checklistDateFrom" value="2025-05-01" class="date-input">
+                            </div>
+                            <div class="filter-item">
+                                <span class="filter-label">по:</span>
+                                <input type="date" id="checklistDateTo" value="2025-07-30" class="date-input">
+                            </div>
+                            <div class="filter-item">
+                                <span class="filter-label">Колл-центр:</span>
+                                <select id="checklistKcFilter">
+                                    <option value="">Все КЦ</option>
+                                </select>
+                            </div>
+                            <div class="filter-item">
+                                <span class="filter-label">Группа:</span>
+                                <select id="checklistGroupFilter">
+                                    <option value="">Все группы</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="filter-group">
+                            <div class="filter-item">
+                                <span class="filter-label">Оператор:</span>
+                                <select id="checklistOperatorFilter">
+                                    <option value="">Все операторы</option>
+                                </select>
+                            </div>
+                            <div class="filter-item">
+                                <span class="filter-label">Блок 0 уровня:</span>
+                                <select id="checklistBlock0Filter">
+                                    <option value="">Все блоки 0</option>
+                                </select>
+                            </div>
+                            <div class="filter-item">
+                                <span class="filter-label">Блок 1 уровня:</span>
+                                <select id="checklistBlock1Filter">
+                                    <option value="">Все блоки 1</option>
+                                </select>
+                            </div>
+                            <div class="filter-item">
+                                <button id="checklistUpdateButton" class="btn btn-primary">Обновить</button>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Сворачиваемый блок: Динамика по времени -->
-                <div class="collapsible-section">
-                    <div class="collapsible-header" id="empDetailsDynamicsHeader">
-                        <h4 style="margin: 0; display: flex; align-items: center;">
-                            <span class="collapse-arrow">▼</span>
-                            <span style="margin-left: 10px;">📈 Динамика по времени</span>
-                        </h4>
+                    <div id="checklistStructureStatus" class="structure-status"></div>
+
+                    <!-- Статистические карточки -->
+                    <div class="checklist-stats-grid">
+                        <div class="checklist-stat-card">
+                            <div class="checklist-stat-number" id="checklistTotalRecords">0</div>
+                            <div class="checklist-stat-label">Всего</div>
+                        </div>
+                        <div class="checklist-stat-card">
+                            <div class="checklist-stat-number" id="checklistTotalIssues">0</div>
+                            <div class="checklist-stat-label">Проблем (score=1)</div>
+                        </div>
+                        <div class="checklist-stat-card">
+                            <div class="checklist-stat-number" id="checklistUniqueOperators">0</div>
+                            <div class="checklist-stat-label">Операторов</div>
+                        </div>
+                        <div class="checklist-stat-card">
+                            <div class="checklist-stat-number" id="checklistUniqueGroups">0</div>
+                            <div class="checklist-stat-label">Групп</div>
+                        </div>
+                        <div class="checklist-stat-card">
+                            <div class="checklist-stat-number" id="checklistIssueRate">0%</div>
+                            <div class="checklist-stat-label">% отклонений</div>
+                        </div>
+                        <div class="checklist-stat-card">
+                            <div class="checklist-stat-number" id="checklistDateRange">0</div>
+                            <div class="checklist-stat-label">Дней в периоде</div>
+                        </div>
                     </div>
-                    <div class="collapsible-content show" id="empDetailsDynamicsContent">
-                        <div class="checklist-dynamics-charts">
+
+                    <!-- Сводная информация -->
+                    <div class="checklist-summary-section">
+                        <h3 style="margin-bottom: 15px; color: #2c3e50;">📈 Сводная информация</h3>
+                        <div class="checklist-summary-grid">
+                            <div class="checklist-summary-item">
+                                <div class="checklist-summary-title">Топ блок 0 по проблемам</div>
+                                <div class="checklist-summary-value" id="checklistTopBlock0">-</div>
+                            </div>
+                            <div class="checklist-summary-item">
+                                <div class="checklist-summary-title">Топ блок 1 по проблемам</div>
+                                <div class="checklist-summary-value" id="checklistTopBlock1">-</div>
+                            </div>
+                            <div class="checklist-summary-item">
+                                <div class="checklist-summary-title">Оператор с наибольшими проблемами</div>
+                                <div class="checklist-summary-value" id="checklistTopOperator">-</div>
+                            </div>
+                            <div class="checklist-summary-item">
+                                <div class="checklist-summary-title">Группа с наибольшими проблемами</div>
+                                <div class="checklist-summary-value" id="checklistTopGroup">-</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Сворачиваемый блок: Аналитические графики -->
+                    <div class="collapsible-section">
+                        <div class="collapsible-header" id="checklistAnalyticsHeader">
+                            <h4 style="margin: 0; display: flex; align-items: center;">
+                                <span class="collapse-arrow">▼</span>
+                                <span style="margin-left: 10px;">📊 Аналитические графики</span>
+                            </h4>
+                        </div>
+                        <div class="collapsible-content show" id="checklistAnalyticsContent">
+                            <div class="checklist-analytics-section">
+                                <div class="checklist-chart-container">
+                                    <div class="checklist-chart-title">📊 Статистика по блокам 0 уровня</div>
+                                    <div id="checklistBlock0Chart" class="checklist-bar-chart"></div>
+                                </div>
+                                <div class="checklist-chart-container">
+                                    <div class="checklist-chart-title">📊 Статистика по блокам 1 уровня</div>
+                                    <div id="checklistBlock1Chart" class="checklist-bar-chart"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Сворачиваемый блок: Таблица операторов -->
+                    <div class="collapsible-section">
+                        <div class="collapsible-header" id="checklistOperatorTableHeader">
+                            <h4 style="margin: 0; display: flex; align-items: center;">
+                                <span class="collapse-arrow">▼</span>
+                                <span style="margin-left: 10px;">📋 Детальные данные по операторам</span>
+                            </h4>
+                        </div>
+                        <div class="collapsible-content show" id="checklistOperatorTableContent">
+                            <div class="checklist-table-container">
+                                <div id="checklistLoading" class="loading">Загрузка данных...</div>
+                                <table id="checklistOperatorTable" style="display: none;">
+                                    <thead>
+                                        <tr>
+                                            <th title="Нажмите для сортировки">Оператор</th>
+                                            <th title="Нажмите для сортировки">Группа</th>
+                                            <th title="Нажмите для сортировки">КЦ</th>
+                                            <th title="Нажмите для сортировки">Всего</th>
+                                            <th title="Нажмите для сортировки">Проблем</th>
+                                            <th title="Нажмите для сортировки">% отклонений</th>
+                                            <th title="Нажмите для сортировки">Топ блок 0</th>
+                                            <th title="Нажмите для сортировки">Топ блок 1</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="checklistOperatorBody">
+                                    </tbody>
+                                </table>
+                                <div id="checklistNoData" class="no-data" style="display: none;">
+                                    Нет данных для отображения
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Сворачиваемый блок: Подробные записи -->
+                    <div class="collapsible-section">
+                        <div class="collapsible-header" id="checklistResultsTableHeader">
+                            <h4 style="margin: 0; display: flex; align-items: center;">
+                                <span class="collapse-arrow">▼</span>
+                                <span style="margin-left: 10px;">📋 Подробные записи (только проблемы)</span>
+                            </h4>
+                        </div>
+                        <div class="collapsible-content show" id="checklistResultsTableContent">
+                            <div class="checklist-table-container">
+                                <table id="checklistResultsTable" style="display: none;">
+                                    <thead>
+                                        <tr>
+                                            <th title="Нажмите для сортировки">Дата</th>
+                                            <th title="Нажмите для сортировки">Оператор</th>
+                                            <th title="Нажмите для сортировки">Группа</th>
+                                            <th title="Нажмите для сортировки">КЦ</th>
+                                            <th title="Нажмите для сортировки">Блок 0</th>
+                                            <th title="Нажмите для сортировки">Блок 1</th>
+                                            <th title="Нажмите для сортировки">Блок 2</th>
+                                            <th title="Нажмите для сортировки">Балл</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="checklistResultsBody">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Сворачиваемый блок: Отклонения по подблокам в разрезе КЦ -->
+                    <div class="collapsible-section">
+                        <div class="collapsible-header" id="checklistKcSubblocksHeader">
+                            <h4 style="margin: 0; display: flex; align-items: center;">
+                                <span class="collapse-arrow">▼</span>
+                                <span style="margin-left: 10px;">📊 Отклонения по подблокам в разрезе КЦ</span>
+                            </h4>
+                        </div>
+                        <div class="collapsible-content show" id="checklistKcSubblocksContent">
                             <div class="checklist-chart-card">
-                                <div class="checklist-chart-header">
-                                    <h5>Динамика отклонений по дням</h5>
-                                </div>
                                 <div class="checklist-chart-wrapper">
-                                    <canvas id="empDetailsDailyChart"></canvas>
+                                    <canvas id="checklistKcSubblocksChart"></canvas>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Сворачиваемый блок: Подробные записи -->
-                <div class="collapsible-section">
-                    <div class="collapsible-header" id="empDetailsRecordsHeader">
-                        <h4 style="margin: 0; display: flex; align-items: center;">
-                            <span class="collapse-arrow">▼</span>
-                            <span style="margin-left: 10px;">📋 Подробные записи</span>
-                        </h4>
-                    </div>
-                    <div class="collapsible-content show" id="empDetailsRecordsContent">
-                        <div class="checklist-table-container">
-                            <div id="empDetailsLoading" class="loading">Выберите сотрудника для просмотра данных</div>
-                            <table id="empDetailsTable" style="display: none;">
-                                <thead>
-                                    <tr>
-                                        <th title="Нажмите для сортировки">Дата</th>
-                                        <th title="Нажмите для сортировки">Блок 0</th>
-                                        <th title="Нажмите для сортировки">Блок 1</th>
-                                        <th title="Нажмите для сортировки">Блок 2</th>
-                                        <th title="Нажмите для сортировки">Балл</th>
-                                        <th title="Нажмите для сортировки">Статус</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="empDetailsTableBody">
-                                </tbody>
-                            </table>
+                    <!-- Сворачиваемый блок: Графики динамики блоков -->
+                    <div class="collapsible-section">
+                        <div class="collapsible-header" id="checklistChartsHeader">
+                            <h4 style="margin: 0; display: flex; align-items: center;">
+                                <span class="collapse-arrow">▼</span>
+                                <span style="margin-left: 10px;">📊 Динамика блоков по месяцам</span>
+                            </h4>
                         </div>
-                    </div>
-                </div>
-
-                <!-- Сворачиваемый блок: Сравнение сотрудников (показывается только в режиме сравнения) -->
-                <div class="collapsible-section" id="empDetailsCompareSection" style="display: none;">
-                    <div class="collapsible-header" id="empDetailsCompareHeader">
-                        <h4 style="margin: 0; display: flex; align-items: center;">
-                            <span class="collapse-arrow">▼</span>
-                            <span style="margin-left: 10px;">⚖️ Сравнение сотрудников</span>
-                        </h4>
-                    </div>
-                    <div class="collapsible-content show" id="empDetailsCompareContent">
-                        <div class="employee-comparison-container">
-                            <div class="comparison-stats-grid">
-                                <div class="comparison-employee-card">
-                                    <h5 id="empDetailsFirstEmployeeName">Сотрудник 1</h5>
-                                    <div class="comparison-stats">
-                                        <div class="comparison-stat">
-                                            <span class="stat-label">Всего записей:</span>
-                                            <span class="stat-value" id="empDetailsFirstTotal">0</span>
-                                        </div>
-                                        <div class="comparison-stat">
-                                            <span class="stat-label">Проблем:</span>
-                                            <span class="stat-value" id="empDetailsFirstIssues">0</span>
-                                        </div>
-                                        <div class="comparison-stat">
-                                            <span class="stat-label">% отклонений:</span>
-                                            <span class="stat-value" id="empDetailsFirstRate">0%</span>
-                                        </div>
+                        <div class="collapsible-content show" id="checklistChartsContent">
+                            <!-- Переключатели режимов отображения -->
+                            <div class="charts-controls-container">
+                                <div class="charts-mode-toggle-container">
+                                    <span class="toggle-label">Режим отображения:</span>
+                                    <div class="toggle-switch" id="checklistChartsToggle">
+                                        <div class="toggle-option active" data-mode="count">ШТ</div>
+                                        <div class="toggle-option" data-mode="percent">%</div>
+                                        <div class="toggle-slider"></div>
                                     </div>
                                 </div>
-                                <div class="comparison-vs">VS</div>
-                                <div class="comparison-employee-card">
-                                    <h5 id="empDetailsSecondEmployeeName">Сотрудник 2</h5>
-                                    <div class="comparison-stats">
-                                        <div class="comparison-stat">
-                                            <span class="stat-label">Всего записей:</span>
-                                            <span class="stat-value" id="empDetailsSecondTotal">0</span>
-                                        </div>
-                                        <div class="comparison-stat">
-                                            <span class="stat-label">Проблем:</span>
-                                            <span class="stat-value" id="empDetailsSecondIssues">0</span>
-                                        </div>
-                                        <div class="comparison-stat">
-                                            <span class="stat-label">% отклонений:</span>
-                                            <span class="stat-value" id="empDetailsSecondRate">0%</span>
-                                        </div>
+                                <div class="charts-grouping-toggle-container">
+                                    <span class="toggle-label">Группировка:</span>
+                                    <div class="toggle-switch" id="checklistGroupingToggle">
+                                        <div class="toggle-option active" data-mode="months">По месяцам</div>
+                                        <div class="toggle-option" data-mode="departments">По подразделениям</div>
+                                        <div class="toggle-slider"></div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="comparison-chart-container">
+                            <div class="checklist-dynamics-charts">
                                 <div class="checklist-chart-card">
                                     <div class="checklist-chart-header">
-                                        <h5>Сравнение по блокам 0 уровня</h5>
+                                        <h5>Динамика блока: Влияние на бизнес</h5>
                                     </div>
                                     <div class="checklist-chart-wrapper">
-                                        <canvas id="empDetailsComparisonChart"></canvas>
+                                        <canvas id="checklistResultChart"></canvas>
+                                    </div>
+                                </div>
+
+                                <div class="checklist-chart-card">
+                                    <div class="checklist-chart-header">
+                                        <h5>Динамика блока: Влияние на мотивацию сотрудника</h5>
+                                    </div>
+                                    <div class="checklist-chart-wrapper">
+                                        <canvas id="checklistMotivationChart"></canvas>
+                                    </div>
+                                </div>
+
+                                <div class="checklist-chart-card">
+                                    <div class="checklist-chart-header">
+                                        <h5>Динамика блока: Клиентоцентричность</h5>
+                                    </div>
+                                    <div class="checklist-chart-wrapper">
+                                        <canvas id="checklistObjectionsChart"></canvas>
                                     </div>
                                 </div>
                             </div>
@@ -1459,323 +1428,323 @@
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Employee Dynamics Tab Content -->
-        <div id="employeeDynamicsTab" class="tab-content">
-            <!-- Закрепленная панель фильтров -->
-            <div class="sticky-header">
-                <div class="filters-container">
-                    <div class="filter-group">
-                        <div class="filter-item">
-                            <span class="filter-label">Сотрудник:</span>
-                            <select id="empDynOperator" class="date-input">
-                                <option value="">Выберите сотрудника</option>
-                            </select>
+            <div id="detailsBlocksSection" class="details-inner-section">
+                <div class="checklist-dashboard">
+                    <div class="filters-container">
+                        <div class="filter-group">
+                            <div class="filter-item">
+                                <span class="filter-label">Блоки:</span>
+                                <select id="blockDetailsBlockFilter" class="block-select" title="Выберите блок">
+                                    <option value="">Выберите блок</option>
+                                </select>
+                            </div>
+                            <div class="filter-item">
+                                <span class="filter-label">Период с:</span>
+                                <input type="date" id="blockDetailsDateFrom" value="2025-05-01" class="date-input">
+                            </div>
+                            <div class="filter-item">
+                                <span class="filter-label">по:</span>
+                                <input type="date" id="blockDetailsDateTo" value="2025-07-30" class="date-input">
+                            </div>
+                            <div class="filter-item">
+                                <span class="filter-label">Режим отображения:</span>
+                                <select id="blockDetailsTimeGranularity">
+                                    <option value="Неделя">Неделя</option>
+                                    <option value="Месяц" selected>Месяц</option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="filter-item">
-                            <span class="filter-label">Период с:</span>
-                            <input type="date" id="empDynStartDate" value="2025-05-01" class="date-input">
+
+                        <div class="filter-group">
+                            <div class="filter-item">
+                                <span class="filter-label">Колл-центр:</span>
+                                <select id="blockDetailsKcFilter">
+                                    <option value="">Все КЦ</option>
+                                </select>
+                            </div>
+                            <div class="filter-item">
+                                <span class="filter-label">Группа:</span>
+                                <select id="blockDetailsGroupFilter">
+                                    <option value="">Все группы</option>
+                                </select>
+                            </div>
+                            <div class="filter-item">
+                                <span class="filter-label">Оператор:</span>
+                                <select id="blockDetailsOperatorFilter">
+                                    <option value="">Все операторы</option>
+                                </select>
+                            </div>
+                            <div class="filter-item">
+                                <button id="blockDetailsRefreshSelects" class="btn btn-secondary"
+                                    style="margin-right: 10px;">Обновить списки</button>
+                                <button id="blockDetailsUpdateButton" class="btn btn-primary">Обновить</button>
+                            </div>
                         </div>
-                        <div class="filter-item">
-                            <span class="filter-label">по:</span>
-                            <input type="date" id="empDynEndDate" value="2025-07-31" class="date-input">
+                    </div>
+
+                    <div class="charts-mode-toggle-container">
+                        <span class="toggle-label">Режим отображения:</span>
+                        <div class="toggle-switch" id="blockDetailsChartsToggle">
+                            <div class="toggle-option active" data-mode="count">ШТ</div>
+                            <div class="toggle-option" data-mode="percent">%</div>
+                            <div class="toggle-slider"></div>
                         </div>
-                        <div class="filter-item">
-                            <span class="filter-label">Группировка:</span>
-                            <select id="empDynGranularity" class="date-input">
-                                <option value="week">Неделя</option>
-                                <option value="month" selected>Месяц</option>
-                            </select>
+                    </div>
+
+                    <div class="checklist-chart-card">
+                        <div class="checklist-chart-header">
+                            <h5 id="blockDetailsChartTitle">Детализация по выбранному блоку</h5>
                         </div>
-                        <div class="filter-item">
-                            <span class="filter-label">Сравнить с:</span>
-                            <select id="empDynCompareOperator" class="date-input">
-                                <option value="">Не выбрано</option>
-                            </select>
-                        </div>
-                        <div class="filter-item">
-                            <button id="empDynUpdateButton" class="btn btn-primary">Обновить</button>
+                        <div class="checklist-chart-wrapper">
+                            <canvas id="blockDetailsChart"></canvas>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Прокручиваемый контент -->
-            <div class="scrollable-content">
-                <!-- Информация о сотруднике -->
-                <!-- Информация о сотруднике и статистика -->
-                <div id="empDynEmployeeInfo" class="employee-info-section" style="display: none;">
-                    <div class="employee-header-card">
-                        <div class="employee-avatar">
-                            <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <circle cx="24" cy="24" r="24" fill="#007bff" opacity="0.1"/>
-                                <path d="M24 24C27.3137 24 30 21.3137 30 18C30 14.6863 27.3137 12 24 12C20.6863 12 18 14.6863 18 18C18 21.3137 20.6863 24 24 24Z" fill="#007bff"/>
-                                <path d="M24 27C17.3726 27 12 29.6863 12 33V36H36V33C36 29.6863 30.6274 27 24 27Z" fill="#007bff"/>
-                            </svg>
-                        </div>
-                        <div class="employee-main-info">
-                            <h3 class="employee-name" id="empDynName">-</h3>
-                            <div class="employee-meta">
-                                <span class="meta-item">
-                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                        <path d="M8 8C9.65685 8 11 6.65685 11 5C11 3.34315 9.65685 2 8 2C6.34315 2 5 3.34315 5 5C5 6.65685 6.34315 8 8 8Z" fill="#6c757d"/>
-                                        <path d="M8 9.5C5.51472 9.5 3.5 10.7909 3.5 12.375V14H12.5V12.375C12.5 10.7909 10.4853 9.5 8 9.5Z" fill="#6c757d"/>
-                                    </svg>
-                                    <span id="empDynGroup">-</span>
-                                </span>
-                                <span class="meta-item">
-                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                        <path d="M8 2L2 5L8 8L14 5L8 2Z" fill="#6c757d"/>
-                                        <path d="M2 7V11L8 14L14 11V7L8 10L2 7Z" fill="#6c757d"/>
-                                    </svg>
-                                    <span id="empDynKc">-</span>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="employee-stats-grid">
-                        <div class="stat-card-modern">
-                            <div class="stat-icon stat-icon-blue">
-                                📊
-                            </div>
-                            <div class="stat-content">
-                                <div class="stat-label">Всего звонков</div>
-                                <div class="stat-value" id="empDynTotalCalls">0</div>
-                            </div>
-                        </div>
-                        
-                        <div class="stat-card-modern">
-                            <div class="stat-icon stat-icon-yellow-light">
-                                ✅
-                            </div>
-                            <div class="stat-content">
-                                <div class="stat-label">Всего отклонений</div>
-                                <div class="stat-value" id="empDynTotalIssues">0</div>
-                            </div>
-                        </div>
-                        
-                        <div class="stat-card-modern">
-                            <div class="stat-icon stat-icon-yellow">
-                                ⚠️
-                            </div>
-                            <div class="stat-content">
-                                <div class="stat-label">% отклонений</div>
-                                <div class="stat-value" id="empDynIssueRate">0%</div>
-                            </div>
-                        </div>
-                        
-                        <div class="stat-card-modern">
-                            <div class="stat-icon stat-icon-orange">
-                                📈
-                            </div>
-                            <div class="stat-content">
-                                <div class="stat-label">Средний % за период</div>
-                                <div class="stat-value" id="empDynAvgRate">0%</div>
-                            </div>
-                        </div>
-                    </div>
+            <div class="collapsible-section">
+                <div class="collapsible-header" id="employeeDetailsSectionHeader">
+                    <h4 style="margin: 0; display: flex; align-items: center;">
+                        <span class="collapse-arrow">▼</span>
+                        <span style="margin-left: 10px;">Детализация по сотруднику</span>
+                    </h4>
                 </div>
-                
-                <!-- Рейтинг сотрудника -->
-                <div id="empDynRankingSection" class="ranking-section" style="display: none;">
-                    <h4 class="section-title">🏆 Рейтинг сотрудника</h4>
-                    <div class="ranking-cards-grid">
-                        <div class="ranking-card">
-                            <div class="ranking-header">
-                                <span class="ranking-icon">🌍</span>
-                                <span class="ranking-title">Общий зачет</span>
-                            </div>
-                            <div class="ranking-position">
-                                <span class="rank-number" id="empDynRankOverall">-</span>
-                                <span class="rank-total">из <span id="empDynRankOverallTotal">-</span></span>
-                            </div>
-                            <div class="ranking-percentage">
-                                <span id="empDynRankOverallPercent">-%</span> отклонений
-                            </div>
-                        </div>
-                        
-                        <div class="ranking-card">
-                            <div class="ranking-header">
-                                <span class="ranking-icon">🏢</span>
-                                <span class="ranking-title">По КЦ</span>
-                            </div>
-                            <div class="ranking-position">
-                                <span class="rank-number" id="empDynRankKc">-</span>
-                                <span class="rank-total">из <span id="empDynRankKcTotal">-</span></span>
-                            </div>
-                            <div class="ranking-percentage">
-                                <span id="empDynRankKcPercent">-%</span> отклонений
-                            </div>
-                        </div>
-                        
-                        <div class="ranking-card">
-                            <div class="ranking-header">
-                                <span class="ranking-icon">👥</span>
-                                <span class="ranking-title">По группе</span>
-                            </div>
-                            <div class="ranking-position">
-                                <span class="rank-number" id="empDynRankGroup">-</span>
-                                <span class="rank-total">из <span id="empDynRankGroupTotal">-</span></span>
-                            </div>
-                            <div class="ranking-percentage">
-                                <span id="empDynRankGroupPercent">-%</span> отклонений
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- График динамики -->
-                <div class="collapsible-section">
-                    <div class="collapsible-header" id="empDynChartHeader">
-                        <h4 style="margin: 0; display: flex; align-items: center;">
-                            <span class="collapse-arrow">▼</span>
-                            <span style="margin-left: 10px;">График динамики</span>
-                        </h4>
-                    </div>
-                    <div class="collapsible-content show" id="empDynChartContent">
-                        <div class="chart-card">
-                            <canvas id="empDynChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Таблица с данными по периодам -->
-                <div class="collapsible-section">
-                    <div class="collapsible-header" id="empDynTableHeader">
-                        <h4 style="margin: 0; display: flex; align-items: center;">
-                            <span class="collapse-arrow">▼</span>
-                            <span style="margin-left: 10px;">Детализация по периодам</span>
-                        </h4>
-                    </div>
-                    <div class="collapsible-content show" id="empDynTableContent">
-                        <div id="empDynLoading" class="loading">Выберите сотрудника для просмотра данных</div>
-                        <table id="empDynTable" class="data-table" style="display: none;">
-                            <thead>
-                                <tr>
-                                    <th>Период</th>
-                                    <th>Звонков</th>
-                                    <th>Отклонений</th>
-                                    <th>% отклонений</th>
-                                    <th>Изменение</th>
-                                </tr>
-                            </thead>
-                            <tbody id="empDynTableBody">
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Детализация по блокам 0 уровня -->
-                <div class="collapsible-section" id="empDynBlocksSection" style="display: none;">
-                    <div class="collapsible-header" id="empDynBlocksHeader">
-                        <h4 style="margin: 0; display: flex; align-items: center;">
-                            <span class="collapse-arrow">▼</span>
-                            <span style="margin-left: 10px;">📊 Детализация по блокам (Block 0)</span>
-                        </h4>
-                    </div>
-                    <div class="collapsible-content show" id="empDynBlocksContent">
-                        <div class="charts-grid">
-                            <div class="chart-card">
-                                <h5>Топ-3 проблемных блока</h5>
-                                <canvas id="empDynTopBlocksChart"></canvas>
-                            </div>
-                            <div class="chart-card">
-                                <h5>Динамика по блокам</h5>
-                                <canvas id="empDynBlocksDynamicsChart"></canvas>
-                            </div>
-                            <div class="chart-card">
-                                <h5>Распределение отклонений</h5>
-                                <canvas id="empDynBlocksDistributionChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Детализация по блокам 1 уровня -->
-                <div class="collapsible-section" id="empDynBlocks1Section" style="display: none;">
-                    <div class="collapsible-header" id="empDynBlocks1Header">
-                        <h4 style="margin: 0; display: flex; align-items: center;">
-                            <span class="collapse-arrow">▼</span>
-                            <span style="margin-left: 10px;">📈 Детализация по блокам (Block 1)</span>
-                        </h4>
-                    </div>
-                    <div class="collapsible-content show" id="empDynBlocks1Content">
-                        <div class="charts-grid">
-                            <div class="chart-card">
-                                <h5>Топ-5 проблемных блоков</h5>
-                                <canvas id="empDynTopBlocks1Chart"></canvas>
-                            </div>
-                            <div class="chart-card">
-                                <h5>Динамика по блокам</h5>
-                                <canvas id="empDynBlocks1DynamicsChart"></canvas>
-                            </div>
-                            <div class="chart-card">
-                                <h5>Распределение отклонений</h5>
-                                <canvas id="empDynBlocks1DistributionChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Сравнение с другим сотрудником -->
-                <div class="collapsible-section" id="empDynComparisonSection" style="display: none;">
-                    <div class="collapsible-header" id="empDynComparisonHeader">
-                        <h4 style="margin: 0; display: flex; align-items: center;">
-                            <span class="collapse-arrow">▼</span>
-                            <span style="margin-left: 10px;">Сравнение сотрудников</span>
-                        </h4>
-                    </div>
-                    <div class="collapsible-content show" id="empDynComparisonContent">
-                        <!-- Сравнительная статистика -->
-                        <div class="comparison-stats-grid">
-                            <div class="comparison-card">
-                                <h5 id="empDynCompareEmployee1Name">Сотрудник 1</h5>
-                                <div class="comparison-stats">
-                                    <div class="comparison-stat">
-                                        <span class="stat-label">Всего записей:</span>
-                                        <span class="stat-value" id="empDynCompare1Total">0</span>
-                                    </div>
-                                    <div class="comparison-stat">
-                                        <span class="stat-label">Отклонений:</span>
-                                        <span class="stat-value" id="empDynCompare1Issues">0</span>
-                                    </div>
-                                    <div class="comparison-stat">
-                                        <span class="stat-label">% отклонений:</span>
-                                        <span class="stat-value" id="empDynCompare1Rate">0%</span>
-                                    </div>
+                <div class="collapsible-content show" id="employeeDetailsSectionContent">
+                    <div class="checklist-dashboard">
+                        <div class="filters-container">
+                            <div class="filter-group">
+                                <div class="filter-item">
+                                    <span class="filter-label">Дашборд:</span>
+                                    <select id="empDetailsDashboard">
+                                        <option value="Автооценка" selected>Автооценка</option>
+                                        <option value="Автооценка УАВ/ПреХард">Автооценка УАВ/ПреХард</option>
+                                    </select>
+                                </div>
+                                <div class="filter-item">
+                                    <span class="filter-label">Период с:</span>
+                                    <input type="date" id="empDetailsDateFrom" value="2025-05-01" class="date-input">
+                                </div>
+                                <div class="filter-item">
+                                    <span class="filter-label">по:</span>
+                                    <input type="date" id="empDetailsDateTo" value="2025-07-30" class="date-input">
+                                </div>
+                                <div class="filter-item">
+                                    <span class="filter-label">Колл-центр:</span>
+                                    <select id="empDetailsKcFilter">
+                                        <option value="">Все КЦ</option>
+                                    </select>
                                 </div>
                             </div>
-                            <div class="comparison-vs">VS</div>
-                            <div class="comparison-card">
-                                <h5 id="empDynCompareEmployee2Name">Сотрудник 2</h5>
-                                <div class="comparison-stats">
-                                    <div class="comparison-stat">
-                                        <span class="stat-label">Всего записей:</span>
-                                        <span class="stat-value" id="empDynCompare2Total">0</span>
+
+                            <div class="filter-group">
+                                <div class="filter-item">
+                                    <span class="filter-label">Группа:</span>
+                                    <select id="empDetailsGroupFilter">
+                                        <option value="">Все группы</option>
+                                    </select>
+                                </div>
+                                <div class="filter-item">
+                                    <span class="filter-label">Сотрудник:</span>
+                                    <select id="empDetailsOperatorFilter">
+                                        <option value="">Выберите сотрудника</option>
+                                    </select>
+                                </div>
+                                <div class="filter-item">
+                                    <span class="filter-label">Режим сравнения:</span>
+                                    <select id="empDetailsCompareMode">
+                                        <option value="single" selected>Один сотрудник</option>
+                                        <option value="compare">Сравнение сотрудников</option>
+                                    </select>
+                                </div>
+                                <div class="filter-item" id="empDetailsSecondOperatorContainer" style="display: none;">
+                                    <span class="filter-label">Сравнить с:</span>
+                                    <select id="empDetailsSecondOperator">
+                                        <option value="">Выберите второго сотрудника</option>
+                                    </select>
+                                </div>
+                                <div class="filter-item">
+                                    <button id="empDetailsUpdateButton" class="btn btn-primary">Обновить</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="checklist-stats-grid" id="empDetailsStatsGrid">
+                            <div class="checklist-stat-card">
+                                <div class="checklist-stat-number" id="empDetailsTotalRecords">0</div>
+                                <div class="checklist-stat-label">Всего записей</div>
+                            </div>
+                            <div class="checklist-stat-card">
+                                <div class="checklist-stat-number" id="empDetailsTotalIssues">0</div>
+                                <div class="checklist-stat-label">Проблем (score=1)</div>
+                            </div>
+                            <div class="checklist-stat-card">
+                                <div class="checklist-stat-number" id="empDetailsIssueRate">0%</div>
+                                <div class="checklist-stat-label">% отклонений</div>
+                            </div>
+                            <div class="checklist-stat-card">
+                                <div class="checklist-stat-number" id="empDetailsDateRange">0</div>
+                                <div class="checklist-stat-label">Дней в периоде</div>
+                            </div>
+                            <div class="checklist-stat-card">
+                                <div class="checklist-stat-number" id="empDetailsTopBlock">-</div>
+                                <div class="checklist-stat-label">Топ проблемный блок</div>
+                            </div>
+                            <div class="checklist-stat-card">
+                                <div class="checklist-stat-number" id="empDetailsAvgDaily">0</div>
+                                <div class="checklist-stat-label">Среднее в день</div>
+                            </div>
+                        </div>
+
+                        <div class="checklist-summary-section" id="empDetailsSummarySection">
+                            <h3 style="margin-bottom: 15px; color: #2c3e50;">👤 Профиль сотрудника</h3>
+                            <div class="checklist-summary-grid">
+                                <div class="checklist-summary-item">
+                                    <div class="checklist-summary-title">ФИО</div>
+                                    <div class="checklist-summary-value" id="empDetailsName">-</div>
+                                </div>
+                                <div class="checklist-summary-item">
+                                    <div class="checklist-summary-title">Группа</div>
+                                    <div class="checklist-summary-value" id="empDetailsGroup">-</div>
+                                </div>
+                                <div class="checklist-summary-item">
+                                    <div class="checklist-summary-title">Колл-центр</div>
+                                    <div class="checklist-summary-value" id="empDetailsKc">-</div>
+                                </div>
+                                <div class="checklist-summary-item">
+                                    <div class="checklist-summary-title">Рейтинг в группе</div>
+                                    <div class="checklist-summary-value" id="empDetailsRankInGroup">-</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="collapsible-section">
+                            <div class="collapsible-header" id="empDetailsBlocksHeader">
+                                <h4 style="margin: 0; display: flex; align-items: center;">
+                                    <span class="collapse-arrow">▼</span>
+                                    <span style="margin-left: 10px;">📊 Детализация по блокам</span>
+                                </h4>
+                            </div>
+                            <div class="collapsible-content show" id="empDetailsBlocksContent">
+                                <div class="checklist-analytics-section">
+                                    <div class="checklist-chart-container">
+                                        <div class="checklist-chart-title">📊 Статистика по блокам 0 уровня</div>
+                                        <div id="empDetailsBlock0Chart" class="checklist-bar-chart"></div>
                                     </div>
-                                    <div class="comparison-stat">
-                                        <span class="stat-label">Отклонений:</span>
-                                        <span class="stat-value" id="empDynCompare2Issues">0</span>
-                                    </div>
-                                    <div class="comparison-stat">
-                                        <span class="stat-label">% отклонений:</span>
-                                        <span class="stat-value" id="empDynCompare2Rate">0%</span>
+                                    <div class="checklist-chart-container">
+                                        <div class="checklist-chart-title">📊 Статистика по блокам 1 уровня</div>
+                                        <div id="empDetailsBlock1Chart" class="checklist-bar-chart"></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Графики сравнения -->
-                        <div class="charts-grid">
-                            <div class="chart-card">
-                                <h5>Сравнение динамики</h5>
-                                <canvas id="empDynComparisonDynamicsChart"></canvas>
+                        <div class="collapsible-section">
+                            <div class="collapsible-header" id="empDetailsDynamicsHeader">
+                                <h4 style="margin: 0; display: flex; align-items: center;">
+                                    <span class="collapse-arrow">▼</span>
+                                    <span style="margin-left: 10px;">📈 Динамика по времени</span>
+                                </h4>
                             </div>
-                            <div class="chart-card">
-                                <h5>Сравнение по блокам</h5>
-                                <canvas id="empDynComparisonBlocksChart"></canvas>
+                            <div class="collapsible-content show" id="empDetailsDynamicsContent">
+                                <div class="checklist-dynamics-charts">
+                                    <div class="checklist-chart-card">
+                                        <div class="checklist-chart-header">
+                                            <h5>Динамика отклонений по дням</h5>
+                                        </div>
+                                        <div class="checklist-chart-wrapper">
+                                            <canvas id="empDetailsDailyChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="collapsible-section">
+                            <div class="collapsible-header" id="empDetailsRecordsHeader">
+                                <h4 style="margin: 0; display: flex; align-items: center;">
+                                    <span class="collapse-arrow">▼</span>
+                                    <span style="margin-left: 10px;">📋 Подробные записи</span>
+                                </h4>
+                            </div>
+                            <div class="collapsible-content show" id="empDetailsRecordsContent">
+                                <div class="checklist-table-container">
+                                    <div id="empDetailsLoading" class="loading">Выберите сотрудника для просмотра данных</div>
+                                    <table id="empDetailsTable" style="display: none;">
+                                        <thead>
+                                            <tr>
+                                                <th title="Нажмите для сортировки">Дата</th>
+                                                <th title="Нажмите для сортировки">Блок 0</th>
+                                                <th title="Нажмите для сортировки">Блок 1</th>
+                                                <th title="Нажмите для сортировки">Блок 2</th>
+                                                <th title="Нажмите для сортировки">Балл</th>
+                                                <th title="Нажмите для сортировки">Статус</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="empDetailsTableBody">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="collapsible-section" id="empDetailsCompareSection" style="display: none;">
+                            <div class="collapsible-header" id="empDetailsCompareHeader">
+                                <h4 style="margin: 0; display: flex; align-items: center;">
+                                    <span class="collapse-arrow">▼</span>
+                                    <span style="margin-left: 10px;">⚖️ Сравнение сотрудников</span>
+                                </h4>
+                            </div>
+                            <div class="collapsible-content show" id="empDetailsCompareContent">
+                                <div class="employee-comparison-container">
+                                    <div class="comparison-stats-grid">
+                                        <div class="comparison-employee-card">
+                                            <h5 id="empDetailsFirstEmployeeName">Сотрудник 1</h5>
+                                            <div class="comparison-stats">
+                                                <div class="comparison-stat">
+                                                    <span class="stat-label">Всего записей:</span>
+                                                    <span class="stat-value" id="empDetailsFirstTotal">0</span>
+                                                </div>
+                                                <div class="comparison-stat">
+                                                    <span class="stat-label">Проблем:</span>
+                                                    <span class="stat-value" id="empDetailsFirstIssues">0</span>
+                                                </div>
+                                                <div class="comparison-stat">
+                                                    <span class="stat-label">% отклонений:</span>
+                                                    <span class="stat-value" id="empDetailsFirstRate">0%</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="comparison-vs">VS</div>
+                                        <div class="comparison-employee-card">
+                                            <h5 id="empDetailsSecondEmployeeName">Сотрудник 2</h5>
+                                            <div class="comparison-stats">
+                                                <div class="comparison-stat">
+                                                    <span class="stat-label">Всего записей:</span>
+                                                    <span class="stat-value" id="empDetailsSecondTotal">0</span>
+                                                </div>
+                                                <div class="comparison-stat">
+                                                    <span class="stat-label">Проблем:</span>
+                                                    <span class="stat-value" id="empDetailsSecondIssues">0</span>
+                                                </div>
+                                                <div class="comparison-stat">
+                                                    <span class="stat-label">% отклонений:</span>
+                                                    <span class="stat-value" id="empDetailsSecondRate">0%</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="comparison-chart-container">
+                                        <div class="checklist-chart-card">
+                                            <div class="checklist-chart-header">
+                                                <h5>Сравнение по блокам 0 уровня</h5>
+                                            </div>
+                                            <div class="checklist-chart-wrapper">
+                                                <canvas id="empDetailsComparisonChart"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1832,6 +1801,7 @@
         <script src="js/modules/company-dynamics.js"></script>
         <script src="js/modules/charts.js"></script>
         <script src="js/modules/checklist-charts.js"></script>
+        <script src="js/modules/block-structure.js"></script>
         <script src="js/modules/block-details.js"></script>
         <script src="js/checklist-dashboard.js"></script>
         <script src="js/employee-details-dashboard.js"></script>

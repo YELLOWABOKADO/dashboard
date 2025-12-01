@@ -2,7 +2,7 @@
  * Модуль управления вкладками
  */
 
-let currentTab = 'company';
+let currentTab = 'org';
 
 // Инициализация вкладок
 function initTabs() {
@@ -10,6 +10,12 @@ function initTabs() {
 
     const tabButtons = document.querySelectorAll('.tab-button');
     const tabContents = document.querySelectorAll('.tab-content');
+
+    // Выставляем текущую вкладку по активной кнопке разметки
+    const activeButton = document.querySelector('.tab-button.active');
+    if (activeButton) {
+        currentTab = activeButton.getAttribute('data-tab');
+    }
 
     console.log('Найдено кнопок вкладок:', tabButtons.length);
     console.log('Найдено содержимого вкладок:', tabContents.length);
@@ -50,42 +56,45 @@ function initTabs() {
             // Загружаем данные для новой активной вкладки
             setTimeout(() => {
                 console.log('=== Переключаемся на вкладку:', tabId);
-
-                // Специальная обработка для вкладки "Детализация по блокам"
-                if (tabId === 'blockDetails') {
-                    console.log('Инициализируем модуль детализации по блокам');
-                    if (typeof initBlockDetailsModule === 'function') {
-                        try {
-                            initBlockDetailsModule();
-                            console.log('Модуль детализации по блокам инициализирован успешно');
-                        } catch (error) {
-                            console.error('Ошибка инициализации модуля детализации по блокам:', error);
-                        }
-                    } else {
-                        console.error('Функция initBlockDetailsModule не найдена');
-                    }
-                } 
-                // Специальная обработка для вкладки "Детализация по сотруднику"
-                else if (tabId === 'employeeDetails') {
-                    console.log('Инициализируем модуль детализации по сотруднику');
-                    if (typeof initEmployeeDetailsModule === 'function') {
-                        try {
-                            initEmployeeDetailsModule();
-                            console.log('Модуль детализации по сотруднику инициализирован успешно');
-                        } catch (error) {
-                            console.error('Ошибка инициализации модуля детализации по сотруднику:', error);
-                        }
-                    } else {
-                        console.error('Функция initEmployeeDetailsModule не найдена');
-                    }
+                if (typeof updateActiveTab === 'function') {
+                    updateActiveTab();
                 } else {
-                    if (typeof updateActiveTab === 'function') {
-                        updateActiveTab();
-                    } else {
-                        console.log('updateActiveTab не готова');
-                    }
+                    console.log('updateActiveTab не готова');
                 }
             }, 200);
+        });
+    });
+}
+
+// Локальный переключатель внутренних табов детализации
+function initDetailsInnerTabs() {
+    const buttons = document.querySelectorAll('.details-tab-button');
+    const sections = document.querySelectorAll('.details-inner-section');
+
+    if (!buttons.length || !sections.length) {
+        return;
+    }
+
+    buttons.forEach(button => {
+        button.addEventListener('click', () => {
+            const target = button.getAttribute('data-target');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            sections.forEach(section => section.classList.remove('active'));
+
+            button.classList.add('active');
+            const targetSection = document.getElementById(target);
+            if (targetSection) {
+                targetSection.classList.add('active');
+            }
+
+            if (target === 'detailsBlocksSection' && typeof initBlockDetailsModule === 'function' && !window.blockDetailsInitialized) {
+                initBlockDetailsModule();
+                window.blockDetailsInitialized = true;
+            }
+
+            if (target === 'detailsChecklistSection' && typeof window.checklistDashboard === 'object' && typeof window.checklistDashboard.applyFilters === 'function') {
+                window.checklistDashboard.applyFilters();
+            }
         });
     });
 }
@@ -93,6 +102,7 @@ function initTabs() {
 // Экспорт для браузера
 if (typeof window !== 'undefined') {
     window.initTabs = initTabs;
+    window.initDetailsInnerTabs = initDetailsInnerTabs;
     window.getCurrentTab = () => currentTab;
     window.setCurrentTab = (tab) => { currentTab = tab; };
 }

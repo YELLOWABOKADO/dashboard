@@ -243,10 +243,8 @@ function renderEmployeesTable(employeesData) {
 
         // Обновляем высоту сворачивающегося блока после отрисовки
         const content = document.getElementById('employeesTableContent');
-        if (content && !content.classList.contains('collapsed')) {
-            setTimeout(() => {
-                content.style.maxHeight = content.scrollHeight + 'px';
-            }, 50);
+        if (content && !content.classList.contains('collapsed') && typeof refreshCollapsibleHeight === 'function') {
+            setTimeout(() => refreshCollapsibleHeight(content), 60);
         }
     }, 100);
 }

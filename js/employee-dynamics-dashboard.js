@@ -6,6 +6,8 @@ let empDynFilteredData = [];
 let empDynChart = null;
 let empDynBlockCharts = {}; // Графики по блокам
 let empDynComparisonChart = null; // График сравнения
+let empDynChartMode = 'percent';
+let empDynLastGroupedData = [];
 
 // Загрузка данных
 async function loadEmployeeDynamicsData() {
@@ -86,6 +88,7 @@ async function applyEmployeeDynamicsFilters() {
     const granularity = document.getElementById('empDynGranularity').value;
     
     if (!selectedOperator) {
+        empDynLastGroupedData = [];
         document.getElementById('empDynLoading').innerHTML = 'Выберите сотрудника для просмотра данных';
         document.getElementById('empDynTable').style.display = 'none';
         document.getElementById('empDynEmployeeInfo').style.display = 'none';
@@ -108,6 +111,7 @@ async function applyEmployeeDynamicsFilters() {
     });
     
     if (empDynFilteredData.length === 0) {
+        empDynLastGroupedData = [];
         document.getElementById('empDynLoading').innerHTML = 'Нет данных для выбранного периода';
         return;
     }
@@ -124,6 +128,7 @@ async function applyEmployeeDynamicsFilters() {
     // Группируем данные по выбранной гранулярности
     const groupedData = groupDataByPeriodNew(empDynFilteredData, granularity);
     console.log('[Employee Dynamics] Сгруппировано периодов:', groupedData.length);
+    empDynLastGroupedData = groupedData;
     
     // Обновляем статистику
     updateEmployeeDynamicsStatsNew(empDynFilteredData);
@@ -168,6 +173,10 @@ async function applyEmployeeDynamicsFilters() {
     
     document.getElementById('empDynLoading').style.display = 'none';
     document.getElementById('empDynTable').style.display = 'table';
+
+    if (typeof refreshCollapsibleHeight === 'function') {
+        refreshCollapsibleHeight('employeeDynamicsContent');
+    }
     
     console.log('[Employee Dynamics] ✅ Данные обновлены успешно');
 }
@@ -498,6 +507,14 @@ function updateEmployeeDynamicsChartNew(groupedData) {
     if (empDynChart) {
         empDynChart.destroy();
     }
+
+    const isPercentMode = empDynChartMode === 'percent';
+    const primaryLabel = isPercentMode ? '% отклонений' : 'Отклонений, шт';
+    const primaryData = isPercentMode
+        ? groupedData.map(item => item.rate)
+        : groupedData.map(item => item.issues);
+    const secondaryLabel = 'Количество записей';
+    const secondaryData = groupedData.map(item => item.total);
     
     empDynChart = new Chart(ctx, {
         type: 'line',
@@ -505,16 +522,16 @@ function updateEmployeeDynamicsChartNew(groupedData) {
             labels: groupedData.map(item => item.period),
             datasets: [
                 {
-                    label: '% отклонений',
-                    data: groupedData.map(item => item.rate),
+                    label: primaryLabel,
+                    data: primaryData,
                     borderColor: '#EE964B',
                     backgroundColor: 'rgba(238, 150, 75, 0.1)',
                     tension: 0.3,
                     yAxisID: 'y'
                 },
                 {
-                    label: 'Количество записей',
-                    data: groupedData.map(item => item.total),
+                    label: secondaryLabel,
+                    data: secondaryData,
                     borderColor: '#0D3B66',
                     backgroundColor: 'rgba(13, 59, 102, 0.1)',
                     tension: 0.3,
@@ -532,6 +549,18 @@ function updateEmployeeDynamicsChartNew(groupedData) {
             plugins: {
                 legend: {
                     position: 'top'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.dataset.label || '';
+                            const value = context.parsed.y;
+                            if (context.dataset.yAxisID === 'y') {
+                                return `${label}: ${isPercentMode ? value.toFixed(2) + '%' : value.toLocaleString()}`;
+                            }
+                            return `${label}: ${value.toLocaleString()}`;
+                        }
+                    }
                 }
             },
             scales: {
@@ -541,7 +570,7 @@ function updateEmployeeDynamicsChartNew(groupedData) {
                     position: 'left',
                     title: {
                         display: true,
-                        text: '% отклонений'
+                        text: primaryLabel
                     }
                 },
                 y1: {
@@ -550,7 +579,7 @@ function updateEmployeeDynamicsChartNew(groupedData) {
                     position: 'right',
                     title: {
                         display: true,
-                        text: 'Количество записей'
+                        text: secondaryLabel
                     },
                     grid: {
                         drawOnChartArea: false
@@ -684,24 +713,43 @@ function updateBlocksDistributionChart(blockStats) {
         empDynBlockCharts.distribution.destroy();
     }
     
-    const blocks = Object.keys(blockStats);
+    const blocks = Object.keys(blockStats).sort((a, b) => blockStats[a].issues - blockStats[b].issues);
     const colors = ['#EE964B', '#F4D35E', '#FAF0CA', '#0D3B66', '#7c9ff5', '#9b8fd9'];
+
+    if (ctx.parentElement) {
+        ctx.parentElement.style.height = `${Math.max(220, blocks.length * 32)}px`;
+    }
     
     empDynBlockCharts.distribution = new Chart(ctx, {
-        type: 'pie',
+        type: 'bar',
         data: {
             labels: blocks,
             datasets: [{
+                label: 'Отклонения',
                 data: blocks.map(b => blockStats[b].issues),
                 backgroundColor: colors
             }]
         },
         options: {
             responsive: true,
-            maintainAspectRatio: true,
+            maintainAspectRatio: false,
+            indexAxis: 'y',
             plugins: {
                 legend: {
-                    position: 'right'
+                    display: false
+                }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    ticks: {
+                        precision: 0
+                    }
+                },
+                y: {
+                    ticks: {
+                        autoSkip: false
+                    }
                 }
             }
         }
@@ -844,12 +892,14 @@ function updateBlocks1DistributionChart(blockStats) {
     const colors = ['#EE964B', '#F4D35E', '#FAF0CA', '#0D3B66', '#7c9ff5', '#9b8fd9', '#FAF0CA', '#EE964B'];
     
     empDynBlock1Charts.distribution = new Chart(ctx, {
-        type: 'doughnut',
+        type: 'bar',
         data: {
             labels: blocks,
             datasets: [{
                 data: blocks.map(b => blockStats[b].issues),
-                backgroundColor: colors
+                backgroundColor: blocks.map((_, idx) => colors[idx % colors.length]),
+                borderColor: '#FF9800',
+                borderWidth: 1
             }]
         },
         options: {
@@ -857,9 +907,27 @@ function updateBlocks1DistributionChart(blockStats) {
             maintainAspectRatio: true,
             plugins: {
                 legend: {
-                    position: 'right',
-                    labels: {
-                        boxWidth: 12,
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const value = context.parsed.x;
+                            return `${context.label}: ${value.toLocaleString()}`;
+                        }
+                    }
+                }
+            },
+            indexAxis: 'y',
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: value => value.toLocaleString()
+                    }
+                },
+                y: {
+                    ticks: {
                         font: {
                             size: 11
                         }
@@ -1041,6 +1109,21 @@ function initEmployeeDynamicsEventListeners() {
     if (updateButton) {
         updateButton.addEventListener('click', applyEmployeeDynamicsFilters);
         console.log('[Employee Dynamics] Обработчик кнопки обновления добавлен');
+    }
+
+    const toggleButtons = document.querySelectorAll('.empdyn-chart-toggle .toggle-btn');
+    if (toggleButtons && toggleButtons.length > 0) {
+        toggleButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const mode = btn.getAttribute('data-mode');
+                if (!mode) return;
+                empDynChartMode = mode;
+                toggleButtons.forEach(b => b.classList.toggle('active', b === btn));
+                if (empDynLastGroupedData && empDynLastGroupedData.length > 0) {
+                    updateEmployeeDynamicsChartNew(empDynLastGroupedData);
+                }
+            });
+        });
     }
     
     // Инициализация сворачиваемых секций
